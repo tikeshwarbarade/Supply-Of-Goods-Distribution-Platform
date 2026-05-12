@@ -1,0 +1,68 @@
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+  <a class="navbar-brand" href="#">Supply-of-Goods M&DP</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'MANUFACTURER'" [routerLink]="['/create-product']">Create Products</a>
+
+      </li>
+      <!-- <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'MANUFACTURER'" [routerLink]="['/get-orders']">Get Orders</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'MANUFACTURER'" [routerLink]="['/product-allocation']">Products Allocate</a>
+
+      </li> -->
+      <!-- <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/create-product']">Create Products</a>
+
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/get-orders']">Get Orders</a>
+      </li>
+    
+      
+      
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/place-product']">Place Order</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/add-inventory']">Add Inventory</a>
+      </li>
+
+    
+
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'CONSUMER'" [routerLink]="['/consumer-place-order']">Place Order</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="roleName === 'CONSUMER'" [routerLink]="['/consumer-get-orders']">Orders</a>
+      </li>
+     
+    </ul>
+ 
+    <!-- Login/Logout buttons -->
+    <ul class="navbar-nav">
+      <li *ngIf="!IsLoggin" class="nav-item">
+        <a class="nav-link" [routerLink]="['/login']">Login</a>
+      </li>
+      <li *ngIf="IsLoggin" class="nav-item">
+        <a class="nav-link" (click)="logout()" [routerLink]="['/login']">Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<body  >
+  <div class="container mt-4 mx-5">
+    <router-outlet>    
+    </router-outlet>
+  </div>
+
+</body>
+

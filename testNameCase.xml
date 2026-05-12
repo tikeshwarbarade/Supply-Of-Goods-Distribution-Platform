@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+
+    <!-- =============================== -->
+    <!-- Backend (Spring Boot) Tests -->
+    <!-- =============================== -->
+
+    <property name="testConsumerShouldGetAllOrders" value="testConsumerShouldGetAllOrders" />
+    <property name="testAddInventory" value="testAddInventory" />
+    <property name="testGetAllProductsOfManufacturer" value="testGetAllProductsOfManufacturer" />
+    <property name="testLoginUser" value="testLoginUser" />
+    <property name="testManufacturerApiShouldBeForbiddenForOtherUser"
+        value="testManufacturerApiShouldBeForbiddenForOtherUser" />
+    <property name="testUpdateInventory" value="testUpdateInventory" />
+    <property name="testWholesalerShouldPlaceOrder" value="testWholesalerShouldPlaceOrder" />
+    <property name="testRegisterUser" value="testRegisterUser" />
+    <property name="testCreateProduct" value="testCreateProduct" />
+    <property name="testConsumerApiShouldBeForbiddenForOtherUser"
+        value="testConsumerApiShouldBeForbiddenForOtherUser" />
+    <property name="testWholesalerApiShouldBeForbiddenForOtherUser"
+        value="testWholesalerApiShouldBeForbiddenForOtherUser" />
+    <property name="testLoginWithWrongUsernameOrPassword"
+        value="testLoginWithWrongUsernameOrPassword" />
+    <property name="testConsumerShouldProvideFeedback" value="testConsumerShouldProvideFeedback" />
+    <property name="testUpdateProduct" value="testUpdateProduct" />
+    <property name="testWholesalerShouldUpdateOrderStatus"
+        value="testWholesalerShouldUpdateOrderStatus" />
+    <property name="testGetAllWholesalerOrders" value="testGetAllWholesalerOrders" />
+    <property name="testGetAllInventories" value="testGetAllInventories" />
+    <property name="testWholesalerShouldBrowseProducts" value="testWholesalerShouldBrowseProducts" />
+    <property name="testConsumerShouldPlaceOrder" value="testConsumerShouldPlaceOrder" />
+
+    <!-- =============================== -->
+    <!-- AddInventoryComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="AddInventoryComponent should create" value="AddInventoryComponent should create" />
+    <property name="AddInventoryComponent should not submit the form with invalid inputs"
+        value="AddInventoryComponent should not submit the form with invalid inputs" />
+    <property name="AddInventoryComponent should submit the form with valid inputs"
+        value="AddInventoryComponent should submit the form with valid inputs" />
+        
+    <!-- =============================== -->
+    <!-- CreateProductsComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="CreateProductsComponent should create"
+        value="CreateProductsComponent should create" />
+    <property name="CreateProductsComponent should not submit the form with invalid inputs"
+        value="CreateProductsComponent should not submit the form with invalid inputs" />
+    <property name="CreateProductsComponent should submit the form with valid inputs"
+        value="CreateProductsComponent should submit the form with valid inputs" />
+
+    <!-- =============================== -->
+    <!-- HttpService Tests -->
+    <!-- =============================== -->
+
+    <property name="HttpService should get products by wholesaler"
+        value="HttpService should get products by wholesaler" />
+    <property name="HttpService should get products by consumers"
+        value="HttpService should get products by consumers" />
+    <property name="HttpService should get orders by wholesalers"
+        value="HttpService should get orders by wholesalers" />
+    <property name="HttpService should get orders by consumers"
+        value="HttpService should get orders by consumers" />
+    <property name="HttpService should get inventory by wholesalers"
+        value="HttpService should get inventory by wholesalers" />
+    <property name="HttpService should get products by manufacturer"
+        value="HttpService should get products by manufacturer" />
+    <property name="HttpService should place order" value="HttpService should place order" />
+    <property name="HttpService should place order for consumer"
+        value="HttpService should place order for consumer" />
+    <property name="HttpService should update order status"
+        value="HttpService should update order status" />
+    <property name="HttpService should add consumer feedback"
+        value="HttpService should add consumer feedback" />
+    <property name="HttpService should create a product" value="HttpService should create a product" />
+    <property name="HttpService should update a product" value="HttpService should update a product" />
+    <property name="HttpService should add inventory" value="HttpService should add inventory" />
+    <property name="HttpService should update inventory" value="HttpService should update inventory" />
+    <property name="HttpService should login" value="HttpService should login" />
+    <property name="HttpService should register user" value="HttpService should register user" />
+
+    <!-- =============================== -->
+    <!-- LoginComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="LoginComponent should have invalid form if username and password are empty"
+        value="LoginComponent should have invalid form if username and password are empty" />
+    <property name="LoginComponent should have invalid form if username or password is empty"
+        value="LoginComponent should have invalid form if username or password is empty" />
+    <property name="LoginComponent should have valid form if username and password are provided"
+        value="LoginComponent should have valid form if username and password are provided" />
+        
+    <!-- =============================== -->
+    <!-- PlaceOrderComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="PlaceOrderComponent should create" value="PlaceOrderComponent should create" />
+    <property name="PlaceOrderComponent should not submit the form with invalid inputs"
+        value="PlaceOrderComponent should not submit the form with invalid inputs" />
+    <property name="PlaceOrderComponent should submit the form with valid inputs"
+        value="PlaceOrderComponent should submit the form with valid inputs" />
+
+    <!-- =============================== -->
+    <!-- RegistrationComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="RegistrationComponent should have invalid form if any field is empty"
+        value="RegistrationComponent should have invalid form if any field is empty" />
+    <property name="RegistrationComponent should have invalid form if email is invalid"
+        value="RegistrationComponent should have invalid form if email is invalid" />
+    <property name="RegistrationComponent should have valid form if all fields are filled correctly"
+        value="RegistrationComponent should have valid form if all fields are filled correctly" />
+
+</properties>
