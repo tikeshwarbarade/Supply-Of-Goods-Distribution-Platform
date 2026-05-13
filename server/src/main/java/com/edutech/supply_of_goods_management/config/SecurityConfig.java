@@ -21,22 +21,24 @@ import com.edutech.supply_of_goods_management.jwt.JwtRequestFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.cors()
+        .and()
+        .csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/api/user/**").permitAll()
+        .antMatchers("/api/manufacturers/**").hasAuthority("MANUFACTURER")
+        .antMatchers("/api/wholesalers/**").hasAuthority("WHOLESALER")
+        .antMatchers("/api/consumers/**").hasAuthority("CONSUMER")
+        .and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.csrf().disable()
-            .authorizeRequests()
-            .antMatchers("/api/user/**").permitAll()
-            .antMatchers("/api/manufacturers/**").hasAuthority("MANUFACTURER")
-            .antMatchers("/api/wholesalers/**").hasAuthority("WHOLESALER")
-            .antMatchers("/api/consumers/**").hasAuthority("CONSUMER")
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    return http.build();
+}
 
-        return http.build();
-    }
 }
 
 // public class SecurityConfig  {

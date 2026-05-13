@@ -20,6 +20,7 @@ public class ConsumerController {
 
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
+    @Autowired private FeedbackService feedbackService;
 
     @GetMapping("/products")
     public List<Product> getProducts() {
@@ -38,4 +39,15 @@ public class ConsumerController {
     public List<Order> get(@RequestParam Long userId) {
         return orderService.getAllOrders(userId);
     }
+
+    @PostMapping("/order/{orderId}/feedback")
+public ResponseEntity<?> addFeedback(
+        @PathVariable Long orderId,
+        @RequestParam Long userId,
+        @RequestBody Feedback feedback) {
+
+    Feedback fb = feedbackService.provideFeedback(orderId, userId, feedback);
+
+    return ResponseEntity.status(201).body(fb);  // ✅ IMPORTANT
+}
 }

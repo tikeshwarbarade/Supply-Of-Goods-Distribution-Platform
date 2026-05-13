@@ -1,1 +1,20 @@
-//todo: complete missing code
+<div class="container">
+
+  <h4>Orders</h4>
+
+  <div *ngFor="let o of orders" class="card p-2 mb-2">
+
+    <p>Quantity: {{o.quantity}}</p>
+    <p>Status: {{o.status}}</p>
+    <p>Product: {{o.product.name}}</p>
+
+    <textarea [(ngModel)]="feedback"></textarea>
+
+    <button class="btn btn-success"
+            (click)="addFeedback(o.id)">
+      Add Feedback
+    </button>
+
+  </div>
+
+</div>

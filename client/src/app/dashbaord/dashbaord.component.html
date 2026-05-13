@@ -1,3 +1,52 @@
-<div class="row text-center">
-<h1 class="text-capitalize text-uppercase">Supply-of-Goods Management and Distribution Platform</h1>
+<div class="container mt-4">
+
+  <h2 class="text-center mb-4">
+    Supply-Of-Goods Management And Distribution Platform
+  </h2>
+
+  <!-- ✅ MANUFACTURER -->
+  <div *ngIf="role === 'MANUFACTURER'" class="card p-4 shadow">
+    <h4>Manage Products</h4>
+    <p>You can create, update and view your products</p>
+
+    <button class="btn btn-primary mt-2"
+            routerLink="/create-product">
+      Go to Create Products
+    </button>
+  </div>
+
+  <!-- ✅ WHOLESALER -->
+  <div *ngIf="role === 'WHOLESALER'" class="card p-4 shadow">
+    <h4>Wholesaler Dashboard</h4>
+    <p>Manage orders and inventory</p>
+
+    <button class="btn btn-success m-1" routerLink="/place-product">
+      Place Order
+    </button>
+
+    <button class="btn btn-info m-1" routerLink="/get-orders">
+      View Orders
+    </button>
+
+    <button class="btn btn-warning m-1" routerLink="/add-inventory">
+      Add Inventory
+    </button>
+  </div>
+
+  <!-- ✅ CONSUMER -->
+  <div *ngIf="role === 'CONSUMER'" class="card p-4 shadow">
+    <h4>Consumer Dashboard</h4>
+    <p>Browse and order products</p>
+
+    <button class="btn btn-success m-1"
+            routerLink="/consumer-place-order">
+      Place Order
+    </button>
+
+    <button class="btn btn-info m-1"
+            routerLink="/consumer-get-orders">
+      View Orders
+    </button>
+  </div>
+
 </div>

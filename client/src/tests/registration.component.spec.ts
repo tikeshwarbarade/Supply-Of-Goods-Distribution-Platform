@@ -77,4 +77,36 @@ describe('RegistrationComponent', () => {
 
     expect(form.valid).toBeTruthy();
   });
+
+  it('should have email control with email validator', () => {
+    const emailControl = component.itemForm.controls['email'];
+    emailControl.setValue('not-an-email');
+    expect(emailControl.hasError('email')).toBeTrue();
+  });
+
+  it('should mark form as valid when all fields are correct', () => {
+    component.itemForm.controls['email'].setValue('valid@test.com');
+    component.itemForm.controls['password'].setValue('pass123');
+    component.itemForm.controls['role'].setValue('CONSUMER');
+    component.itemForm.controls['username'].setValue('validUser');
+    expect(component.itemForm.valid).toBeTrue();
+  });
+
+  it('role control should be invalid when empty', () => {
+    const roleControl = component.itemForm.controls['role'];
+    roleControl.setValue(null);
+    expect(roleControl.valid).toBeFalse();
+  });
+
+  it('username control should be invalid when empty', () => {
+    const usernameControl = component.itemForm.controls['username'];
+    usernameControl.setValue('');
+    expect(usernameControl.hasError('required')).toBeTrue();
+  });
+
+  it('password control should be invalid when empty', () => {
+    const passwordControl = component.itemForm.controls['password'];
+    passwordControl.setValue('');
+    expect(passwordControl.hasError('required')).toBeTrue();
+  });
 });

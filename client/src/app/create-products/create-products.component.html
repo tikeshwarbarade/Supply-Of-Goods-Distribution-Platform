@@ -1,1 +1,60 @@
-//todo: complete missing code
+<div class="container mt-3">
+
+  <h4>Manage Products</h4>
+
+  <form [formGroup]="itemForm" (ngSubmit)="submit()" class="card p-3 mb-3">
+
+    <div class="row">
+      <div class="col-md-4">
+        <input class="form-control" placeholder="Product Name" formControlName="name">
+      </div>
+
+      <div class="col-md-4">
+        <input type="number" class="form-control" placeholder="Stock Quantity" formControlName="stockQuantity">
+      </div>
+
+      <div class="col-md-4">
+        <input type="number" class="form-control" placeholder="Price" formControlName="price">
+      </div>
+    </div>
+
+    <div class="mt-2">
+      <textarea class="form-control" placeholder="Description" formControlName="description"></textarea>
+    </div>
+
+    <button class="btn btn-primary mt-2">Submit</button>
+
+  </form>
+
+  <div class="card p-3">
+    <h5>Product Information</h5>
+
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Sr#</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Description</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let p of products; let i=index">
+          <td>{{i+1}}</td>
+          <td>{{p.name}}</td>
+          <td>{{p.price}}</td>
+          <td>{{p.stockQuantity}}</td>
+          <td>{{p.description}}</td>
+          <td>
+            <button class="btn btn-warning btn-sm"
+                    (click)="editProduct(p)">Edit</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

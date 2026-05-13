@@ -1,1 +1,33 @@
-//todo: complete missing code
+<div class="container d-flex justify-content-center mt-5">
+
+  <div class="card p-4" style="width: 500px;">
+
+    <h3 class="text-center">
+      SUPPLY-OF-GOODS<br>
+      MANAGEMENT AND<br>
+      DISTRIBUTION PLATFORM
+    </h3>
+
+    <p class="text-center">Please enter your user and password!</p>
+
+    <form [formGroup]="itemForm" (ngSubmit)="submit()">
+
+      <label>Username</label>
+      <input class="form-control mb-3" formControlName="username">
+
+      <label>Password</label>
+      <input type="password" class="form-control mb-3" formControlName="password">
+
+      <button class="btn btn-dark w-100" type="submit">
+        Login
+      </button>
+
+    </form>
+
+    <p class="text-center mt-3">
+      Don't have an account?
+      <a routerLink="/registration">Registration</a>
+    </p>
+
+  </div>
+</div>

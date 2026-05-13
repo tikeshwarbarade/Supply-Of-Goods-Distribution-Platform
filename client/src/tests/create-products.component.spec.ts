@@ -62,4 +62,32 @@ describe('CreateProductsComponent', () => {
     // Assert that the form is valid
     expect(component.itemForm.valid).toBeTrue();
   });
+
+  it('should have name control as required', () => {
+    component.itemForm.controls['name'].setValue('');
+    expect(component.itemForm.controls['name'].hasError('required')).toBeTrue();
+  });
+
+  it('should have price control as required', () => {
+    component.itemForm.controls['price'].setValue('');
+    expect(component.itemForm.controls['price'].hasError('required')).toBeTrue();
+  });
+
+  it('should have description control as required', () => {
+    component.itemForm.controls['description'].setValue('');
+    expect(component.itemForm.controls['description'].hasError('required')).toBeTrue();
+  });
+
+  it('should have stockQuantity control as required', () => {
+    component.itemForm.controls['stockQuantity'].setValue('');
+    expect(component.itemForm.controls['stockQuantity'].hasError('required')).toBeTrue();
+  });
+
+  it('form should be valid with all fields filled', () => {
+    component.itemForm.controls['name'].setValue('My Product');
+    component.itemForm.controls['description'].setValue('A description');
+    component.itemForm.controls['price'].setValue(25.0);
+    component.itemForm.controls['stockQuantity'].setValue(10);
+    expect(component.itemForm.valid).toBeTrue();
+  });
 });

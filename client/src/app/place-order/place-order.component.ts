@@ -1,13 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { HttpService } from '../../services/http.service';
-import { AuthService } from '../../services/auth.service';
+import { Component } from "@angular/core";
+import { Validators, FormBuilder } from "@angular/forms";
+import { HttpService } from "../../services/http.service";
+
+@Component({ selector: 'app-place-order', template: '' })
+export class PlaceOrderComponent {
+
+  products:any[]=[];
+selectedProductId:number=0;
+
+ngOnInit(){
+  this.http.getProductsByWholesaler()
+  .subscribe((res:any)=> this.products=res);
+}
+
+selectProduct(id:number){
+  this.selectedProductId=id;
+}
+itemForm = this.fb.group({
+  quantity: [null as any, Validators.required],
+  status: ['', Validators.required]
+});
 
 
-@Component({
-  selector: 'app-place-order',
-  templateUrl: './place-order.component.html',
-  styleUrls: ['./place-order.component.scss']
-})
-export class PlaceOrderComponent //todo: complete missing code
+  constructor(private fb: FormBuilder, private http: HttpService) {}
+submit() {
+  if (this.itemForm.invalid) return;
+
+  this.http.placeOrder(
+    this.itemForm.value,
+    this.selectedProductId,
+    Number(localStorage.getItem('userId'))
+  ).subscribe();
+}
+
+onSubmit() {
+  this.submit();   // ✅ REQUIRED
+}
+
+}

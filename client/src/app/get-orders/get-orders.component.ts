@@ -10,4 +10,4 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./get-orders.component.scss']
 })
 export class GetOrdersComponent //todo: complete missing code
-}
+{}

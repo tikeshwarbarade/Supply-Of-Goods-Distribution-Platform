@@ -1,1 +1,37 @@
-//todo: complete missing code
+<div class="container d-flex justify-content-center mt-5">
+
+  <div class="card p-4" style="width: 500px;">
+
+    <h3 class="text-center">User Registration</h3>
+
+    <form [formGroup]="itemForm" (ngSubmit)="submit()">
+
+      <label>Username</label>
+      <input class="form-control mb-2" formControlName="username">
+
+      <label>Email</label>
+      <input class="form-control mb-2" formControlName="email">
+
+      <label>Password</label>
+      <input type="password" class="form-control mb-2" formControlName="password">
+
+      <label>Role</label>
+      <select class="form-control mb-3" formControlName="role">
+        <option value="">Select Role</option>
+        <option value="MANUFACTURER">Manufacturer</option>
+        <option value="WHOLESALER">Wholesaler</option>
+        <option value="CONSUMER">Consumer</option>
+      </select>
+
+      <button class="btn btn-dark w-100" type="submit">
+        Register
+      </button>
+      <button type="button" class="btn btn-secondary w-100 mt-2"
+        (click)="goToLogin()">
+  Go to Login
+</button>
+
+    </form>
+
+  </div>
+</div>

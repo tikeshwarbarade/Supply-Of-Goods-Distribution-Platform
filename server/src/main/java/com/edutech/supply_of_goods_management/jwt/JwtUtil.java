@@ -1,39 +1,39 @@
 package com.edutech.supply_of_goods_management.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
-import com.edutech.supply_of_goods_management.entity.User;
-import com.edutech.supply_of_goods_management.repository.UserRepository;
-
+import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "secret123";
+    // ✅ MUST be at least 64+ chars (VERY IMPORTANT)
+    private final String SECRET = "my-super-secure-secret-key-for-jwt-token-which-is-more-than-64-bytes-long-1234567890";
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET.getBytes());
+    }
 
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
-                .signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
     public String extractUsername(String token) {
-        return extract(token).getSubject();
+        return getClaims(token).getSubject();
     }
 
-    private Claims extract(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET.getBytes())
+    public Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }

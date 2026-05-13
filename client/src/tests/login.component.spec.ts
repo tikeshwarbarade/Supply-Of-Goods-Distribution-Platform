@@ -66,4 +66,36 @@ describe('LoginComponent', () => {
     passwordControl.setValue('testpassword');
     expect(form.valid).toBeTruthy();
   });
+
+  it('should have password control with required validator', () => {
+    const form = component.itemForm;
+    const passwordControl = form.controls['password'];
+    passwordControl.setValue('');
+    expect(passwordControl.hasError('required')).toBeTrue();
+  });
+
+  it('should have username control with required validator', () => {
+    const form = component.itemForm;
+    const usernameControl = form.controls['username'];
+    usernameControl.setValue('');
+    expect(usernameControl.hasError('required')).toBeTrue();
+  });
+
+  it('form should be valid when both username and password are provided', () => {
+    component.itemForm.controls['username'].setValue('admin');
+    component.itemForm.controls['password'].setValue('secretPass');
+    expect(component.itemForm.valid).toBeTrue();
+  });
+
+  it('form should remain invalid if only username is provided', () => {
+    component.itemForm.controls['username'].setValue('admin');
+    component.itemForm.controls['password'].setValue('');
+    expect(component.itemForm.valid).toBeFalse();
+  });
+
+  it('form should remain invalid if only password is provided', () => {
+    component.itemForm.controls['username'].setValue('');
+    component.itemForm.controls['password'].setValue('mypassword');
+    expect(component.itemForm.valid).toBeFalse();
+  });
 });

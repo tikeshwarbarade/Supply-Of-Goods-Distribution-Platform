@@ -281,4 +281,42 @@ describe('HttpService', () => {
     expect(req.request.body).toEqual(registerDetails);
     req.flush(mockResponse);
   });
+
+  it('should handle login error gracefully', () => {
+    const loginDetails = { username: 'bad', password: 'wrong' };
+    service.Login(loginDetails).subscribe({
+      error: (err: any) => { expect(err).toBeTruthy(); }
+    });
+    const req = httpMock.expectOne(`${environment.apiUrl}/api/user/login`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+  });
+
+  it('should send correct headers for register user', () => {
+    const registerDetails = { username: 'newuser', email: 'new@example.com', password: 'pass', role: 'CONSUMER' };
+    service.registerUser(registerDetails).subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/api/user/register`);
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    req.flush({ id: 1 });
+  });
+
+  it('should send correct body for add inventory', () => {
+    const inventoryDetails = { wholesalerId: 1, stockQuantity: 50 };
+    const productId = 10;
+    service.addInventory(inventoryDetails, productId).subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/api/wholesalers/inventories?productId=${productId}`);
+    expect(req.request.body).toEqual(inventoryDetails);
+    expect(req.request.method).toBe('POST');
+    req.flush({ id: 1 });
+  });
+
+  it('should send correct body for update inventory', () => {
+    const stockQuantity = 200;
+    const inventoryId = 5;
+    service.updateInventory(stockQuantity, inventoryId).subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/api/wholesalers/inventories/${inventoryId}?stockQuantity=${stockQuantity}`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer mockToken');
+    req.flush({ id: inventoryId, stockQuantity });
+  });
 });

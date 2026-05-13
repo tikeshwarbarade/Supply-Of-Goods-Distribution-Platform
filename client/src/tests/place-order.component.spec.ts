@@ -58,4 +58,26 @@ describe('PlaceOrderComponent', () => {
     // Assert that the form is valid
     expect(component.itemForm.valid).toBeTrue();
   });
+
+  it('should have quantity control as required', () => {
+    component.itemForm.controls['quantity'].setValue('');
+    expect(component.itemForm.controls['quantity'].hasError('required')).toBeTrue();
+  });
+
+  it('should have status control as required', () => {
+    component.itemForm.controls['status'].setValue('');
+    expect(component.itemForm.controls['status'].hasError('required')).toBeTrue();
+  });
+
+  it('form should be valid with quantity and status', () => {
+    component.itemForm.controls['quantity'].setValue(5);
+    component.itemForm.controls['status'].setValue('PENDING');
+    expect(component.itemForm.valid).toBeTrue();
+  });
+
+  it('form should be invalid when only quantity is set', () => {
+    component.itemForm.controls['quantity'].setValue(5);
+    component.itemForm.controls['status'].setValue('');
+    expect(component.itemForm.valid).toBeFalse();
+  });
 });

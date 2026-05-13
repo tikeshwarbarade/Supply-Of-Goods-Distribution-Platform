@@ -1,1 +1,47 @@
-//todo: complete missing code
+<div class="container mt-3">
+
+  <h4>Place Order</h4>
+
+  <form [formGroup]="itemForm" (ngSubmit)="submit()" class="card p-3 mb-3">
+
+    <div class="row">
+      <div class="col-md-4">
+        <input class="form-control" formControlName="quantity" placeholder="Quantity">
+      </div>
+
+      <div class="col-md-4">
+        <select class="form-control" formControlName="status">
+          <option value="">Select Status</option>
+          <option value="PENDING">Start</option>
+          <option value="SHIPPED">Shipped</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <button class="btn btn-success">Submit</button>
+      </div>
+    </div>
+
+  </form>
+
+  <div class="card p-3">
+
+    <table class="table">
+      <tr *ngFor="let p of products">
+        <td>{{p.name}}</td>
+        <td>{{p.price}}</td>
+        <td>{{p.stockQuantity}}</td>
+        <td>{{p.description}}</td>
+
+        <td>
+          <button class="btn btn-warning"
+                  (click)="selectProduct(p.id)">
+            Add for Order
+          </button>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+</div>
