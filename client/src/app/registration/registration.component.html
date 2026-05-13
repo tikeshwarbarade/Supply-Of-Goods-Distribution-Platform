@@ -1,37 +1,312 @@
-<div class="container d-flex justify-content-center mt-5">
+<div class="register-page">
+  <section class="register-container">
 
-  <div class="card p-4" style="width: 500px;">
+    <!-- LEFT BRAND PANEL -->
+    <aside class="brand-section">
+      <div class="brand-shape shape-one"></div>
+      <div class="brand-shape shape-two"></div>
 
-    <h3 class="text-center">User Registration</h3>
+      <div class="brand-top">
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z"></path>
+            <path d="M12 6L17 8.8V15.2L12 18L7 15.2V8.8L12 6Z"></path>
+            <path d="M7 8.8L12 11.7L17 8.8"></path>
+            <path d="M12 11.7V18"></path>
+          </svg>
+        </div>
 
-    <form [formGroup]="itemForm" (ngSubmit)="submit()">
+        <span class="brand-pill">Supply Chain Management</span>
 
-      <label>Username</label>
-      <input class="form-control mb-2" formControlName="username">
+        <h1>Nexus</h1>
 
-      <label>Email</label>
-      <input class="form-control mb-2" formControlName="email">
+        <p>
+          Register your business identity and manage logistics, inventory,
+          distribution, and customer operations from one clean platform.
+        </p>
+      </div>
 
-      <label>Password</label>
-      <input type="password" class="form-control mb-2" formControlName="password">
+      <div class="role-section">
+        <h2>Designed for every role</h2>
 
-      <label>Role</label>
-      <select class="form-control mb-3" formControlName="role">
-        <option value="">Select Role</option>
-        <option value="MANUFACTURER">Manufacturer</option>
-        <option value="WHOLESALER">Wholesaler</option>
-        <option value="CONSUMER">Consumer</option>
-      </select>
+        <div class="role-card">
+          <div class="role-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 21H21"></path>
+              <path d="M5 21V8L12 4L19 8V21"></path>
+              <path d="M9 21V14H15V21"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>Manufacturer</h3>
+            <p>Create products, manage stock, and monitor supply flow.</p>
+          </div>
+        </div>
 
-      <button class="btn btn-dark w-100" type="submit">
-        Register
-      </button>
-      <button type="button" class="btn btn-secondary w-100 mt-2"
-        (click)="goToLogin()">
-  Go to Login
-</button>
+        <div class="role-card">
+          <div class="role-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7H20"></path>
+              <path d="M6 7V21"></path>
+              <path d="M18 7V21"></path>
+              <path d="M9 11H15"></path>
+              <path d="M9 15H15"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>Wholesaler</h3>
+            <p>Handle bulk orders, inventory movement, and distribution.</p>
+          </div>
+        </div>
 
-    </form>
+        <div class="role-card">
+          <div class="role-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 6H21L19 14H8L6 6Z"></path>
+              <path d="M6 6L5 3H2"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>Consumer</h3>
+            <p>Browse products, place orders, and track delivery status.</p>
+          </div>
+        </div>
+      </div>
 
-  </div>
+      <div class="secure-status">
+        <span></span>
+        Secure access for verified Nexus users
+      </div>
+    </aside>
+
+    <!-- RIGHT FORM PANEL -->
+    <section class="form-section">
+      <div class="mobile-brand">
+        <div class="mobile-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z"></path>
+            <path d="M12 6L17 8.8V15.2L12 18L7 15.2V8.8L12 6Z"></path>
+          </svg>
+        </div>
+        <span>Nexus</span>
+      </div>
+
+      <div class="form-card">
+        <div class="form-header">
+          <span class="form-badge">Create Account</span>
+          <h2>Register your identity</h2>
+          <p>
+            Choose your role and create your Nexus account to start managing
+            your business workflow.
+          </p>
+        </div>
+
+        <form class="register-form" [formGroup]="itemForm" (ngSubmit)="submit()">
+
+          <!-- MOCK COMPANY NAME -->
+          <!-- <div class="form-group">
+            <label>Company Name</label>
+            <div class="input-control">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 21H21"></path>
+                  <path d="M5 21V7H13V21"></path>
+                  <path d="M13 11H19V21"></path>
+                </svg>
+              </span>
+
+              <input
+                type="text"
+                [(ngModel)]="companyName"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="Enter company name"
+                autocomplete="organization"
+              />
+            </div>
+          </div> -->
+
+          <!-- USERNAME -->
+          <div class="form-group">
+            <label>Username</label>
+            <div class="input-control">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21"></path>
+                  <path d="M12 11C14.2 11 16 9.2 16 7C16 4.8 14.2 3 12 3C9.8 3 8 4.8 8 7C8 9.2 9.8 11 12 11Z"></path>
+                </svg>
+              </span>
+
+              <input
+                type="text"
+                formControlName="username"
+                placeholder="Enter username"
+                autocomplete="username"
+              />
+            </div>
+
+            <small class="error-text"
+                   *ngIf="itemForm.controls['username'].invalid && itemForm.controls['username'].touched">
+              Username is required.
+            </small>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-control">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 6H20V18H4V6Z"></path>
+                  <path d="M4 7L12 13L20 7"></path>
+                </svg>
+              </span>
+
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="Enter email address"
+                autocomplete="email"
+              />
+            </div>
+
+            <small class="error-text"
+                   *ngIf="itemForm.controls['email'].invalid && itemForm.controls['email'].touched">
+              Valid email is required.
+            </small>
+          </div>
+
+          <div class="form-grid">
+
+            <!-- MOCK PHONE -->
+            <div class="form-group">
+              <label>Phone Number</label>
+              <div class="input-control">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M22 16.92V19.92C22 20.52 21.52 21 20.92 21C11.52 21 3 12.48 3 3.08C3 2.48 3.48 2 4.08 2H7.08"></path>
+                  </svg>
+                </span>
+
+                <input
+                  type="tel"
+                  [(ngModel)]="phone"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Phone number"
+                  autocomplete="tel"
+                />
+              </div>
+            </div>
+
+            <!-- ROLE -->
+            <div class="form-group">
+              <label>Select Role</label>
+              <div class="input-control select-control">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z"></path>
+                    <path d="M8 10L12 12.5L16 10"></path>
+                  </svg>
+                </span>
+
+                <select formControlName="role">
+                  <option value="" disabled>Select role</option>
+                  <option value="MANUFACTURER">Manufacturer</option>
+                  <option value="WHOLESALER">Wholesaler</option>
+                  <option value="CONSUMER">Consumer</option>
+                </select>
+              </div>
+
+              <small class="error-text"
+                     *ngIf="itemForm.controls['role'].invalid && itemForm.controls['role'].touched">
+                Role is required.
+              </small>
+            </div>
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-control password-control">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7 11V8C7 5.2 9.2 3 12 3C14.8 3 17 5.2 17 8V11"></path>
+                  <path d="M6 11H18C19.1 11 20 11.9 20 13V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V13C4 11.9 4.9 11 6 11Z"></path>
+                </svg>
+              </span>
+
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Create password"
+                autocomplete="new-password"
+              />
+
+              <button type="button"
+                      class="password-toggle"
+                      (click)="togglePassword()"
+                      [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                <svg viewBox="0 0 24 24">
+                  <path d="M1.5 12S5.5 5 12 5S22.5 12 22.5 12S18.5 19 12 19S1.5 12 1.5 12Z"></path>
+                  <path d="M12 15C13.7 15 15 13.7 15 12C15 10.3 13.7 9 12 9C10.3 9 9 10.3 9 12C9 13.7 10.3 15 12 15Z"></path>
+                </svg>
+              </button>
+            </div>
+
+            <small class="error-text"
+                   *ngIf="itemForm.controls['password'].invalid && itemForm.controls['password'].touched">
+              Password is required.
+            </small>
+          </div>
+
+          <!-- CONFIRM PASSWORD MOCK VALIDATION -->
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="input-control password-control">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 12L11 14L15 10"></path>
+                  <path d="M7 11V8C7 5.2 9.2 3 12 3C14.8 3 17 5.2 17 8V11"></path>
+                </svg>
+              </span>
+
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                [(ngModel)]="confirmPassword"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="Confirm password"
+                autocomplete="new-password"
+              />
+
+              <button type="button"
+                      class="password-toggle"
+                      (click)="toggleConfirmPassword()"
+                      [attr.aria-label]="showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'">
+                <svg viewBox="0 0 24 24">
+                  <path d="M1.5 12S5.5 5 12 5S22.5 12 22.5 12S18.5 19 12 19S1.5 12 1.5 12Z"></path>
+                  <path d="M12 15C13.7 15 15 13.7 15 12C15 10.3 13.7 9 12 9C10.3 9 9 10.3 9 12C9 13.7 10.3 15 12 15Z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <p class="form-message" [ngClass]="{ error: formMessageError }">
+            {{ formMessage }}
+          </p>
+
+          <button type="submit" class="submit-btn">
+            <span>Create Account</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12H19"></path>
+              <path d="M13 6L19 12L13 18"></path>
+            </svg>
+          </button>
+        </form>
+
+        <p class="login-text">
+          Already have an account?
+          <a (click)="goToLogin()">Login here</a>
+        </p>
+      </div>
+    </section>
+  </section>
 </div>
