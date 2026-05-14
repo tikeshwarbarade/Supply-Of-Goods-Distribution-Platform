@@ -139,16 +139,15 @@ export class LoginComponent implements OnInit {
     this.formMessageError = false;
 
     if (this.itemForm.invalid) {
+      this.itemForm.markAllAsTouched();
       this.formMessage = 'Please enter username and password.';
       this.formMessageError = true;
       return;
     }
 
-    // ✅ Skip captcha only during Jasmine/Karma test environment
+    // ✅ Skip captcha only for tests
     if (!this.isTest && !this.captchaVerified) {
-      const validCaptcha = this.verifyCaptcha();
-
-      if (!validCaptcha) {
+      if (!this.verifyCaptcha()) {
         this.formMessage = 'Please verify captcha before login.';
         this.formMessageError = true;
         return;

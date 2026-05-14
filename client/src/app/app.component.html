@@ -1,12 +1,16 @@
 <nav class="navbar navbar-dark bg-dark px-3" *ngIf="IsLoggin">
-  <span class="navbar-brand">Supply-of-Goods M&DP</span>
+  <span class="navbar-brand" routerLink="/dashboard" style="cursor: pointer;">
+    Supply-of-Goods M&DP
+  </span>
 
   <ul class="navbar-nav flex-row">
 
+    <!-- MANUFACTURER -->
     <li *ngIf="roleName === 'MANUFACTURER'" class="mx-2">
       <a routerLink="/create-product" class="text-white">Create Products</a>
     </li>
 
+    <!-- WHOLESALER -->
     <li *ngIf="roleName === 'WHOLESALER'" class="mx-2">
       <a routerLink="/get-orders" class="text-white">Orders</a>
     </li>
@@ -15,14 +19,24 @@
       <a routerLink="/place-product" class="text-white">Place Order</a>
     </li>
 
+    <li *ngIf="roleName === 'WHOLESALER'" class="mx-2">
+      <a routerLink="/add-inventory" class="text-white">Add Inventory</a>
+    </li>
+
+    <!-- CONSUMER -->
+    <li *ngIf="roleName === 'CONSUMER'" class="mx-2">
+      <a routerLink="/consumer-place-order" class="text-white">Place Order</a>
+    </li>
+
+    <li *ngIf="roleName === 'CONSUMER'" class="mx-2">
+      <a routerLink="/consumer-get-orders" class="text-white">Orders</a>
+    </li>
+
     <li class="mx-2">
-      <a (click)="logout()" class="text-white">Logout</a>
+      <a (click)="logout()" class="text-white" style="cursor: pointer;">Logout</a>
     </li>
 
   </ul>
 </nav>
 
-<!-- ✅ ONLY THIS -->
-<div class="container mt-4">
-  <router-outlet></router-outlet>
-</div>
+<router-outlet></router-outlet>

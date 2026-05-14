@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.navbar {
+  min-height: 56px;
+}
+
+.navbar-brand {
+  font-weight: 700;
+}
+
+.navbar-nav {
+  gap: 10px;
+  align-items: center;
+}
+
+a {
+  text-decoration: none;
+}

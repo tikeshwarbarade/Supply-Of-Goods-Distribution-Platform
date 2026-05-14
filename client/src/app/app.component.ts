@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -12,26 +13,38 @@ export class AppComponent implements OnInit {
   IsLoggin: boolean = false;
   roleName: string | null = null;
 
-  constructor(private authService: AuthService,
-              private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  // ✅ USE ngOnInit (IMPORTANT)
   ngOnInit() {
     this.loadUserData();
+
+    // ✅ Re-check login/role after every navigation
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.loadUserData();
+      });
   }
 
-  // ✅ reusable function
   loadUserData() {
     this.IsLoggin = this.authService.getLoginStatus;
     this.roleName = this.authService.getRole;
 
-    if (!this.IsLoggin) {
+    const currentUrl = this.router.url;
+    const publicRoutes = ['/login', '/registration'];
+
+    if (!this.IsLoggin && !publicRoutes.includes(currentUrl)) {
       this.router.navigateByUrl('/login');
     }
   }
 
   logout() {
     this.authService.logout();
+    this.IsLoggin = false;
+    this.roleName = null;
     this.router.navigateByUrl('/login');
   }
 }
