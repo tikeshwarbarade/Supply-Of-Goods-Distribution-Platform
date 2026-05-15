@@ -12,18 +12,19 @@ import java.util.List;
 @Table(name = "products")
 @Getter @Setter
 public class Product {
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Column(name = "manufacturer_id")
+private Long manufacturerId;
 
-    private Long manufacturerId;
-    private String name;
-    private String description;
-    private double price;
-    private int stockQuantity;
+private String name;
+private String description;
+private double price;
 
-    @OneToMany(mappedBy = "product")
+@Column(name = "stock_quantity")
+private int stockQuantity;    @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<Order> orders;
 

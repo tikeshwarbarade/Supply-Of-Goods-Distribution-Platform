@@ -9,6 +9,7 @@ import com.edutech.supply_of_goods_management.entity.Feedback;
 import com.edutech.supply_of_goods_management.entity.Order;
 import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.service.FeedbackService;
+import com.edutech.supply_of_goods_management.service.InventoryService;
 import com.edutech.supply_of_goods_management.service.OrderService;
 import com.edutech.supply_of_goods_management.service.ProductService;
 
@@ -21,6 +22,7 @@ public class ConsumerController {
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
     @Autowired private FeedbackService feedbackService;
+    @Autowired private InventoryService inventoryService;
 
     @GetMapping("/products")
     public List<Product> getProducts() {
@@ -39,6 +41,20 @@ public class ConsumerController {
     public List<Order> get(@RequestParam Long userId) {
         return orderService.getAllOrders(userId);
     }
+
+    @GetMapping("/inventories")
+public ResponseEntity<?> getAvailableInventories() {
+    return ResponseEntity.ok(inventoryService.getAllAvailableInventories());
+}
+
+@PostMapping("/inventory-order")
+public ResponseEntity<?> placeOrderFromInventory(
+        @RequestParam Long inventoryId,
+        @RequestParam Long userId,
+        @RequestBody Order order
+) {
+    return ResponseEntity.ok(orderService.placeConsumerOrderFromInventory(inventoryId, userId, order));
+}
 
     @PostMapping("/order/{orderId}/feedback")
 public ResponseEntity<?> addFeedback(

@@ -1,4 +1,4 @@
-<div class="simple-role-dashboard">
+<!-- <div class="simple-role-dashboard">
   <div class="role-card">
     <h2>Consumer Dashboard</h2>
     <p>Browse products, place orders, and track order history.</p>
@@ -15,4 +15,98 @@
       Logout
     </button>
   </div>
-</div>
+</div> -->
+
+<!-- <main class="simple-role-dashboard">
+  <section class="role-card">
+
+    <span class="role-pill">CONSUMER PORTAL</span>
+
+    <h2>Consumer Dashboard</h2>
+    <p>Browse products, place orders, track purchases, and submit feedback.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span>Available Products</span>
+        <strong>{{ products.length }}</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>My Orders</span>
+        <strong>{{ orders.length }}</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Delivered Orders</span>
+        <strong>{{ deliveredOrders }}</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Feedback Pending</span>
+        <strong>{{ pendingFeedback }}</strong>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" (click)="goToPlaceOrder()">
+        Place Order
+      </button>
+
+      <button type="button" (click)="goToOrders()">
+        View Orders
+      </button>
+
+      <button type="button" class="logout" (click)="logout()">
+        Logout
+      </button>
+    </div>
+
+  </section>
+</main> -->
+
+<main class="consumer-page">
+  <section class="role-card">
+
+    <span class="role-pill">CONSUMER PORTAL</span>
+
+    <h2>Consumer Dashboard</h2>
+    <p>Browse wholesaler inventory, place orders, track delivery, and submit feedback.</p>
+
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span>Available Inventory</span>
+        <strong>{{ inventories.length }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>My Orders</span>
+        <strong>{{ orders.length }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>Pending Orders</span>
+        <strong>{{ pendingOrders }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>Delivered Orders</span>
+        <strong>{{ deliveredOrders }}</strong>
+      </article>
+    </div>
+
+    <div class="actions">
+      <button type="button" (click)="goToPlaceOrder()">
+        Place Order
+      </button>
+
+      <button type="button" (click)="goToOrders()">
+        View Orders / Feedback
+      </button>
+
+      <button type="button" class="logout" (click)="logout()">
+        Logout
+      </button>
+    </div>
+
+  </section>
+</main>

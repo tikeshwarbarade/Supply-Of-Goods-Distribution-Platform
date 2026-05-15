@@ -6,33 +6,30 @@ import { Injectable } from '@angular/core';
 })
 export class HttpService {
 
-  // ✅ AUTO DETECT MODE
   private isTest = window.location.port === '9876';
 
-private baseUrl = this.isTest
-  ? 'http://localhost:9876/context.html'
-  : window.location.origin + '/project/3689/proxy/3000';  // ✅ FIXED
+  private baseUrl = this.isTest
+    ? 'http://localhost:9876/context.html'
+    : window.location.origin + '/project/3689/proxy/3000';
 
   constructor(private http: HttpClient) {}
 
-  // ✅ AUTO TOKEN (TEST vs REAL)
   private getHeaders() {
-    const token = this.isTest
-      ? 'mockToken'
-      : localStorage.getItem('token');
+    const token = this.isTest ? 'mockToken' : localStorage.getItem('token');
 
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
+        Authorization: 'Bearer ' + token
       })
     };
   }
 
-  // ✅ AUTH METHODS (SPECIAL CASE)
+  // =========================
+  // AUTH
+  // =========================
 
   Login(data: any) {
-    // ✅ tests need header, real app doesn’t
     return this.isTest
       ? this.http.post(this.baseUrl + '/api/user/login', data, this.getHeaders())
       : this.http.post(this.baseUrl + '/api/user/login', data);
@@ -44,22 +41,73 @@ private baseUrl = this.isTest
       : this.http.post(this.baseUrl + '/api/user/register', data);
   }
 
-  // ✅ MANUFACTURER
+  logoutUser(userId: number) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/logout?userId=${userId}`,
+      {},
+      this.isTest ? this.getHeaders() : {}
+    );
+  }
+
+  updateUserActivity(userId: number) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/activity?userId=${userId}`,
+      {},
+      this.isTest ? this.getHeaders() : {}
+    );
+  }
+
+  // =========================
+  // MANUFACTURER
+  // =========================
+
   createProduct(data: any) {
-    return this.http.post(this.baseUrl + '/api/manufacturers/product', data, this.getHeaders());
+    return this.http.post(
+      this.baseUrl + '/api/manufacturers/product',
+      data,
+      this.getHeaders()
+    );
   }
 
   updateProduct(data: any, id: number) {
-    return this.http.put(`${this.baseUrl}/api/manufacturers/product/${id}`, data, this.getHeaders());
+    return this.http.put(
+      `${this.baseUrl}/api/manufacturers/product/${id}`,
+      data,
+      this.getHeaders()
+    );
   }
 
   getProductsByManufacturer(id: number) {
-    return this.http.get(`${this.baseUrl}/api/manufacturers/products?manufacturerId=${id}`, this.getHeaders());
+    return this.http.get(
+      `${this.baseUrl}/api/manufacturers/products?manufacturerId=${id}`,
+      this.getHeaders()
+    );
   }
 
-  // ✅ WHOLESALER
+  getOrdersByManufacturer(manufacturerId: number) {
+    return this.http.get(
+      `${this.baseUrl}/api/manufacturers/orders?manufacturerId=${manufacturerId}`,
+      this.getHeaders()
+    );
+  }
+
+  updateManufacturerOrderStatus(orderId: number, status: string) {
+    return this.http.put(
+      `${this.baseUrl}/api/manufacturers/order/${orderId}?status=${status}`,
+      {},
+      this.getHeaders()
+    );
+  }
+
+  // =========================
+  // WHOLESALER
+  // =========================
+
   getProductsByWholesaler() {
-    return this.http.get(this.baseUrl + '/api/wholesalers/products', this.getHeaders());
+    return this.http.get(
+      this.baseUrl + '/api/wholesalers/products',
+      this.getHeaders()
+    );
   }
 
   placeOrder(data: any, productId: number, userId: number) {
@@ -71,7 +119,18 @@ private baseUrl = this.isTest
   }
 
   getOrderByWholesalers(id: number) {
-    return this.http.get(`${this.baseUrl}/api/wholesalers/orders?userId=${id}`, this.getHeaders());
+    return this.http.get(
+      `${this.baseUrl}/api/wholesalers/orders?userId=${id}`,
+      this.getHeaders()
+    );
+  }
+
+  updateOrderStatus(id: number, status: string) {
+    return this.http.put(
+      `${this.baseUrl}/api/wholesalers/order/${id}?status=${status}`,
+      {},
+      this.getHeaders()
+    );
   }
 
   addInventory(data: any, productId: number) {
@@ -97,9 +156,52 @@ private baseUrl = this.isTest
     );
   }
 
-  // ✅ CONSUMER
+  // =========================
+  // CONSUMER
+  // =========================
+
+  getInventoriesForConsumers() {
+  return this.http.get(
+    `${this.baseUrl}/api/consumers/inventories`,
+    this.getHeaders()
+  );
+}
+
+consumerPlaceInventoryOrder(data: any, inventoryId: number, userId: number) {
+  return this.http.post(
+    `${this.baseUrl}/api/consumers/inventory-order?inventoryId=${inventoryId}&userId=${userId}`,
+    data,
+    this.getHeaders()
+  );
+}
+
+getCustomerOrdersByWholesaler(wholesalerId: number) {
+  return this.http.get(
+    `${this.baseUrl}/api/wholesalers/customer-orders?wholesalerId=${wholesalerId}`,
+    this.getHeaders()
+  );
+}
+
+updateCustomerOrderStatus(orderId: number, status: string) {
+  return this.http.put(
+    `${this.baseUrl}/api/wholesalers/customer-order/${orderId}?status=${status}`,
+    {},
+    this.getHeaders()
+  );
+}
+
+getWholesalerFeedbacks(wholesalerId: number) {
+  return this.http.get(
+    `${this.baseUrl}/api/wholesalers/feedbacks?wholesalerId=${wholesalerId}`,
+    this.getHeaders()
+  );
+}
+
   getProductsByConsumers() {
-    return this.http.get(this.baseUrl + '/api/consumers/products', this.getHeaders());
+    return this.http.get(
+      this.baseUrl + '/api/consumers/products',
+      this.getHeaders()
+    );
   }
 
   consumerPlaceOrder(data: any, productId: number, userId: number) {
@@ -111,7 +213,10 @@ private baseUrl = this.isTest
   }
 
   getOrderConsumer(id: number) {
-    return this.http.get(`${this.baseUrl}/api/consumers/orders?userId=${id}`, this.getHeaders());
+    return this.http.get(
+      `${this.baseUrl}/api/consumers/orders?userId=${id}`,
+      this.getHeaders()
+    );
   }
 
   addConsumerFeedBack(id: number, userId: number, data: any) {
@@ -122,27 +227,5 @@ private baseUrl = this.isTest
     );
   }
 
-  updateOrderStatus(id: number, status: string) {
-    return this.http.put(
-      `${this.baseUrl}/api/wholesalers/order/${id}?status=${status}`,
-      {},
-      this.getHeaders()
-    );
-  }
-
- logoutUser(userId: number) {
-  return this.http.post(
-    `${this.baseUrl}/api/user/logout?userId=${userId}`,
-    {},
-    this.isTest ? this.getHeaders() : {}
-  );
-}
-
-updateUserActivity(userId: number) {
-  return this.http.post(
-    `${this.baseUrl}/api/user/activity?userId=${userId}`,
-    {},
-    this.isTest ? this.getHeaders() : {}
-  );
-}
+  
 }

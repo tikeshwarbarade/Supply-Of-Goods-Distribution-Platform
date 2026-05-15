@@ -22,6 +22,13 @@ public class Order {
     private int quantity;
     private String status;
 
+
+@Column(name = "order_type")
+private String orderType;
+
+@Column(name = "seller_wholesaler_id")
+private Long sellerWholesalerId;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

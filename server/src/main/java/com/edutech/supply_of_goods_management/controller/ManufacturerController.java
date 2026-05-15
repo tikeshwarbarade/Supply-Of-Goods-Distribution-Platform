@@ -5,15 +5,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.edutech.supply_of_goods_management.entity.Product;
+import com.edutech.supply_of_goods_management.service.OrderService;
 import com.edutech.supply_of_goods_management.service.ProductService;
 
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/manufacturers")
 public class ManufacturerController {
 
-    @Autowired private ProductService service;
+    @Autowired
+    private ProductService service;
+
+    @Autowired
+    private OrderService orderService;
 
     @PostMapping("/product")
     public ResponseEntity<?> create(@RequestBody Product p) {
@@ -21,13 +25,25 @@ public class ManufacturerController {
     }
 
     @PutMapping("/product/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id,
-                                   @RequestBody Product p) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Product p) {
         return ResponseEntity.ok(service.update(id, p));
     }
 
     @GetMapping("/products")
     public List<Product> get(@RequestParam Long manufacturerId) {
         return service.getManufacturer(manufacturerId);
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<?> getManufacturerOrders(@RequestParam Long manufacturerId) {
+        return ResponseEntity.ok(orderService.getOrdersForManufacturer(manufacturerId));
+    }
+
+    @PutMapping("/order/{id}")
+    public ResponseEntity<?> updateManufacturerOrderStatus(
+            @PathVariable Long id,
+            @RequestParam String status
+    ) {
+        return ResponseEntity.ok(orderService.updateManufacturerOrderStatus(id, status));
     }
 }

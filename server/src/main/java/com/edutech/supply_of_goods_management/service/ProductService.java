@@ -18,16 +18,17 @@ public class ProductService {
     public Product create(Product p) {
         return repo.save(p);
     }
+public Product update(Long id, Product p) {
+    Product db = repo.findById(id).orElseThrow();
 
-    public Product update(Long id, Product p) {
-        Product db = repo.findById(id).orElseThrow();
-        db.setName(p.getName());
-        db.setDescription(p.getDescription());
-        db.setPrice(p.getPrice());
-        db.setStockQuantity(p.getStockQuantity());
-        return repo.save(db);
-    }
+    db.setManufacturerId(p.getManufacturerId());
+    db.setName(p.getName());
+    db.setDescription(p.getDescription());
+    db.setPrice(p.getPrice());
+    db.setStockQuantity(p.getStockQuantity());
 
+    return repo.save(db);
+}
     public List<Product> getManufacturer(Long id) {
         return repo.findByManufacturerId(id);
     }

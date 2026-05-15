@@ -1,6 +1,7 @@
 package com.edutech.supply_of_goods_management.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,4 +27,7 @@ public class FeedbackService {
 
         return repo.save(fb);
     }
+    public List<Feedback> getFeedbacksForWholesaler(Long wholesalerId) {
+    return repo.findFeedbacksForWholesaler(wholesalerId);
+}
 }

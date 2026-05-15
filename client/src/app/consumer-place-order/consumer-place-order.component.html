@@ -1,47 +1,111 @@
-<div class="container mt-3">
+<main class="consumer-order-page">
 
-  <h4>Place Order</h4>
+  <section class="page-shell">
 
-  <form [formGroup]="itemForm" (ngSubmit)="submit()" class="card p-3 mb-3">
+    <section class="hero-card">
+      <span class="role-pill">CONSUMER ORDER</span>
+      <h2>Place Order From Wholesaler Inventory</h2>
+      <p>
+        Consumers can order only from wholesaler inventory stock. Order status will be PENDING by default.
+      </p>
 
-    <div class="row">
-      <div class="col-md-4">
-        <input class="form-control" formControlName="quantity" placeholder="Quantity">
+      <div class="message" *ngIf="message" [class.error]="messageError">
+        {{ message }}
       </div>
 
-      <div class="col-md-4">
-        <select class="form-control" formControlName="status">
-          <option value="">Select Status</option>
-          <option value="PENDING">Start</option>
-          <option value="SHIPPED">Shipped</option>
-        </select>
+      <div class="selected-box" *ngIf="getSelectedInventory() as selected">
+        <h3>Selected Product</h3>
+        <p>
+          {{ selected.product?.name }} · Available Stock: {{ selected.stockQuantity }}
+        </p>
+
+        <input
+          type="number"
+          min="1"
+          placeholder="Enter quantity"
+          [value]="orderQuantity || ''"
+          (input)="setOrderQuantity($any($event.target).value)"
+        />
+
+        <button type="button" [disabled]="submitting" (click)="placeOrder()">
+          {{ submitting ? 'Placing Order...' : 'Place Order' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="inventory-panel">
+
+      <div class="section-header">
+        <div>
+          <span class="section-label">Available Stock</span>
+          <h3>Wholesaler Inventory</h3>
+          <p>Products available from wholesalers for consumer purchase.</p>
+        </div>
+
+        <div class="search-box">
+          <span>🔍</span>
+          <input
+            type="text"
+            placeholder="Search inventory..."
+            [value]="searchText"
+            (input)="onSearch($any($event.target).value)"
+          />
+          <button type="button" *ngIf="searchText" (click)="clearSearch()">×</button>
+        </div>
       </div>
 
-      <div class="col-md-4">
-        <button class="btn btn-success">Submit</button>
-      </div>
-    </div>
+      <div class="products-grid">
 
-  </form>
+        <article
+          class="inventory-card"
+          *ngFor="let inventory of filteredInventories"
+          [class.selected]="selectedInventoryId === inventory.id">
 
-  <div class="card p-3">
+          <div class="product-icon">📦</div>
 
-    <table class="table">
-      <tr *ngFor="let p of products">
-        <td>{{p.name}}</td>
-        <td>{{p.price}}</td>
-        <td>{{p.stockQuantity}}</td>
-        <td>{{p.description}}</td>
+          <h4>{{ inventory.product?.name || 'Unnamed Product' }}</h4>
 
-        <td>
-          <button class="btn btn-warning"
-                  (click)="selectProduct(p.id)">
-            Add for Order
+          <p>{{ inventory.product?.description || 'No description available.' }}</p>
+
+          <div class="meta-grid">
+            <div>
+              <span>Price</span>
+              <strong>{{ formatCurrency(inventory.product?.price) }}</strong>
+            </div>
+
+            <div>
+              <span>Available</span>
+              <strong>{{ inventory.stockQuantity || 0 }}</strong>
+            </div>
+
+            <div>
+              <span>Wholesaler</span>
+              <strong>#{{ inventory.wholesalerId }}</strong>
+            </div>
+
+            <div>
+              <span>Inventory ID</span>
+              <strong>#{{ inventory.id }}</strong>
+            </div>
+          </div>
+
+          <button type="button" (click)="selectInventory(inventory)">
+            Select Product
           </button>
-        </td>
-      </tr>
-    </table>
+        </article>
 
-  </div>
+        <div class="empty-state" *ngIf="!loading && filteredInventories.length === 0">
+          No wholesaler inventory available.
+        </div>
 
-</div>
+        <div class="empty-state" *ngIf="loading">
+          Loading inventory...
+        </div>
+
+      </div>
+
+    </section>
+
+  </section>
+
+</main>

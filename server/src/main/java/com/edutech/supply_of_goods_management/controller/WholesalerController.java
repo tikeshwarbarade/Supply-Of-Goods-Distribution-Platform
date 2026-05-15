@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Order;
 import com.edutech.supply_of_goods_management.entity.Product;
+import com.edutech.supply_of_goods_management.service.FeedbackService;
 import com.edutech.supply_of_goods_management.service.InventoryService;
 import com.edutech.supply_of_goods_management.service.OrderService;
 import com.edutech.supply_of_goods_management.service.ProductService;
@@ -27,6 +28,7 @@ public class WholesalerController {
     @Autowired private InventoryService invService;
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
+    @Autowired private FeedbackService feedbackService;
 
     // ✅ GET PRODUCTS
     @GetMapping("/products")
@@ -86,4 +88,8 @@ public class WholesalerController {
 
         return invService.getAllInventories(wholesalerId);
     }
+    @GetMapping("/feedbacks")
+public ResponseEntity<?> getFeedbacksForWholesaler(@RequestParam Long wholesalerId) {
+    return ResponseEntity.ok(feedbackService.getFeedbacksForWholesaler(wholesalerId));
+}
 }

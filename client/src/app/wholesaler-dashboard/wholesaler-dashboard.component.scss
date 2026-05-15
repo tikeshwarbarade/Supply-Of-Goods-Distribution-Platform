@@ -1390,3 +1390,101 @@ tbody {
     max-width: none;
   }
 }
+.status-help {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+.status-help {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-pill {
+  display: inline-flex;
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 950;
+}
+
+.status-pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.status-shipped {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.status-delivered {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.status-cancelled {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.status-select {
+  height: 40px;
+  min-width: 145px;
+  padding: 0 12px;
+  border-radius: 13px;
+  border: 1px solid var(--border, #e2e8f0);
+  outline: none;
+  color: var(--dark, #0f172a);
+  background: #ffffff;
+  font-weight: 850;
+}
+
+.feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.feedback-card {
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.86);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.feedback-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.feedback-top strong {
+  color: #0f172a;
+  font-weight: 950;
+}
+
+.feedback-top span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.feedback-card p {
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+.feedback-card small {
+  display: block;
+  margin-top: 12px;
+  color: #64748b;
+  font-weight: 700;
+}

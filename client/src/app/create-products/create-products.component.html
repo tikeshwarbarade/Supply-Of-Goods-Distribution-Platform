@@ -1,4 +1,4 @@
-<div class="container mt-3">
+<!-- <div class="container mt-3">
 
   <h4>Manage Products</h4>
 
@@ -57,4 +57,226 @@
     </table>
   </div>
 
-</div>
+</div> -->
+
+<main class="product-page">
+
+  <section class="product-shell">
+
+    <!-- FORM CARD -->
+    <section class="form-card">
+
+      <div class="form-header">
+        <span class="form-badge">
+          {{ editingProductId ? 'UPDATE PRODUCT' : 'CREATE PRODUCT' }}
+        </span>
+
+        <h2>
+          {{ editingProductId ? 'Update Product & Stock' : 'Create Manufacturer Product' }}
+        </h2>
+
+        <p>
+          Product stock quantity represents manufacturer inventory.
+        </p>
+      </div>
+
+      <div
+        class="form-alert"
+        *ngIf="formMessage"
+        [class.error]="formMessageError">
+        {{ formMessage }}
+      </div>
+
+      <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+          <label>Product Name</label>
+          <input
+            type="text"
+            placeholder="Enter product name"
+            formControlName="name"
+          />
+          <small *ngIf="isInvalid('name')">
+            Product name is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea
+            placeholder="Enter product description"
+            formControlName="description">
+          </textarea>
+          <small *ngIf="isInvalid('description')">
+            Description is required.
+          </small>
+        </div>
+
+        <div class="form-row">
+
+          <div class="form-group">
+            <label>Price</label>
+            <input
+              type="number"
+              min="1"
+              placeholder="Enter price"
+              formControlName="price"
+            />
+            <small *ngIf="isInvalid('price')">
+              Valid price is required.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Stock Quantity</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="Enter stock quantity"
+              formControlName="stockQuantity"
+            />
+            <small *ngIf="isInvalid('stockQuantity')">
+              Valid stock quantity is required.
+            </small>
+          </div>
+
+        </div>
+
+        <button
+          class="submit-btn"
+          type="submit"
+          [disabled]="submitting">
+          {{ submitting ? 'Saving...' : editingProductId ? 'Update Product' : 'Create Product' }}
+        </button>
+
+        <button
+          class="clear-btn"
+          type="button"
+          *ngIf="editingProductId"
+          (click)="cancelEdit()">
+          Cancel Edit
+        </button>
+
+        <button
+          class="clear-btn"
+          type="button"
+          *ngIf="!editingProductId"
+          (click)="resetForm()">
+          Clear Form
+        </button>
+
+      </form>
+
+    </section>
+
+    <!-- PRODUCTS PANEL -->
+    <section class="products-panel">
+
+      <!-- STATS -->
+      <div class="stats-grid">
+
+        <article class="stat-card">
+          <p>My Products</p>
+          <h3>{{ productCount }}</h3>
+        </article>
+
+        <article class="stat-card">
+          <p>Total Stock</p>
+          <h3>{{ totalStock }}</h3>
+        </article>
+
+        <article class="stat-card">
+          <p>Inventory Value</p>
+          <h3>{{ formatCurrency(inventoryValue) }}</h3>
+        </article>
+
+      </div>
+
+      <!-- HEADER -->
+      <div class="section-header">
+        <div>
+          <span class="section-label">Product List</span>
+          <h3>Manufacturer Products</h3>
+          <p>View and update products created by logged-in manufacturer.</p>
+        </div>
+
+        <div class="search-box">
+          <span>🔍</span>
+
+          <input
+            type="text"
+            placeholder="Search products..."
+            [value]="productSearch"
+            (input)="onProductSearch($any($event.target).value)"
+          />
+
+          <button
+            type="button"
+            *ngIf="productSearch"
+            (click)="clearSearch()">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-card">
+        <div class="responsive-table">
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr *ngFor="let product of filteredProducts">
+                <td>#{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ formatCurrency(product.price) }}</td>
+                <td>{{ product.stockQuantity }}</td>
+                <td>
+                  <button
+                    class="small-btn"
+                    type="button"
+                    (click)="editProduct(product)">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="loading">
+                <td colspan="6">
+                  <div class="empty-state">
+                    Loading products...
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngIf="!loading && filteredProducts.length === 0">
+                <td colspan="6">
+                  <div class="empty-state">
+                    No products found.
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+    </section>
+
+  </section>
+
+</main>

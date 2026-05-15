@@ -3,7 +3,13 @@ import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 import { SessionService } from '../../services/session.service';
 
-type DashboardSection = 'overview' | 'products' | 'orders' | 'inventory';
+type DashboardSection =
+  | 'overview'
+  | 'products'
+  | 'purchaseOrders'
+  | 'inventory'
+  | 'customerOrders'
+  | 'feedbacks';
 
 @Component({
   selector: 'app-wholesaler-dashboard',
@@ -18,24 +24,27 @@ export class WholesalerDashboardComponent implements OnInit {
 
   products: any[] = [];
   filteredProducts: any[] = [];
-  orders: any[] = [];
-  inventories: any[] = [];
 
-  productSearch: string = '';
+  purchaseOrders: any[] = [];
+  customerOrders: any[] = [];
+  inventories: any[] = [];
+  feedbacks: any[] = [];
+
+  productSearch = '';
 
   selectedProduct: any = null;
-  orderDrawerOpen: boolean = false;
+  orderDrawerOpen = false;
   orderQuantity: number | null = null;
-  orderStatus: string = 'PENDING';
 
   inventoryProductId: number | null = null;
   inventoryStock: number | null = null;
   editingInventoryId: number | null = null;
 
-  toastMessage: string = '';
-  toastVisible: boolean = false;
+  toastMessage = '';
+  toastVisible = false;
+  toastError = false;
 
-  loading: boolean = false;
+  loading = false;
 
   readonly statuses: string[] = ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
@@ -47,7 +56,7 @@ export class WholesalerDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.auth.getUserId();
-    this.loadWholesalerDashboard();
+    this.refreshDashboard();
   }
 
   // =========================
@@ -58,8 +67,9 @@ export class WholesalerDashboardComponent implements OnInit {
     this.activeSection = section;
   }
 
-  showToast(message: string): void {
+  showToast(message: string, isError: boolean = false): void {
     this.toastMessage = message;
+    this.toastError = isError;
     this.toastVisible = true;
 
     setTimeout(() => {
@@ -72,25 +82,22 @@ export class WholesalerDashboardComponent implements OnInit {
   }
 
   refreshDashboard(): void {
-    this.loadWholesalerDashboard();
-  }
-
-  // =========================
-  // LOAD DASHBOARD DATA
-  // =========================
-
-  loadWholesalerDashboard(): void {
     this.loading = true;
-    this.showToast('Loading wholesaler dashboard data...');
 
     this.loadProducts();
-    this.loadOrders();
+    this.loadPurchaseOrders();
     this.loadInventories();
+    this.loadCustomerOrders();
+    this.loadFeedbacks();
 
     setTimeout(() => {
       this.loading = false;
     }, 600);
   }
+
+  // =========================
+  // LOAD DATA
+  // =========================
 
   loadProducts(): void {
     this.http.getProductsByWholesaler().subscribe({
@@ -103,37 +110,28 @@ export class WholesalerDashboardComponent implements OnInit {
         console.error('Failed to load products', err);
         this.products = [];
         this.filteredProducts = [];
-        this.showToast('Unable to load products from backend.');
+        this.showToast('Unable to load products.', true);
       }
     });
   }
 
-  loadOrders(): void {
-    if (!this.userId) {
-      return;
-    }
+  loadPurchaseOrders(): void {
+    if (!this.userId) return;
 
     this.http.getOrderByWholesalers(this.userId).subscribe({
       next: (res: any) => {
-        this.orders = Array.isArray(res) ? res : [];
-
-        this.orders = this.orders.map(order => ({
-          ...order,
-          selectedStatus: this.normalizeStatus(order.status)
-        }));
+        this.purchaseOrders = Array.isArray(res) ? res : [];
       },
       error: (err) => {
-        console.error('Failed to load orders', err);
-        this.orders = [];
-        this.showToast('Unable to load orders from backend.');
+        console.error('Failed to load purchase orders', err);
+        this.purchaseOrders = [];
+        this.showToast('Unable to load purchase orders.', true);
       }
     });
   }
 
   loadInventories(): void {
-    if (!this.userId) {
-      return;
-    }
+    if (!this.userId) return;
 
     this.http.getInventoryByWholesalers(this.userId).subscribe({
       next: (res: any) => {
@@ -142,7 +140,41 @@ export class WholesalerDashboardComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load inventories', err);
         this.inventories = [];
-        this.showToast('Unable to load inventories from backend.');
+        this.showToast('Unable to load inventory.', true);
+      }
+    });
+  }
+
+  loadCustomerOrders(): void {
+    if (!this.userId) return;
+
+    this.http.getCustomerOrdersByWholesaler(this.userId).subscribe({
+      next: (res: any) => {
+        const data = Array.isArray(res) ? res : [];
+
+        this.customerOrders = data.map(order => ({
+          ...order,
+          selectedStatus: this.normalizeStatus(order.status)
+        }));
+      },
+      error: (err) => {
+        console.error('Failed to load customer orders', err);
+        this.customerOrders = [];
+        this.showToast('Unable to load customer orders.', true);
+      }
+    });
+  }
+
+  loadFeedbacks(): void {
+    if (!this.userId) return;
+
+    this.http.getWholesalerFeedbacks(this.userId).subscribe({
+      next: (res: any) => {
+        this.feedbacks = Array.isArray(res) ? res : [];
+      },
+      error: (err) => {
+        console.error('Failed to load feedbacks', err);
+        this.feedbacks = [];
       }
     });
   }
@@ -151,14 +183,22 @@ export class WholesalerDashboardComponent implements OnInit {
   // STATS
   // =========================
 
-  get deliveredOrderCount(): number {
-    return this.orders.filter(order =>
-      this.normalizeStatus(order.status) === 'DELIVERED'
-    ).length;
+  get purchaseDeliveredCount(): number {
+    return this.purchaseOrders.filter(order => this.normalizeStatus(order.status) === 'DELIVERED').length;
+  }
+
+  get customerDeliveredCount(): number {
+    return this.customerOrders.filter(order => this.normalizeStatus(order.status) === 'DELIVERED').length;
+  }
+
+  get totalInventoryStock(): number {
+    return this.inventories.reduce((sum, item) => {
+      return sum + Number(item.stockQuantity || 0);
+    }, 0);
   }
 
   // =========================
-  // PRODUCTS
+  // PRODUCT SEARCH
   // =========================
 
   onProductSearch(value: string): void {
@@ -180,7 +220,7 @@ export class WholesalerDashboardComponent implements OnInit {
     }
 
     this.filteredProducts = this.products.filter(product => {
-      const searchableText = [
+      return [
         product.id,
         product.name,
         product.description,
@@ -189,16 +229,18 @@ export class WholesalerDashboardComponent implements OnInit {
         product.manufacturerId
       ]
         .map(value => String(value ?? '').toLowerCase())
-        .join(' ');
-
-      return searchableText.includes(query);
+        .join(' ')
+        .includes(query);
     });
   }
+
+  // =========================
+  // PLACE ORDER TO MANUFACTURER
+  // =========================
 
   openOrderDrawer(product: any): void {
     this.selectedProduct = product;
     this.orderQuantity = null;
-    this.orderStatus = 'PENDING';
     this.orderDrawerOpen = true;
   }
 
@@ -206,8 +248,76 @@ export class WholesalerDashboardComponent implements OnInit {
     this.orderDrawerOpen = false;
     this.selectedProduct = null;
     this.orderQuantity = null;
-    this.orderStatus = 'PENDING';
   }
+
+  setOrderQuantity(value: string): void {
+    this.orderQuantity = value ? Number(value) : null;
+  }
+
+  placeWholesalerOrder(): void {
+    if (!this.selectedProduct?.id) {
+      this.showToast('Please select a product first.', true);
+      return;
+    }
+
+    if (!this.userId) {
+      this.showToast('User session not found.', true);
+      return;
+    }
+
+    if (!this.orderQuantity || this.orderQuantity <= 0) {
+      this.showToast('Please enter valid quantity.', true);
+      return;
+    }
+
+    const payload = {
+      quantity: this.orderQuantity,
+      status: 'PENDING'
+    };
+
+    this.http.placeOrder(payload, this.selectedProduct.id, this.userId).subscribe({
+      next: () => {
+        this.showToast('Purchase order placed. Waiting for manufacturer update.');
+        this.closeOrderDrawer();
+        this.loadPurchaseOrders();
+        this.showSection('purchaseOrders');
+      },
+      error: (err) => {
+        console.error('Place purchase order failed', err);
+        this.showToast('Failed to place purchase order.', true);
+      }
+    });
+  }
+
+  // =========================
+  // CUSTOMER ORDER STATUS
+  // =========================
+
+  updateCustomerOrderStatus(order: any): void {
+    const status = order.selectedStatus || 'PENDING';
+
+    this.http.updateCustomerOrderStatus(order.id, status).subscribe({
+      next: () => {
+        this.showToast('Customer order status updated.');
+        this.loadCustomerOrders();
+        this.loadInventories();
+      },
+      error: (err) => {
+        console.error('Customer order status update failed', err);
+
+        const message =
+          err?.error?.message ||
+          err?.error?.error ||
+          'Failed to update customer order status.';
+
+        this.showToast(message, true);
+      }
+    });
+  }
+
+  // =========================
+  // INVENTORY
+  // =========================
 
   selectProductForInventory(product: any): void {
     this.activeSection = 'inventory';
@@ -217,77 +327,14 @@ export class WholesalerDashboardComponent implements OnInit {
     this.showToast(`${product.name} selected for inventory.`);
   }
 
-  // =========================
-  // PLACE ORDER
-  // =========================
-
-  placeWholesalerOrder(): void {
-    if (!this.selectedProduct || !this.selectedProduct.id) {
-      this.showToast('Please select a product first.');
-      return;
-    }
-
-    if (!this.userId) {
-      this.showToast('User session not found. Please login again.');
-      return;
-    }
-
-    if (!this.orderQuantity || this.orderQuantity <= 0) {
-      this.showToast('Please enter a valid order quantity.');
-      return;
-    }
-
-    const payload = {
-      quantity: this.orderQuantity,
-      status: this.orderStatus
-    };
-
-    this.http.placeOrder(payload, this.selectedProduct.id, this.userId).subscribe({
-      next: () => {
-        this.showToast('Order placed successfully.');
-        this.closeOrderDrawer();
-        this.loadOrders();
-        this.activeSection = 'orders';
-      },
-      error: (err) => {
-        console.error('Place order failed', err);
-        this.showToast('Failed to place order.');
-      }
-    });
-  }
-
-  // =========================
-  // ORDER STATUS
-  // =========================
-
-  updateOrderStatus(order: any): void {
-    const status = order.selectedStatus || 'PENDING';
-
-    this.http.updateOrderStatus(order.id, status).subscribe({
-      next: () => {
-        this.showToast('Order status updated successfully.');
-        order.status = status;
-        this.loadOrders();
-      },
-      error: (err) => {
-        console.error('Order status update failed', err);
-        this.showToast('Failed to update order status.');
-      }
-    });
-  }
-
-  // =========================
-  // INVENTORY
-  // =========================
-
   submitInventory(): void {
     if (!this.inventoryProductId) {
-      this.showToast('Please select a product.');
+      this.showToast('Please select a product.', true);
       return;
     }
 
     if (!this.inventoryStock || this.inventoryStock <= 0) {
-      this.showToast('Please enter a valid stock quantity.');
+      this.showToast('Please enter valid stock quantity.', true);
       return;
     }
 
@@ -299,9 +346,7 @@ export class WholesalerDashboardComponent implements OnInit {
   }
 
   addInventory(): void {
-    if (!this.userId || !this.inventoryProductId || !this.inventoryStock) {
-      return;
-    }
+    if (!this.userId || !this.inventoryProductId || !this.inventoryStock) return;
 
     const payload = {
       wholesalerId: this.userId,
@@ -316,15 +361,13 @@ export class WholesalerDashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Add inventory failed', err);
-        this.showToast('Failed to add inventory.');
+        this.showToast('Failed to add inventory.', true);
       }
     });
   }
 
   updateInventory(): void {
-    if (!this.editingInventoryId || !this.inventoryStock) {
-      return;
-    }
+    if (!this.editingInventoryId || !this.inventoryStock) return;
 
     this.http.updateInventory(this.inventoryStock, this.editingInventoryId).subscribe({
       next: () => {
@@ -334,7 +377,7 @@ export class WholesalerDashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Update inventory failed', err);
-        this.showToast('Failed to update inventory.');
+        this.showToast('Failed to update inventory.', true);
       }
     });
   }
@@ -344,7 +387,6 @@ export class WholesalerDashboardComponent implements OnInit {
     this.inventoryProductId = inventory.product?.id || null;
     this.inventoryStock = inventory.stockQuantity || null;
     this.activeSection = 'inventory';
-    this.showToast('Inventory loaded for editing.');
   }
 
   resetInventoryForm(): void {
@@ -353,20 +395,12 @@ export class WholesalerDashboardComponent implements OnInit {
     this.inventoryStock = null;
   }
 
-  // =========================
-  // TEMPLATE VALUE SETTERS
-  // =========================
-
   setInventoryProductId(value: string): void {
     this.inventoryProductId = value ? Number(value) : null;
   }
 
   setInventoryStock(value: string): void {
     this.inventoryStock = value ? Number(value) : null;
-  }
-
-  setOrderQuantity(value: string): void {
-    this.orderQuantity = value ? Number(value) : null;
   }
 
   // =========================
@@ -380,36 +414,28 @@ export class WholesalerDashboardComponent implements OnInit {
   getStatusClass(status: string): string {
     const normalized = this.normalizeStatus(status);
 
-    if (normalized === 'SHIPPED') {
-      return 'status-shipped';
-    }
-
-    if (normalized === 'DELIVERED') {
-      return 'status-delivered';
-    }
-
-    if (normalized === 'CANCELLED') {
-      return 'status-cancelled';
-    }
+    if (normalized === 'SHIPPED') return 'status-shipped';
+    if (normalized === 'DELIVERED') return 'status-delivered';
+    if (normalized === 'CANCELLED') return 'status-cancelled';
 
     return 'status-pending';
   }
 
   getProductName(product: any): string {
-    if (!product) {
-      return 'Product not available';
-    }
-
+    if (!product) return 'Product not available';
     return product.name || `Product #${product.id || 'N/A'}`;
   }
 
-  formatCurrency(value: any): string {
-    const amount = Number(value || 0);
+  getUserName(user: any): string {
+    if (!user) return 'User';
+    return user.username || user.email || `User #${user.id || 'N/A'}`;
+  }
 
+  formatCurrency(value: any): string {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 2
-    }).format(amount);
+    }).format(Number(value || 0));
   }
 }

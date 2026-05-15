@@ -1,6 +1,7 @@
 package com.edutech.supply_of_goods_management.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,4 +37,10 @@ public class InventoryService {
     public List<Inventory> getAllInventories(Long wholesalerId) {
         return repo.findByWholesalerId(wholesalerId);
     }
+    public List<Inventory> getAllAvailableInventories() {
+    return repo.findAll()
+            .stream()
+            .filter(inv -> inv.getStockQuantity() > 0)
+            .collect(Collectors.toList());
+}
 }

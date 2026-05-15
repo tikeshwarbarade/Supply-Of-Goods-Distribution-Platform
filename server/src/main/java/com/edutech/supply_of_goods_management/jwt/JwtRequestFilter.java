@@ -4,6 +4,7 @@ import com.edutech.supply_of_goods_management.service.UserService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -26,46 +27,51 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private UserService userService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain chain
+    ) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
 
         String username = null;
         String token = null;
+        String role = null;
 
-        // ✅ Extract token
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
 
             try {
                 username = jwtUtil.extractUsername(token);
+                Claims claims = jwtUtil.getClaims(token);
+                role = claims.get("role", String.class);
             } catch (Exception e) {
-                // invalid token → ignore (request will fail later)
+                System.out.println("Invalid JWT token: " + e.getMessage());
             }
         }
 
-        // ✅ Authenticate if username found and not already authenticated
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
+        if (
+            username != null &&
+            role != null &&
+            SecurityContextHolder.getContext().getAuthentication() == null
+        ) {
             UserDetails userDetails = userService.loadUserByUsername(username);
 
-            // ✅ No expiry check here because your test system expects simplified validation
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities()
+                            AuthorityUtils.createAuthorityList(role)
                     );
 
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            authToken.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 
-        // ✅ Continue filter chain
         chain.doFilter(request, response);
     }
 }

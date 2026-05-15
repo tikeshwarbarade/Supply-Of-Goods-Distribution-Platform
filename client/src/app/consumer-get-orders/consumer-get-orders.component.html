@@ -1,20 +1,101 @@
-<div class="container">
+<main class="orders-page">
 
-  <h4>Orders</h4>
+  <section class="orders-shell">
 
-  <div *ngFor="let o of orders" class="card p-2 mb-2">
+    <header class="page-header">
+      <span class="role-pill">CONSUMER ORDERS</span>
+      <h2>My Orders</h2>
+      <p>Track your orders. Feedback is available only after order is DELIVERED.</p>
+    </header>
 
-    <p>Quantity: {{o.quantity}}</p>
-    <p>Status: {{o.status}}</p>
-    <p>Product: {{o.product.name}}</p>
+    <div class="message" *ngIf="message" [class.error]="messageError">
+      {{ message }}
+    </div>
 
-    <textarea [(ngModel)]="feedback"></textarea>
+    <div class="table-card">
+      <div class="responsive-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Status</th>
+              <th>Feedback</th>
+            </tr>
+          </thead>
 
-    <button class="btn btn-success"
-            (click)="addFeedback(o.id)">
-      Add Feedback
-    </button>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td>#{{ order.id }}</td>
 
-  </div>
+              <td>{{ getProductName(order.product) }}</td>
 
-</div>
+              <td>{{ order.quantity || 0 }}</td>
+
+              <td>
+                <span class="status-pill" [ngClass]="getStatusClass(order.status)">
+                  {{ normalizeStatus(order.status) }}
+                </span>
+              </td>
+
+              <td>
+                <button
+                  class="small-btn"
+                  type="button"
+                  *ngIf="normalizeStatus(order.status) === 'DELIVERED'"
+                  (click)="openFeedback(order)">
+                  Give Feedback
+                </button>
+
+                <span class="muted" *ngIf="normalizeStatus(order.status) !== 'DELIVERED'">
+                  Available after delivery
+                </span>
+              </td>
+            </tr>
+
+            <tr *ngIf="loading">
+              <td colspan="5">
+                <div class="empty-state">Loading orders...</div>
+              </td>
+            </tr>
+
+            <tr *ngIf="!loading && orders.length === 0">
+              <td colspan="5">
+                <div class="empty-state">No orders found.</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <section class="feedback-panel" *ngIf="feedbackOrderId">
+      <h3>Submit Feedback for Order #{{ feedbackOrderId }}</h3>
+
+      <textarea
+        placeholder="Write your feedback..."
+        [value]="feedbackContent"
+        (input)="setFeedbackContent($any($event.target).value)">
+      </textarea>
+
+      <div class="feedback-actions">
+        <button
+          type="button"
+          [disabled]="submitting"
+          (click)="submitFeedback()">
+          {{ submitting ? 'Submitting...' : 'Submit Feedback' }}
+        </button>
+
+        <button
+          type="button"
+          class="cancel"
+          (click)="cancelFeedback()">
+          Cancel
+        </button>
+      </div>
+    </section>
+
+  </section>
+
+</main>
