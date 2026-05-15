@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
+import { SessionService } from '../../services/session.service';
 
 @Component({
   selector: 'app-login',
@@ -40,13 +41,13 @@ export class LoginComponent implements OnInit {
     '#0f172a',
     '#1d4ed8'
   ];
-
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpService,
-    private auth: AuthService,
-    private router: Router
-  ) {}
+constructor(
+  private fb: FormBuilder,
+  private http: HttpService,
+  private auth: AuthService,
+  private router: Router,
+  private sessionService: SessionService
+) {}
 
   ngOnInit() {
     this.generateCaptcha();
@@ -134,50 +135,62 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  submit() {
-    this.formMessage = '';
-    this.formMessageError = false;
+ submit() {
+  this.formMessage = '';
+  this.formMessageError = false;
 
-    if (this.itemForm.invalid) {
-      this.itemForm.markAllAsTouched();
-      this.formMessage = 'Please enter username and password.';
+  if (this.itemForm.invalid) {
+    this.itemForm.markAllAsTouched();
+    this.formMessage = 'Please enter username and password.';
+    this.formMessageError = true;
+    return;
+  }
+
+  // ✅ Skip captcha only for tests
+  if (!this.isTest && !this.captchaVerified) {
+    if (!this.verifyCaptcha()) {
+      this.formMessage = 'Please verify captcha before login.';
       this.formMessageError = true;
       return;
     }
-
-    // ✅ Skip captcha only for tests
-    if (!this.isTest && !this.captchaVerified) {
-      if (!this.verifyCaptcha()) {
-        this.formMessage = 'Please verify captcha before login.';
-        this.formMessageError = true;
-        return;
-      }
-    }
-
-    this.http.Login(this.itemForm.value).subscribe({
-      next: (res: any) => {
-        this.auth.saveToken(res.token);
-        this.auth.SetRole(res.role);
-        this.auth.saveUserId(res.userId);
-
-        this.formMessage = 'Login successful.';
-        this.formMessageError = false;
-
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        console.error(err);
-        this.formMessage = 'Invalid Username or Password.';
-        this.formMessageError = true;
-        alert('Invalid Username or Password ❌');
-
-        if (!this.isTest) {
-          this.generateCaptcha();
-        }
-      }
-    });
   }
 
+  this.http.Login(this.itemForm.value).subscribe({
+  next: (res: any) => {
+  this.auth.saveToken(res.token);
+  this.auth.SetRole(res.role);
+  this.auth.saveUserId(res.userId);
+
+  this.formMessage = 'Login successful.';
+  this.formMessageError = false;
+
+  if (res.role === 'WHOLESALER') {
+    this.router.navigate(['/wholesaler-dashboard']);
+    return;
+  }
+
+  this.router.navigate(['/dashboard']);
+},
+    error: (err) => {
+      console.error(err);
+
+      if (err.status === 409) {
+        this.formMessage = 'User is already logged in from another session.';
+        this.formMessageError = true;
+        alert('User already logged in from another browser/session ❌');
+        return;
+      }
+
+      this.formMessage = 'Invalid Username or Password.';
+      this.formMessageError = true;
+      alert('Invalid Username or Password ❌');
+
+      if (!this.isTest) {
+        this.generateCaptcha();
+      }
+    }
+  });
+}
   onSubmit() {
     this.submit();
   }

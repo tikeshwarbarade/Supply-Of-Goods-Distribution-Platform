@@ -27,12 +27,10 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
-  // ✅ FIXED
   get getLoginStatus(): boolean {
     return localStorage.getItem('token') !== null;
   }
 
-  // ✅ FIXED
   get getRole(): string | null {
     return localStorage.getItem('role');
   }

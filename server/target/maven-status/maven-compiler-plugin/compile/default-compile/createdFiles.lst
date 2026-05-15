@@ -1,4 +1,5 @@
 com/edutech/supply_of_goods_management/dto/LoginResponse.class
 com/edutech/supply_of_goods_management/entity/Feedback.class
 com/edutech/supply_of_goods_management/jwt/JwtUtil.class
+com/edutech/supply_of_goods_management/controller/WholesalerController.class
 com/edutech/supply_of_goods_management/dto/LoginRequest.class

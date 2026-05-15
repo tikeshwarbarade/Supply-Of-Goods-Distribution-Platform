@@ -129,4 +129,20 @@ private baseUrl = this.isTest
       this.getHeaders()
     );
   }
+
+ logoutUser(userId: number) {
+  return this.http.post(
+    `${this.baseUrl}/api/user/logout?userId=${userId}`,
+    {},
+    this.isTest ? this.getHeaders() : {}
+  );
+}
+
+updateUserActivity(userId: number) {
+  return this.http.post(
+    `${this.baseUrl}/api/user/activity?userId=${userId}`,
+    {},
+    this.isTest ? this.getHeaders() : {}
+  );
+}
 }

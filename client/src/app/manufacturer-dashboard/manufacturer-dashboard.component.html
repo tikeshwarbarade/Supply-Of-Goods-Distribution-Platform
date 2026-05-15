@@ -1,0 +1,1246 @@
+<div class="app-layout" [class.dark-mode]="darkMode">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="logo-area">
+      <i class="fas fa-cubes logo-icon"></i>
+      <span class="logo-text">
+        Nexus<span class="logo-accent">Pro</span>
+      </span>
+    </div>
+
+    <nav class="nav-menu">
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'dashboard'"
+        type="button"
+        (click)="switchSection('dashboard')">
+        <i class="fas fa-chart-line nav-icon"></i>
+        <span>Dashboard</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'products'"
+        type="button"
+        (click)="switchSection('products')">
+        <i class="fas fa-boxes nav-icon"></i>
+        <span>Products</span>
+        <span class="nav-badge">{{ products.length }}</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'orders'"
+        type="button"
+        (click)="switchSection('orders')">
+        <i class="fas fa-truck-fast nav-icon"></i>
+        <span>Orders</span>
+        <span class="nav-badge">{{ orders.length }}</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'warehouses'"
+        type="button"
+        (click)="switchSection('warehouses')">
+        <i class="fas fa-warehouse nav-icon"></i>
+        <span>Warehouses</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'analytics'"
+        type="button"
+        (click)="switchSection('analytics')">
+        <i class="fas fa-chart-simple nav-icon"></i>
+        <span>Analytics</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'finance'"
+        type="button"
+        (click)="switchSection('finance')">
+        <i class="fas fa-coins nav-icon"></i>
+        <span>Finance</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'customers'"
+        type="button"
+        (click)="switchSection('customers')">
+        <i class="fas fa-users nav-icon"></i>
+        <span>Customers</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'suppliers'"
+        type="button"
+        (click)="switchSection('suppliers')">
+        <i class="fas fa-truck nav-icon"></i>
+        <span>Suppliers</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="activeSection === 'settings'"
+        type="button"
+        (click)="switchSection('settings')">
+        <i class="fas fa-sliders-h nav-icon"></i>
+        <span>Settings</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <i class="fas fa-circle"></i>
+        Live Sync
+      </div>
+      <div class="version">v4.0 · Enterprise</div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <div class="topbar-left">
+        <h2>{{ sectionTitle }}</h2>
+
+        <div class="breadcrumb">
+          <i class="fas fa-home"></i>
+          /
+       <span>{{ getSectionLabel(activeSection) }}</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+
+        <div class="search-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            id="globalSearchInput"
+            type="text"
+            placeholder="Search products, orders, customers..."
+            [value]="globalSearch"
+            (input)="setGlobalSearch($any($event.target).value)"
+          />
+        </div>
+
+        <button
+          id="globalAddBtn"
+          class="primary-btn"
+          type="button"
+          (click)="quickCreate()">
+          <i class="fas fa-plus"></i>
+          Quick Create
+        </button>
+
+        <button
+          id="exportDataBtn"
+          class="secondary-btn"
+          type="button"
+          (click)="exportData()">
+          <i class="fas fa-download"></i>
+          Export
+        </button>
+
+        <button
+          id="importDataBtn"
+          class="secondary-btn"
+          type="button"
+          (click)="openImportModal()">
+          <i class="fas fa-upload"></i>
+          Import
+        </button>
+
+        <button
+          class="danger-btn"
+          type="button"
+          (click)="logout()">
+          <i class="fas fa-right-from-bracket"></i>
+          Logout
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- DASHBOARD -->
+    <section
+      id="dashboardSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'dashboard'">
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div>
+            <h3>Total Revenue</h3>
+            <h1>{{ formatCurrency(totalRevenue) }}</h1>
+            <span class="trend up">
+              <i class="fas fa-arrow-up"></i>
+              +18%
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-cubes"></i>
+          </div>
+          <div>
+            <h3>Total Products</h3>
+            <h1>{{ products.length }}</h1>
+            <span class="trend up">active SKUs</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div>
+            <h3>Total Orders</h3>
+            <h1>{{ orders.length }}</h1>
+            <span class="trend up">this month</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-warehouse"></i>
+          </div>
+          <div>
+            <h3>Warehouses</h3>
+            <h1>{{ warehouses.length }}</h1>
+            <span class="trend">global hubs</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="dashboard-row">
+
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-clock"></i>
+            <h3>Recent Orders</h3>
+
+            <button
+              class="view-all-link"
+              type="button"
+              (click)="switchSection('orders')">
+              View all
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <div id="recentOrdersTable" class="compact-table-container">
+
+            <table class="compact-table" *ngIf="recentOrders.length > 0">
+              <tbody>
+                <tr *ngFor="let order of recentOrders">
+                  <td>{{ order.productName }}</td>
+                  <td>{{ formatCurrency(order.total) }}</td>
+                  <td>
+                <span
+  [class]="'badge-status badge-' + (order.status || '').toLowerCase()">
+  {{ order.status }}
+</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="text-muted" *ngIf="recentOrders.length === 0">
+              No recent orders.
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Low Stock Alerts</h3>
+          </div>
+
+          <div id="lowStockList" class="alert-list" *ngIf="lowStockProducts.length > 0">
+            <div class="low-stock-item" *ngFor="let product of lowStockProducts">
+              <span>
+                <i class="fas fa-box"></i>
+                {{ product.name }}
+              </span>
+              <span>
+                Stock: {{ getStock(product) }} &lt; {{ stockThreshold }}
+              </span>
+            </div>
+          </div>
+
+          <div class="text-muted" *ngIf="lowStockProducts.length === 0">
+            ✅ All stock levels are healthy
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-chart-pie"></i>
+          <h3>Top Products by Inventory Value</h3>
+        </div>
+
+        <div class="bar-list">
+          <div class="bar-row" *ngFor="let product of topProductsByValue">
+            <div class="bar-label">
+              <span>{{ product.name }}</span>
+              <strong>{{ formatCurrency(productInventoryValue(product)) }}</strong>
+            </div>
+
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                [style.width]="getTrendWidth(productInventoryValue(product) / 1000)">
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="topProductsByValue.length === 0">
+            No product value data available.
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-row">
+
+        <div class="card">
+          <h3>Monthly Revenue Trend</h3>
+
+          <div class="mock-chart">
+            <div class="chart-bar" style="height: 38%;">
+              <span>Jan</span>
+            </div>
+
+            <div class="chart-bar" style="height: 52%;">
+              <span>Feb</span>
+            </div>
+
+            <div class="chart-bar" style="height: 68%;">
+              <span>Mar</span>
+            </div>
+
+            <div class="chart-bar" style="height: 82%;">
+              <span>Apr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Order Status Distribution</h3>
+
+          <div class="status-summary">
+            <div class="status-summary-row" *ngFor="let item of orderStatusDistribution">
+              <span>{{ item.status }}</span>
+              <strong>{{ item.count }}</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- PRODUCTS -->
+    <section
+      id="productsSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'products'">
+
+      <div class="section-header-actions">
+        <h2>
+          <i class="fas fa-boxes"></i>
+          Product Inventory
+        </h2>
+
+        <div class="filter-group">
+          <input
+            id="productSearchInput"
+            type="text"
+            placeholder="Filter by name/description..."
+            [value]="productSearch"
+            (input)="setProductSearch($any($event.target).value)"
+          />
+
+          <button
+            id="addProductBtnNew"
+            class="primary-btn small"
+            type="button"
+            (click)="goToCreateProduct()">
+            <i class="fas fa-plus"></i>
+            Add Product
+          </button>
+
+          <button
+            class="secondary-btn small"
+            type="button"
+            (click)="openProductModal()">
+            <i class="fas fa-pen"></i>
+            Add Local
+          </button>
+        </div>
+      </div>
+
+      <div id="productsGrid" class="products-grid">
+
+        <div class="product-card" *ngFor="let product of filteredProducts">
+
+          <div class="product-banner">
+            <i [class]="product.icon || 'fas fa-box'"></i>
+          </div>
+
+          <div class="product-content">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description }}</p>
+            <h4>{{ formatCurrency(product.price) }}</h4>
+            <p>Stock: {{ getStock(product) }} units</p>
+
+            <div class="product-actions">
+              <button
+                class="edit-btn"
+                type="button"
+                (click)="openProductModal(product)">
+                <i class="fas fa-edit"></i>
+                Edit
+              </button>
+
+              <button
+                class="delete-btn"
+                type="button"
+                (click)="deleteProduct(product.id)">
+                <i class="fas fa-trash"></i>
+                Delete
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="empty-state" *ngIf="filteredProducts.length === 0">
+          No products found.
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ORDERS -->
+    <section
+      id="ordersSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'orders'">
+
+      <div class="section-header-actions">
+        <h2>
+          <i class="fas fa-truck"></i>
+          Order Management
+        </h2>
+
+        <button
+          id="createOrderBtn"
+          class="primary-btn"
+          type="button"
+          (click)="openOrderModal()">
+          <i class="fas fa-plus-circle"></i>
+          New Order
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Total ₹</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody id="ordersTableBody">
+            <tr *ngFor="let order of filteredOrders">
+              <td>#{{ order.id }}</td>
+              <td>{{ order.customerName }}</td>
+              <td>{{ order.productName }}</td>
+              <td>{{ order.quantity }}</td>
+              <td>{{ formatCurrency(order.total) }}</td>
+
+              <td>
+                <span
+                  class="badge-status"
+                  [ngClass]="'badge-' + (order.status || '').toLowerCase()">
+                  {{ order.status }}
+                </span>
+              </td>
+
+              <td>{{ order.date }}</td>
+
+              <td>
+                <button
+                  class="edit-btn small"
+                  type="button"
+                  (click)="openStatusModal(order)">
+                  <i class="fas fa-pen"></i>
+                  Status
+                </button>
+
+                <button
+                  class="delete-btn small"
+                  type="button"
+                  (click)="deleteOrder(order.id)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredOrders.length === 0">
+              <td colspan="8">No orders available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- WAREHOUSES -->
+    <section
+      id="warehousesSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'warehouses'">
+
+      <div class="section-header-actions">
+        <h2>
+          <i class="fas fa-building"></i>
+          Warehouses &amp; Stock Hubs
+        </h2>
+
+        <button
+          id="addWarehouseBtn"
+          class="secondary-btn"
+          type="button"
+          (click)="openWarehouseModal()">
+          <i class="fas fa-plus"></i>
+          Register Hub
+        </button>
+      </div>
+
+      <div id="warehousesGrid" class="warehouse-cards-grid">
+
+        <div class="warehouse-card" *ngFor="let warehouse of warehouses">
+          <i class="fas fa-building warehouse-main-icon"></i>
+
+          <h3>{{ warehouse.name }}</h3>
+          <p>📍 {{ warehouse.location }}</p>
+          <p>📦 Usage: {{ warehouse.used }}/{{ warehouse.capacity }} units</p>
+
+          <div class="bar-track">
+            <div
+              class="bar-fill"
+              [style.width]="getUsagePercentage(warehouse) + '%'">
+            </div>
+          </div>
+
+          <button
+            class="delete-btn small"
+            type="button"
+            (click)="deleteWarehouse(warehouse.id)">
+            <i class="fas fa-trash"></i>
+            Delete
+          </button>
+        </div>
+
+        <div class="empty-state" *ngIf="warehouses.length === 0">
+          No warehouses registered.
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ANALYTICS -->
+    <section
+      id="analyticsSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'analytics'">
+
+      <h2>
+        <i class="fas fa-chart-line"></i>
+        Advanced Analytics
+      </h2>
+
+      <div class="analytics-dashboard">
+
+        <div class="card">
+          <h3>Top Selling SKUs by Revenue</h3>
+
+          <div id="topSellingList" class="bar-list">
+            <div class="bar-row" *ngFor="let product of topProductsByValue">
+              <div class="bar-label">
+                <span>{{ product.name }}</span>
+                <strong>{{ formatCurrency(productInventoryValue(product)) }}</strong>
+              </div>
+
+              <div class="bar-track">
+                <div
+                  class="bar-fill"
+                  [style.width]="getTrendWidth(productInventoryValue(product) / 1000)">
+                </div>
+              </div>
+            </div>
+
+            <div class="empty-state" *ngIf="topProductsByValue.length === 0">
+              No analytics data available.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Inventory Turnover Rate</h3>
+
+          <div class="bar-list">
+            <div class="bar-row" *ngFor="let product of topProductsByValue">
+              <div class="bar-label">
+                <span>{{ product.name }}</span>
+                <strong>{{ getStock(product) }}</strong>
+              </div>
+
+              <div class="bar-track">
+                <div
+                  class="bar-fill green"
+                  [style.width]="getTrendWidth(getStock(product))">
+                </div>
+              </div>
+            </div>
+
+            <div class="empty-state" *ngIf="topProductsByValue.length === 0">
+              No turnover data available.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- FINANCE -->
+    <section
+      id="financeSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'finance'">
+
+      <h2>
+        <i class="fas fa-coins"></i>
+        Financial Overview
+      </h2>
+
+      <div class="finance-cards">
+
+        <div class="stat-card">
+          <h3>Gross Revenue</h3>
+          <h2>{{ formatCurrency(grossRevenue) }}</h2>
+        </div>
+
+        <div class="stat-card">
+          <h3>Net Profit est. 28%</h3>
+          <h2>{{ formatCurrency(netProfit) }}</h2>
+        </div>
+
+        <div class="stat-card">
+          <h3>Inventory Value</h3>
+          <h2>{{ formatCurrency(inventoryValue) }}</h2>
+        </div>
+
+        <div class="stat-card">
+          <h3>Outstanding Orders Value</h3>
+          <h2>{{ formatCurrency(outstandingValue) }}</h2>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <h3>Expense Overview</h3>
+
+        <div class="mock-chart">
+          <div class="chart-bar warning" style="height: 65%;">
+            <span>Procurement</span>
+          </div>
+
+          <div class="chart-bar warning" style="height: 40%;">
+            <span>Logistics</span>
+          </div>
+
+          <div class="chart-bar warning" style="height: 55%;">
+            <span>Operations</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CUSTOMERS -->
+    <section
+      id="customersSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'customers'">
+
+      <div class="section-header-actions">
+        <h2>
+          <i class="fas fa-user-friends"></i>
+          Customer Directory
+        </h2>
+
+        <button
+          id="addCustomerBtn"
+          class="primary-btn"
+          type="button"
+          (click)="openCustomerModal()">
+          <i class="fas fa-user-plus"></i>
+          Add Customer
+        </button>
+      </div>
+
+      <div id="customersList" class="customers-grid">
+
+        <div class="customer-card" *ngFor="let customer of filteredCustomers">
+          <i class="fas fa-user-circle fa-2x"></i>
+
+          <h3>{{ customer.name }}</h3>
+          <p>{{ customer.email }}</p>
+          <p>{{ customer.phone }}</p>
+          <small>{{ customer.company }}</small>
+
+          <div>
+            <button
+              class="delete-btn small"
+              type="button"
+              (click)="deleteCustomer(customer.id)">
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="filteredCustomers.length === 0">
+          No customers available.
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SUPPLIERS -->
+    <section
+      id="suppliersSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'suppliers'">
+
+      <div class="section-header-actions">
+        <h2>
+          <i class="fas fa-truck"></i>
+          Supplier Management
+        </h2>
+
+        <button
+          id="addSupplierBtn"
+          class="primary-btn"
+          type="button"
+          (click)="openSupplierModal()">
+          <i class="fas fa-plus"></i>
+          Add Supplier
+        </button>
+      </div>
+
+      <div id="suppliersList" class="customers-grid">
+
+        <div class="customer-card" *ngFor="let supplier of filteredSuppliers">
+          <i class="fas fa-truck fa-2x"></i>
+
+          <h3>{{ supplier.name }}</h3>
+          <p>{{ supplier.material }}</p>
+          <p>{{ supplier.contact }}</p>
+
+          <div>
+            <button
+              class="delete-btn small"
+              type="button"
+              (click)="deleteSupplier(supplier.id)">
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="filteredSuppliers.length === 0">
+          No suppliers available.
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SETTINGS -->
+    <section
+      id="settingsSection"
+      class="section-container"
+      [class.active-section]="activeSection === 'settings'">
+
+      <h2>
+        <i class="fas fa-sliders-h"></i>
+        System Preferences
+      </h2>
+
+      <div class="settings-panel">
+
+        <div class="setting-item">
+          <span>Dark Mode dashboard only</span>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              [checked]="darkMode"
+              (change)="toggleDarkMode($any($event.target).checked)"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <span>Low Stock Threshold</span>
+
+          <input
+            type="number"
+            min="1"
+            style="width:100px;"
+            [value]="stockThreshold"
+            (input)="setStockThreshold($any($event.target).value)"
+          />
+        </div>
+
+        <div class="setting-item">
+          <button
+            id="resetDataBtn"
+            class="danger-btn"
+            type="button"
+            (click)="resetDemoData()">
+            <i class="fas fa-trash-alt"></i>
+            Reset All Demo Data
+          </button>
+        </div>
+
+        <div class="setting-item">
+          <button
+            id="generateSampleDataBtn"
+            class="secondary-btn"
+            type="button"
+            (click)="generateSampleData()">
+            <i class="fas fa-chart-line"></i>
+            Generate Sample Data
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div
+  id="productModal"
+  class="modal"
+  [class.hidden]="modal !== 'product'"
+  (click)="closeModalOnBackdrop($event)">
+
+  <div class="modal-content">
+    <h2>
+      <i class="fas fa-cube"></i>
+      Product Details
+    </h2>
+
+    <form id="productForm" (ngSubmit)="saveProduct()">
+
+      <input
+        type="text"
+        placeholder="Product Name"
+        required
+        [value]="productForm.name"
+        (input)="setProductName($any($event.target).value)"
+      />
+
+      <textarea
+        placeholder="Description"
+        [value]="productForm.description"
+        (input)="setProductDescription($any($event.target).value)">
+      </textarea>
+
+      <input
+        type="number"
+        placeholder="Price ₹"
+        required
+        [value]="productForm.price || ''"
+        (input)="setProductPrice($any($event.target).value)"
+      />
+
+      <input
+        type="number"
+        placeholder="Stock Quantity"
+        required
+        [value]="productForm.stock || ''"
+        (input)="setProductStock($any($event.target).value)"
+      />
+
+      <button
+        type="submit"
+        class="primary-btn full">
+        Save Product
+      </button>
+    </form>
+
+    <button
+      class="close-modal-btn secondary-btn full"
+      type="button"
+      (click)="closeModal()">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div
+  id="orderModal"
+  class="modal"
+  [class.hidden]="modal !== 'order'"
+  (click)="closeModalOnBackdrop($event)">
+
+  <div class="modal-content">
+    <h2>
+      <i class="fas fa-shopping-cart"></i>
+      Create Order
+    </h2>
+
+    <form id="orderForm" (ngSubmit)="saveOrder()">
+
+      <select
+        required
+        [value]="orderForm.productId || ''"
+        (change)="setOrderProductId($any($event.target).value)">
+        <option value="">Select Product</option>
+
+        <option
+          *ngFor="let product of products"
+          [value]="product.id">
+          {{ product.name }} — {{ formatCurrency(product.price) }} | Stock: {{ getStock(product) }}
+        </option>
+      </select>
+
+      <input
+        type="number"
+        min="1"
+        required
+        placeholder="Quantity"
+        [value]="orderForm.quantity || ''"
+        (input)="setOrderQuantity($any($event.target).value)"
+      />
+
+      <select
+        required
+        [value]="orderForm.customerId || ''"
+        (change)="setOrderCustomerId($any($event.target).value)">
+        <option value="">Select Customer</option>
+
+        <option
+          *ngFor="let customer of customers"
+          [value]="customer.id">
+          {{ customer.name }}
+        </option>
+      </select>
+
+      <button
+        type="submit"
+        class="primary-btn full">
+        Place Order
+      </button>
+    </form>
+
+    <button
+      class="close-modal-btn secondary-btn full"
+      type="button"
+      (click)="closeModal()">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- WAREHOUSE MODAL -->
+<div
+  id="warehouseModal"
+  class="modal"
+  [class.hidden]="modal !== 'warehouse'"
+  (click)="closeModalOnBackdrop($event)">
+
+  <div class="modal-content">
+    <h2>
+      <i class="fas fa-warehouse"></i>
+      Register Warehouse
+    </h2>
+
+    <form id="warehouseForm" (ngSubmit)="saveWarehouse()">
+
+      <input
+        type="text"
+        required
+        placeholder="Warehouse Name"
+        [value]="warehouseForm.name"
+        (input)="setWarehouseName($any($event.target).value)"
+      />
+
+      <input
+        type="text"
+        required
+        placeholder="City / Region"
+        [value]="warehouseForm.location"
+        (input)="setWarehouseLocation($any($event.target).value)"
+      />
+
+      <input
+        type="number"
+        required
+        placeholder="Capacity units"
+        [value]="warehouseForm.capacity || ''"
+        (input)="setWarehouseCapacity($any($event.target).value)"
+      />
+
+      <button
+        type="submit"
+        class="primary-btn full">
+        Create Hub
+      </button>
+    </form>
+
+    <button
+      class="close-modal-btn secondary-btn full"
+      type="button"
+      (click)="closeModal()">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- CUSTOMER MODAL -->
+<div
+  id="customerModal"
+  class="modal"
+  [class.hidden]="modal !== 'customer'"
+  (click)="closeModalOnBackdrop($event)">
+
+  <div class="modal-content">
+    <h2>
+      <i class="fas fa-user"></i>
+      New Customer
+    </h2>
+
+    <form id="customerForm" (ngSubmit)="saveCustomer()">
+
+      <input
+        type="text"
+        required
+        placeholder="Full Name / Company"
+        [value]="customerForm.name"
+        (input)="setCustomerName($any($event.target).value)"
+      />
+
+      <input
+        type="email"
+        required
+        placeholder="Email"
+        [value]="customerForm.email"
+        (input)="setCustomerEmail($any($event.target).value)"
+      />
+
+      <input
+        type="text"
+        placeholder="Phone"
+        [value]="customerForm.phone"
+        (input)="setCustomerPhone($any($event.target).value)"
+      />
+
+      <input
+        type="text"
+        placeholder="Organization"
+        [value]="customerForm.company"
+        (input)="setCustomerCompany($any($event.target).value)"
+      />
+
+      <button
+        type="submit"
+        class="primary-btn full">
+        Add Customer
+      </button>
+    </form>
+
+    <button
+      class="close-modal-btn secondary-btn full"
+      type="button"
+      (click)="closeModal()">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- SUPPLIER MODAL -->
+<div
+  id="supplierModal"
+  class="modal"
+  [class.hidden]="modal !== 'supplier'"
+  (click)="closeModalOnBackdrop($event)">
+
+  <div class="modal-content">
+    <h2>
+      <i class="fas fa-truck"></i>
+      Add Supplier
+    </h2>
+
+    <form id="supplierForm" (ngSubmit)="saveSupplier()">
+
+      <input
+        type="text"
+        required
+        placeholder="Supplier Name"
+        [value]="supplierForm.name"
+        (input)="setSupplierName($any($event.target).value)"
+      />
+
+      <input
+        type="text"
+        required
+        placeholder="Material Category"
+        [value]="supplierForm.material"
+        (input)="setSupplierMaterial($any($event.target).value)"
+      />
+
+      <input
+        type="text"
+        placeholder="Contact Info"
+        [value]="supplierForm.contact"
+        (input)="setSupplierContact($any($event.target).value)"
+      />
+
+      <button
+        type="submit"
+        class="primary-btn full">
+        Save Supplier
+      </button>
+    </form>
+
+    <button
+      class="close-modal-btn secondary-btn full"
+      type="button"
+      (click)="closeModal()">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- STATUS MODAL -->
+<div
+  id="statusModal"
+  class="modal"
+  [class.hidden]="modal !== 'status'"
+  (click)="closeModalOnBackdrop($event)">
+
+  <div class="modal-content">
+    <h2>Update Order Status</h2>
+
+    <select
+      class="full-input"
+      [value]="statusForm.status"
+      (change)="setStatus($any($event.target).value)">
+      <option
+        *ngFor="let status of statusOptions"
+        [value]="status">
+        {{ status }}
+      </option>
+    </select>
+
+    <div class="modal-actions">
+      <button
+        id="saveStatusBtn"
+        class="primary-btn"
+        type="button"
+        (click)="saveOrderStatus()">
+        Update
+      </button>
+
+      <button
+        id="closeStatusModalBtn"
+        class="secondary-btn"
+        type="button"
+        (click)="closeModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div
+  id="importModal"
+  class="modal"
+  [class.hidden]="modal !== 'import'"
+  (click)="closeModalOnBackdrop($event)">
+
+  <div class="modal-content">
+    <h2>Import Data JSON</h2>
+
+    <input
+      id="importFileInput"
+      type="file"
+      accept=".json"
+      (change)="importData($event)"
+    />
+
+    <div class="modal-actions">
+      <button
+        id="closeImportModalBtn"
+        class="secondary-btn"
+        type="button"
+        (click)="closeModal()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div
+  id="notificationToast"
+  class="toast-notification"
+  [class.hidden]="!notificationVisible"
+  [class.error]="notificationError">
+  {{ notificationMessage }}
+</div>
