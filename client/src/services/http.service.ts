@@ -63,7 +63,7 @@ export class HttpService {
 
   createProduct(data: any) {
     return this.http.post(
-      this.baseUrl + '/api/manufacturers/product',
+      `${this.baseUrl}/api/manufacturers/product`,
       data,
       this.getHeaders()
     );
@@ -105,7 +105,7 @@ export class HttpService {
 
   getProductsByWholesaler() {
     return this.http.get(
-      this.baseUrl + '/api/wholesalers/products',
+      `${this.baseUrl}/api/wholesalers/products`,
       this.getHeaders()
     );
   }
@@ -156,50 +156,50 @@ export class HttpService {
     );
   }
 
+  getCustomerOrdersByWholesaler(wholesalerId: number) {
+    return this.http.get(
+      `${this.baseUrl}/api/wholesalers/customer-orders?wholesalerId=${wholesalerId}`,
+      this.getHeaders()
+    );
+  }
+
+  updateCustomerOrderStatus(orderId: number, status: string) {
+    return this.http.put(
+      `${this.baseUrl}/api/wholesalers/customer-order/${orderId}?status=${status}`,
+      {},
+      this.getHeaders()
+    );
+  }
+
+  getWholesalerFeedbacks(wholesalerId: number) {
+    return this.http.get(
+      `${this.baseUrl}/api/wholesalers/feedbacks?wholesalerId=${wholesalerId}`,
+      this.getHeaders()
+    );
+  }
+
   // =========================
   // CONSUMER
   // =========================
 
   getInventoriesForConsumers() {
-  return this.http.get(
-    `${this.baseUrl}/api/consumers/inventories`,
-    this.getHeaders()
-  );
-}
+    return this.http.get(
+      `${this.baseUrl}/api/consumers/inventories`,
+      this.getHeaders()
+    );
+  }
 
-consumerPlaceInventoryOrder(data: any, inventoryId: number, userId: number) {
-  return this.http.post(
-    `${this.baseUrl}/api/consumers/inventory-order?inventoryId=${inventoryId}&userId=${userId}`,
-    data,
-    this.getHeaders()
-  );
-}
-
-getCustomerOrdersByWholesaler(wholesalerId: number) {
-  return this.http.get(
-    `${this.baseUrl}/api/wholesalers/customer-orders?wholesalerId=${wholesalerId}`,
-    this.getHeaders()
-  );
-}
-
-updateCustomerOrderStatus(orderId: number, status: string) {
-  return this.http.put(
-    `${this.baseUrl}/api/wholesalers/customer-order/${orderId}?status=${status}`,
-    {},
-    this.getHeaders()
-  );
-}
-
-getWholesalerFeedbacks(wholesalerId: number) {
-  return this.http.get(
-    `${this.baseUrl}/api/wholesalers/feedbacks?wholesalerId=${wholesalerId}`,
-    this.getHeaders()
-  );
-}
+  consumerPlaceInventoryOrder(data: any, inventoryId: number, userId: number) {
+    return this.http.post(
+      `${this.baseUrl}/api/consumers/inventory-order?inventoryId=${inventoryId}&userId=${userId}`,
+      data,
+      this.getHeaders()
+    );
+  }
 
   getProductsByConsumers() {
     return this.http.get(
-      this.baseUrl + '/api/consumers/products',
+      `${this.baseUrl}/api/consumers/products`,
       this.getHeaders()
     );
   }
@@ -226,6 +226,4 @@ getWholesalerFeedbacks(wholesalerId: number) {
       this.getHeaders()
     );
   }
-
-  
 }
