@@ -1,0 +1,528 @@
+
+<div class="landing-shell">
+  <!-- TOP STRIP -->
+  <div class="top-announcement-bar">
+    Free shipping over ₹999 • Trusted marketplace for manufacturers, wholesalers &amp; consumers
+  </div>
+  <!-- -------------------------------------------------- -->
+
+  <!-- <button type="button" class="mobile-menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h16"></path>
+      <path d="M4 12h16"></path>
+      <path d="M4 17h16"></path>
+    </svg>
+  </button> -->
+
+
+  <!-- ---------------------------------------------------------- -->
+  <!-- NAVBAR -->
+  <header class="navbar" [class.menu-open]="isMobileMenuOpen">
+    <div class="nav-left">
+      <a class="brand" routerLink="/">
+        <div class="brand-logo" aria-label="Nexus Logo">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7.5L12 3l8 4.5v9L12 21l-8-4.5v-9z"></path>
+            <path d="M12 12l8-4.5"></path>
+            <path d="M12 12v9"></path>
+            <path d="M12 12L4 7.5"></path>
+          </svg>
+        </div>
+
+        <div class="brand-copy">
+          <p class="brand-text">Nexus</p>
+          <p class="brand-subtext">Premium Trade Platform</p>
+        </div>
+      </a>
+    </div>
+
+    <nav class="nav-center">
+      <button type="button" class="nav-link" (click)="scrollToSection('aboutSection')">
+        About
+      </button>
+      <button type="button" class="nav-link" (click)="scrollToSection('rolesSection')">
+        Roles
+      </button>
+      <button type="button" class="nav-link" (click)="scrollToSection('statsSection')">
+        Insights
+      </button>
+      <button type="button" class="nav-link" (click)="scrollToSection('contactSection')">
+        Contact
+      </button>
+    </nav>
+<div class="nav-right">
+      <a *ngIf="!isLoggedIn" routerLink="/login" class="nav-utility-link">Login</a>
+      <a *ngIf="!isLoggedIn" routerLink="/registration" class="nav-cta">Get Started</a>
+
+      <a *ngIf="isLoggedIn" [routerLink]="getDashboardRoute()" class="nav-icon-btn" aria-label="Dashboard">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 13h7V4H4v9z"></path>
+          <path d="M13 20h7V4h-7v16z"></path>
+          <path d="M4 20h7v-5H4v5z"></path>
+        </svg>
+      </a>
+
+      <button *ngIf="isLoggedIn" type="button" class="nav-icon-btn" (click)="logout()" aria-label="Logout">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <path d="M16 17l5-5-5-5"></path>
+          <path d="M21 12H9"></path>
+        </svg>
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="mobile-menu-toggle"
+      (click)="toggleMobileMenu()"
+      aria-label="Toggle menu"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7h16"></path>
+        <path d="M4 12h16"></path>
+        <path d="M4 17h16"></path>
+      </svg>
+    </button>
+
+  </header>
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-banner" [style.background-image]="'url(' + heroImage + ')'">
+      <div class="hero-dark-overlay"></div>
+      <div class="hero-soft-glow"></div>
+
+      <div class="hero-inner">
+        <div class="hero-content">
+          <span class="hero-tag">SMART SUPPLY OF GOODS PLATFORM</span>
+
+          <h2>
+            NEXUS
+            <span>DISTRIBUTION HUB</span>
+          </h2>
+
+          <p>
+            A modern digital ecosystem connecting manufacturers, wholesalers,
+            and consumers with secure access, inventory visibility, bulk order
+            flow, and a cleaner marketplace experience.
+          </p>
+
+          <div class="hero-actions">
+            <button type="button" class="hero-outline-btn" (click)="scrollToSection('rolesSection')">
+              Explore Roles
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-bottom-band">
+        <div class="hero-band-item">
+          <strong>Manufacturers</strong>
+          <span>Manage products, inventory, and supply control</span>
+        </div>
+
+        <div class="hero-band-item">
+          <strong>Wholesalers</strong>
+          <span>Handle bulk ordering and stock movement efficiently</span>
+        </div>
+
+        <div class="hero-band-item">
+          <strong>Consumers</strong>
+          <span>Experience a cleaner and smarter buying journey</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS / IMPACT -->
+  <section class="stats-section" id="statsSection">
+    <div class="section-head centered stats-head">
+      <span class="section-label">Business Impact</span>
+      <h2>Built for growth across the entire supply chain</h2>
+      <p>
+        Nexus connects manufacturers, wholesalers, and consumers through one
+        intelligent marketplace ecosystem with cleaner workflows, stronger
+        visibility, and smarter digital trade movement.
+      </p>
+    </div>
+
+    <div class="impact-layout">
+      <article class="impact-summary-card">
+        <div class="impact-summary-top">
+          <span class="impact-summary-chip">Annual Growth</span>
+
+          <div class="impact-summary-value">
+            <strong>+38%</strong>
+            <span>Operational uplift</span>
+          </div>
+        </div>
+
+        <h3>Centralized trade flow built for measurable business performance</h3>
+
+        <p>
+          Nexus brings manufacturers, wholesalers, and consumers into one premium
+          ecosystem—reducing friction across product movement, inventory
+          visibility, and wholesale order execution.
+        </p>
+
+        <div class="impact-summary-points">
+          <div class="impact-point">
+            <span class="impact-point-dot"></span>
+            <p>Unified product visibility across all participant roles</p>
+          </div>
+
+          <div class="impact-point">
+            <span class="impact-point-dot"></span>
+            <p>Faster stock movement with role-based operational flow</p>
+          </div>
+
+          <div class="impact-point">
+            <span class="impact-point-dot"></span>
+            <p>Cleaner consumer journey with improved conversion potential</p>
+          </div>
+        </div>
+      </article>
+
+      <div class="impact-card-grid">
+        <article class="impact-card" *ngFor="let stat of stats">
+          <div class="impact-card-top">
+            <span class="impact-card-icon">{{ stat.icon }}</span>
+            <span class="impact-card-trend">{{ stat.trend }}</span>
+          </div>
+
+          <h4>{{ stat.value }}</h4>
+          <h5>{{ stat.title }}</h5>
+          <p>{{ stat.description }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM IMPACT -->
+  <section class="nexus-value-section">
+    <div class="nexus-value-shell">
+      <div class="nexus-value-head">
+        <span class="nexus-value-label">Platform Impact</span>
+        <h2>Business Impact &amp; What Teams Gain With Nexus</h2>
+        <p>
+          A premium ecosystem designed to improve manufacturer operations,
+          simplify wholesale flow, and create a better experience for end consumers.
+        </p>
+      </div>
+
+      <div class="nexus-value-top-grid">
+        <article class="nexus-feature-card">
+          <div class="nexus-feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3l7 4v10l-7 4-7-4V7l7-4z"></path>
+              <path d="M8.5 12l2.2 2.2L15.5 9.5"></path>
+            </svg>
+          </div>
+          <h3>Smarter Manufacturer Control</h3>
+          <p>
+            Manage products, stock visibility, and supply movement with a cleaner
+            workflow built for production-side efficiency.
+          </p>
+        </article>
+
+        <article class="nexus-feature-card">
+          <div class="nexus-feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 7h12v8H3z"></path>
+              <path d="M15 10h3l3 3v2h-6z"></path>
+              <path d="M7 18a1.5 1.5 0 1 0 0 .01"></path>
+              <path d="M18 18a1.5 1.5 0 1 0 0 .01"></path>
+            </svg>
+          </div>
+          <h3>Faster Wholesale Movement</h3>
+          <p>
+            Enable bulk-ready order handling, improved stock coordination,
+            and smoother inventory movement across the distribution chain.
+          </p>
+        </article>
+
+        <article class="nexus-feature-card">
+          <div class="nexus-feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 7h15l-1.4 6.2a2 2 0 0 1-2 1.6H9.2a2 2 0 0 1-2-1.6L6 7z"></path>
+              <path d="M6 7L5 4H2"></path>
+              <path d="M10 19a1.5 1.5 0 1 0 0 .01"></path>
+              <path d="M17 19a1.5 1.5 0 1 0 0 .01"></path>
+            </svg>
+          </div>
+          <h3>Better Consumer Experience</h3>
+          <p>
+            Give buyers a cleaner marketplace journey with stronger product clarity,
+            easier browsing, and improved trust in the platform experience.
+          </p>
+        </article>
+      </div>
+
+      <div class="nexus-value-bottom-grid">
+        <article class="nexus-insight-card">
+          <span class="nexus-insight-number">01</span>
+          <h4>Profit Optimization</h4>
+          <p>
+            Better stock visibility and connected trade flow improve operational
+            efficiency across the platform.
+          </p>
+          <strong class="nexus-insight-value">+18.5%</strong>
+        </article>
+
+        <article class="nexus-insight-card">
+          <span class="nexus-insight-number">02</span>
+          <h4>Manufacturer Reach</h4>
+          <p>
+            More suppliers can onboard and publish products quickly through one
+            centralized digital marketplace.
+          </p>
+          <strong class="nexus-insight-value">1,240+</strong>
+        </article>
+
+        <article class="nexus-insight-card">
+          <span class="nexus-insight-number">03</span>
+          <h4>Bulk Order Flow</h4>
+          <p>
+            Wholesalers benefit from cleaner order movement, smoother replenishment,
+            and better stock coordination.
+          </p>
+          <strong class="nexus-insight-value">9,800+</strong>
+        </article>
+
+        <article class="nexus-insight-card">
+          <span class="nexus-insight-number">04</span>
+          <h4>Consumer Engagement</h4>
+          <p>
+            Premium UI and product clarity support stronger browsing confidence
+            and more meaningful customer interaction.
+          </p>
+          <strong class="nexus-insight-value">3.2L+</strong>
+        </article>
+      </div>
+
+      <div class="nexus-value-footer">
+        <div class="nexus-value-line"></div>
+        <button type="button" class="nexus-value-cta" (click)="scrollToSection('rolesSection')">
+          Explore Platform
+        </button>
+      </div>
+    </div>
+  </section>
+  <!-- ABOUT -->
+  <!-- ABOUT -->
+  <section class="about-section" id="aboutSection">
+    <div class="section-head centered about-head">
+      <span class="section-label">About Nexus</span>
+      <h2>More than a marketplace — a connected trade experience</h2>
+      <p>
+        Nexus is built to simplify product creation, wholesale distribution,
+        and customer access through one unified and premium digital platform.
+      </p>
+    </div>
+
+    <div class="about-showcase-card">
+      <!-- Video on top -->
+      <div class="about-video-card">
+        <video #aboutVideo class="about-video" autoplay muted loop playsinline preload="auto">
+          <source src="assets/about-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <!-- Content below -->
+      <div class="about-showcase-copy">
+        <span class="about-mini-label">Unified Commerce Experience</span>
+        <h3>A single ecosystem for production, distribution, and customer access</h3>
+
+        <p>
+          Nexus brings manufacturers, wholesalers, and consumers into one connected
+          environment where product visibility, operational flow, and digital interaction
+          feel simpler, faster, and more premium.
+        </p>
+
+        <p>
+          From inventory control and role-based workflows to cleaner browsing and smarter
+          marketplace presentation, the platform is designed to reduce friction and improve
+          confidence at every stage of the trade journey.
+        </p>
+
+        <div class="about-highlight-points">
+          <div class="about-highlight-item">
+            <span class="about-highlight-dot"></span>
+            <p>Role-based access for manufacturers, wholesalers, and consumers</p>
+          </div>
+
+          <div class="about-highlight-item">
+            <span class="about-highlight-dot"></span>
+            <p>Cleaner product flow with better visibility and coordination</p>
+          </div>
+
+          <div class="about-highlight-item">
+            <span class="about-highlight-dot"></span>
+            <p>Premium UI designed for trust, usability, and future scalability</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROLES -->
+  <section class="roles-section" id="rolesSection">
+
+    <div class="roles-shell">
+      <!-- Heading -->
+      <div class="roles-head">
+        <span class="roles-label">Three Role Ecosystem</span>
+        <h2>Designed for every participant in your platform</h2>
+        <p>
+          A complete digital experience for production, bulk trade, and end-user product access.
+        </p>
+      </div>
+
+      <!-- Role Cards -->
+      <div class="roles-grid">
+        <article class="roles-card" *ngFor="let role of roles">
+
+          <div class="roles-icon">
+            {{ role.icon }}
+          </div>
+
+          <h3>{{ role.title }}</h3>
+
+          <p class="roles-desc">
+            {{ role.description }}
+          </p>
+
+          <ul class="roles-points">
+            <li *ngFor="let point of role.points">
+              {{ point }}
+            </li>
+          </ul>
+
+        </article>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- CTA -->
+  <!-- <section class="cta-strip">
+    <div class="cta-card">
+      <div>
+        <span class="section-label">Ready to build with Nexus?</span>
+        <h2>Bring manufacturers, wholesalers, and consumers onto one premium platform.</h2>
+      </div>
+
+      <div class="cta-actions">
+        <a routerLink="/registration" class="primary-btn">Create Account</a>
+        <a routerLink="/login" class="secondary-btn">Login Now</a>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- Scroll Up -->
+  <!-- SCROLL TO TOP STRIP -->
+  <section class="scroll-top-strip">
+    <button type="button" class="scroll-top-btn" (click)="scrollToTop()">
+      <span>Head Back To Top Of Page</span>
+      <span class="scroll-top-icon">↑</span>
+    </button>
+  </section>
+  <!-- FOOTER -->
+  <!-- FOOTER -->
+  <footer class="footer" id="contactSection">
+    <div class="footer-main">
+
+      <!-- Left Brand Column -->
+      <div class="footer-brand-block">
+        <div class="footer-brand-row">
+          <div class="brand-logo footer-logo">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7.5L12 3l8 4.5v9L12 21l-8-4.5v-9z"></path>
+              <path d="M12 12l8-4.5"></path>
+              <path d="M12 12v9"></path>
+              <path d="M12 12L4 7.5"></path>
+            </svg>
+          </div>
+
+          <div>
+            <h3>Nexus</h3>
+            <span>Premium Trade Platform</span>
+          </div>
+        </div>
+
+        <p>
+          Nexus is a modern supply-of-goods platform built to connect manufacturers,
+          wholesalers, and consumers through one cleaner digital marketplace.
+          From product visibility to role-based workflows, Nexus helps every
+          participant move smarter.
+        </p>
+
+        <div class="footer-contact-mini">
+          <a href="mailto:support@nexus.com">support@nexus.com</a>
+          <a href="tel:+911234567890">+91 12345 67890</a>
+          <span>India • Digital Commerce Platform</span>
+        </div>
+      </div>
+
+      <!-- Middle Quick Links -->
+      <div class="footer-links-block">
+        <h4>Quick Links</h4>
+
+        <button type="button" (click)="scrollToSection('aboutSection')">
+          About Nexus
+        </button>
+
+        <button type="button" (click)="scrollToSection('rolesSection')">
+          Explore Roles
+        </button>
+
+        <button type="button" (click)="scrollToSection('statsSection')">
+          Business Insights
+        </button>
+
+        <a routerLink="/login">Login</a>
+        <a routerLink="/registration">Create Account</a>
+      </div>
+
+      <!-- Right Form Column -->
+      <div class="footer-form-block">
+        <h4>Have Questions or Want to Connect With Us?</h4>
+
+        <form class="footer-contact-form">
+          <input type="text" placeholder="Full Name*" />
+          <input type="email" placeholder="Email*" />
+          <textarea rows="4" placeholder="Message"></textarea>
+
+          <button type="button" id="footerSubmitBtn" class="footer-submit-btn" style="
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 122px;
+    height: 44px;
+    margin-top: 14px;
+    padding: 0 30px;
+    border: none;
+    border-radius: 50vw;
+    background: linear-gradient(135deg, #312e81 0%, #4f46e5 48%, #0891b2 100%);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 18px 34px rgba(79, 70, 229, 0.32);
+  ">
+            Submit
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom-line"></div>
+
+    <div class="footer-bottom">
+      <span>© 2026 Nexus. Crafted for modern supply-chain excellence.</span>
+      <span>Secure • Scalable • Premium</span>
+    </div>
+  </footer>
+</div>

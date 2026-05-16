@@ -1,3 +1,4 @@
+
 <main class="wholesaler-page">
 
   <section class="dashboard-shell">
@@ -251,8 +252,18 @@
             *ngFor="let product of filteredProducts">
 
             <div class="product-top">
-              <div class="product-icon">📦</div>
+             <div class="product-image-box">
+  <img
+    *ngIf="product.imageUrl"
+    [src]="getImageUrl(product.imageUrl)"
+    alt="product"
+    class="product-card-img"
+  />
 
+  <div *ngIf="!product.imageUrl" class="product-icon">
+    📦
+  </div>
+</div>
               <span class="stock-badge">
                 {{ product.stockQuantity || 0 }} manufacturer stock
               </span>
@@ -284,12 +295,12 @@
                 Place Purchase Order
               </button>
 
-              <button
-                class="action-btn inventory-now-btn"
-                type="button"
-                (click)="selectProductForInventory(product)">
-                Add Inventory
-              </button>
+           <button
+  class="action-btn inventory-now-btn"
+  type="button"
+  (click)="showSection('inventory')">
+  View Inventory
+</button>
             </div>
           </article>
 
@@ -384,123 +395,66 @@
         </div>
       </section>
 
-      <!-- INVENTORY -->
-      <section
-        class="content-section"
-        [class.active-section]="activeSection === 'inventory'">
+  <!-- INVENTORY -->
+<section
+  class="content-section inventory-section"
+  [class.active-section]="activeSection === 'inventory'">
 
-        <div class="section-header">
-          <div>
-            <span class="section-label">Wholesaler Stock</span>
-            <h3>Inventory Records</h3>
-            <p>This inventory is visible to consumers for ordering.</p>
-          </div>
-        </div>
+  <div class="section-header">
+    <div>
+      <span class="section-label">Wholesaler Stock</span>
+      <h3>Inventory Records</h3>
+      <p>
+        This inventory is visible to consumers for ordering. Inventory is created or increased automatically when a manufacturer marks your purchase order as DELIVERED.
+      </p>
+    </div>
+  </div>
 
-        <div class="inventory-layout">
+  <div class="inventory-full-width-shell">
+    <div class="table-card inventory-table-card">
+      <div class="responsive-table inventory-responsive-table">
 
-          <form
-            class="form-card"
-            (ngSubmit)="submitInventory()">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>Inventory ID</th>
+              <th>Product</th>
+              <th>Stock Quantity</th>
+              <th>Source</th>
+            </tr>
+          </thead>
 
-            <div class="form-header">
-              <span class="form-badge">Inventory Form</span>
-              <h3>{{ editingInventoryId ? 'Update Inventory' : 'Add Inventory' }}</h3>
-            </div>
+          <tbody>
+            <tr *ngFor="let inventory of inventories">
+              <td>#{{ inventory.id }}</td>
 
-            <div class="form-group">
-              <label>Product</label>
+              <td>{{ getProductName(inventory.product) }}</td>
 
-              <div class="input-control select-control">
-                <select
-                  [value]="inventoryProductId || ''"
-                  (change)="setInventoryProductId($any($event.target).value)">
+              <td>{{ inventory.stockQuantity || 0 }}</td>
 
-                  <option value="">Select Product</option>
+              <td>
+                <span class="status-help">
+                  Added from delivered manufacturer order
+                </span>
+              </td>
+            </tr>
 
-                  <option
-                    *ngFor="let product of products"
-                    [value]="product.id">
-                    {{ product.name || ('Product #' + product.id) }}
-                  </option>
-                </select>
-              </div>
-            </div>
+            <tr *ngIf="inventories.length === 0">
+              <td colspan="4">
+                <div class="empty-state">
+                  No inventory records available. Inventory will appear after manufacturer delivers your purchase order.
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <div class="form-group">
-              <label>Stock Quantity</label>
+      </div>
+    </div>
+  </div>
 
-              <div class="input-control">
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  placeholder="Enter stock quantity"
-                  [value]="inventoryStock || ''"
-                  (input)="setInventoryStock($any($event.target).value)"
-                />
-              </div>
-            </div>
 
-            <button
-              class="submit-btn"
-              type="submit">
-              {{ editingInventoryId ? 'Update Inventory' : 'Add Inventory' }}
-            </button>
-
-            <button
-              class="clear-btn"
-              type="button"
-              (click)="resetInventoryForm()">
-              Clear Form
-            </button>
-          </form>
-
-          <div class="table-card">
-            <div class="responsive-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Inventory ID</th>
-                    <th>Product</th>
-                    <th>Stock Quantity</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr *ngFor="let inventory of inventories">
-                    <td>#{{ inventory.id }}</td>
-
-                    <td>{{ getProductName(inventory.product) }}</td>
-
-                    <td>{{ inventory.stockQuantity || 0 }}</td>
-
-                    <td>
-                      <button
-                        class="small-btn"
-                        type="button"
-                        (click)="editInventory(inventory)">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-
-                  <tr *ngIf="inventories.length === 0">
-                    <td colspan="4">
-                      <div class="empty-state">
-                        No inventory records available.
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
+</section>
       <!-- CUSTOMER ORDERS -->
       <section
         class="content-section"

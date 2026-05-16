@@ -1,8 +1,6 @@
 com/edutech/supply_of_goods_management/config/SecurityConfig.class
 com/edutech/supply_of_goods_management/SupplyOfGoodsManagementApplication.class
 com/edutech/supply_of_goods_management/dto/LoginResponse.class
-com/edutech/supply_of_goods_management/controller/ManufacturerController.class
-com/edutech/supply_of_goods_management/controller/ConsumerController.class
 com/edutech/supply_of_goods_management/repository/InventoryRepository.class
 com/edutech/supply_of_goods_management/config/SchedulingConfig.class
 com/edutech/supply_of_goods_management/repository/FeedbackRepository.class

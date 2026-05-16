@@ -22,49 +22,52 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            .cors()
-            .and()
-            .csrf().disable()
+                .cors()
+                .and()
+                .csrf().disable()
 
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
 
-            .authorizeRequests()
+                .authorizeRequests()
 
-            // CORS preflight
-            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // CORS preflight
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-            // Public auth APIs
-            .antMatchers("/api/user/**").permitAll()
+                // Public auth APIs
+                .antMatchers("/api/user/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/uploads/**").permitAll()
 
-         .antMatchers(HttpMethod.POST, "/api/manufacturers/product").hasAuthority("MANUFACTURER")
-.antMatchers(HttpMethod.PUT, "/api/manufacturers/product/**").hasAuthority("MANUFACTURER")
-.antMatchers(HttpMethod.GET, "/api/manufacturers/products").hasAuthority("MANUFACTURER")
-.antMatchers(HttpMethod.GET, "/api/manufacturers/orders").hasAuthority("MANUFACTURER")
-.antMatchers(HttpMethod.PUT, "/api/manufacturers/order/**").hasAuthority("MANUFACTURER")
-            // Wholesaler APIs
-            .antMatchers(HttpMethod.GET, "/api/wholesalers/products").hasAuthority("WHOLESALER")
-            .antMatchers(HttpMethod.POST, "/api/wholesalers/order").hasAuthority("WHOLESALER")
-            .antMatchers(HttpMethod.PUT, "/api/wholesalers/order/**").hasAuthority("WHOLESALER")
-            .antMatchers(HttpMethod.GET, "/api/wholesalers/orders").hasAuthority("WHOLESALER")
-            .antMatchers(HttpMethod.POST, "/api/wholesalers/inventories").hasAuthority("WHOLESALER")
-            .antMatchers(HttpMethod.PUT, "/api/wholesalers/inventories/**").hasAuthority("WHOLESALER")
-            .antMatchers(HttpMethod.GET, "/api/wholesalers/inventories").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.POST, "/api/manufacturers/product").hasAuthority("MANUFACTURER")
+                .antMatchers(HttpMethod.PUT, "/api/manufacturers/product/**").hasAuthority("MANUFACTURER")
+                .antMatchers(HttpMethod.POST, "/api/manufacturers/product/**").hasAuthority("MANUFACTURER")
+                .antMatchers(HttpMethod.DELETE, "/api/manufacturers/product/**").hasAuthority("MANUFACTURER")
+                .antMatchers(HttpMethod.GET, "/api/manufacturers/products").hasAuthority("MANUFACTURER")
+                .antMatchers(HttpMethod.GET, "/api/manufacturers/orders").hasAuthority("MANUFACTURER")
+                .antMatchers(HttpMethod.PUT, "/api/manufacturers/order/**").hasAuthority("MANUFACTURER")
+                // Wholesaler APIs
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/products").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.POST, "/api/wholesalers/order").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.PUT, "/api/wholesalers/order/**").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/orders").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.POST, "/api/wholesalers/inventories").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.PUT, "/api/wholesalers/inventories/**").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/inventories").hasAuthority("WHOLESALER")
 
-            // Consumer APIs
-            .antMatchers(HttpMethod.GET, "/api/consumers/inventories").hasAuthority("CONSUMER")
-.antMatchers(HttpMethod.POST, "/api/consumers/inventory-order").hasAuthority("CONSUMER")
+                // Consumer APIs
+                .antMatchers(HttpMethod.GET, "/api/consumers/inventories").hasAuthority("CONSUMER")
+                .antMatchers(HttpMethod.POST, "/api/consumers/inventory-order").hasAuthority("CONSUMER")
 
-.antMatchers(HttpMethod.GET, "/api/wholesalers/customer-orders").hasAuthority("WHOLESALER")
-.antMatchers(HttpMethod.PUT, "/api/wholesalers/customer-order/**").hasAuthority("WHOLESALER")
-.antMatchers(HttpMethod.GET, "/api/wholesalers/feedbacks").hasAuthority("WHOLESALER")
-            .antMatchers(HttpMethod.GET, "/api/consumers/products").hasAuthority("CONSUMER")
-            .antMatchers(HttpMethod.POST, "/api/consumers/order").hasAuthority("CONSUMER")
-            .antMatchers(HttpMethod.GET, "/api/consumers/orders").hasAuthority("CONSUMER")
-            .antMatchers(HttpMethod.POST, "/api/consumers/order/**/feedback").hasAuthority("CONSUMER")
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/customer-orders").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.PUT, "/api/wholesalers/customer-order/**").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/feedbacks").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.GET, "/api/consumers/products").hasAuthority("CONSUMER")
+                .antMatchers(HttpMethod.POST, "/api/consumers/order").hasAuthority("CONSUMER")
+                .antMatchers(HttpMethod.GET, "/api/consumers/orders").hasAuthority("CONSUMER")
+                .antMatchers(HttpMethod.POST, "/api/consumers/order/**/feedback").hasAuthority("CONSUMER")
 
-            .anyRequest().authenticated();
+                .anyRequest().authenticated();
 
         // ✅ THIS WAS MISSING
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

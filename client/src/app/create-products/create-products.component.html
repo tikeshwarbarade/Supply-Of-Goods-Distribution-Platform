@@ -1,282 +1,228 @@
-<!-- <div class="container mt-3">
-
-  <h4>Manage Products</h4>
-
-  <form [formGroup]="itemForm" (ngSubmit)="submit()" class="card p-3 mb-3">
-
-    <div class="row">
-      <div class="col-md-4">
-        <input class="form-control" placeholder="Product Name" formControlName="name">
-      </div>
-
-      <div class="col-md-4">
-        <input type="number" class="form-control" placeholder="Stock Quantity" formControlName="stockQuantity">
-      </div>
-
-      <div class="col-md-4">
-        <input type="number" class="form-control" placeholder="Price" formControlName="price">
-      </div>
-    </div>
-
-    <div class="mt-2">
-      <textarea class="form-control" placeholder="Description" formControlName="description"></textarea>
-    </div>
-
-    <button class="btn btn-primary mt-2">Submit</button>
-
-  </form>
-
-  <div class="card p-3">
-    <h5>Product Information</h5>
-
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Sr#</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Stock</th>
-          <th>Description</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let p of products; let i=index">
-          <td>{{i+1}}</td>
-          <td>{{p.name}}</td>
-          <td>{{p.price}}</td>
-          <td>{{p.stockQuantity}}</td>
-          <td>{{p.description}}</td>
-          <td>
-            <button class="btn btn-warning btn-sm"
-                    (click)="editProduct(p)">Edit</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-</div> -->
-
 <main class="product-page">
-
   <section class="product-shell">
 
     <!-- FORM CARD -->
-    <section class="form-card">
+    <section class="form-card animate-in">
+
+      <button class="back-btn" type="button" (click)="goBack()">
+        <span class="mi">arrow_back</span> Back to Dashboard
+      </button>
 
       <div class="form-header">
-        <span class="form-badge">
-          {{ editingProductId ? 'UPDATE PRODUCT' : 'CREATE PRODUCT' }}
-        </span>
-
-        <h2>
-          {{ editingProductId ? 'Update Product & Stock' : 'Create Manufacturer Product' }}
-        </h2>
-
-        <p>
-          Product stock quantity represents manufacturer inventory.
-        </p>
+        <div class="form-header-icon" [class.editing]="editingProductId">
+          <span class="mi">{{ editingProductId ? 'edit' : 'add_circle' }}</span>
+        </div>
+        <span class="form-badge">{{ editingProductId ? 'UPDATE PRODUCT' : 'CREATE PRODUCT' }}</span>
+        <h2>{{ editingProductId ? 'Update Product & Stock' : 'Create Manufacturer Product' }}</h2>
+        <p>Product stock quantity represents manufacturer inventory.</p>
       </div>
 
-      <div
-        class="form-alert"
-        *ngIf="formMessage"
-        [class.error]="formMessageError">
+      <div class="form-alert" *ngIf="formMessage" [class.error]="formMessageError">
+        <span class="mi mi-sm">{{ formMessageError ? 'error' : 'check_circle' }}</span>
         {{ formMessage }}
       </div>
 
       <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
+        <!-- Image Upload -->
         <div class="form-group">
-          <label>Product Name</label>
-          <input
-            type="text"
-            placeholder="Enter product name"
-            formControlName="name"
-          />
-          <small *ngIf="isInvalid('name')">
-            Product name is required.
-          </small>
+          <label><span class="mi mi-xs">image</span> Product Image</label>
+          <input type="file" id="productImageInput" accept="image/*" (change)="onImageSelected($event)" hidden />
+          <div class="image-upload-area" *ngIf="!imagePreview" (click)="triggerFileInput()">
+            <div class="upload-icon"><span class="mi">cloud_upload</span></div>
+            <span class="upload-text">Click to upload product image</span>
+            <span class="upload-hint">JPG, PNG, WEBP (Max 5MB)</span>
+          </div>
+          <div class="image-preview-area" *ngIf="imagePreview">
+            <img [src]="imagePreview" alt="Product preview" />
+            <div class="image-actions">
+              <button class="img-action-btn change" type="button" (click)="triggerFileInput()">
+                <span class="mi mi-xs">edit</span> Change
+              </button>
+              <button class="img-action-btn remove" type="button" (click)="removeImage()">
+                <span class="mi mi-xs">delete</span> Remove
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
-          <label>Description</label>
-          <textarea
-            placeholder="Enter product description"
-            formControlName="description">
-          </textarea>
-          <small *ngIf="isInvalid('description')">
-            Description is required.
-          </small>
+          <label><span class="mi mi-xs">inventory_2</span> Product Name</label>
+          <div class="input-wrap">
+            <span class="mi input-icon">label</span>
+            <input type="text" placeholder="Enter product name" formControlName="name" />
+          </div>
+          <small *ngIf="isInvalid('name')"><span class="mi mi-xs">error</span> Product name is required.</small>
+        </div>
+
+        <div class="form-group">
+          <label><span class="mi mi-xs">description</span> Description</label>
+          <textarea placeholder="Enter product description" formControlName="description"></textarea>
+          <small *ngIf="isInvalid('description')"><span class="mi mi-xs">error</span> Description is required.</small>
         </div>
 
         <div class="form-row">
-
           <div class="form-group">
-            <label>Price</label>
-            <input
-              type="number"
-              min="1"
-              placeholder="Enter price"
-              formControlName="price"
-            />
-            <small *ngIf="isInvalid('price')">
-              Valid price is required.
-            </small>
+            <label><span class="mi mi-xs">currency_rupee</span> Price</label>
+            <div class="input-wrap">
+              <span class="mi input-icon">currency_rupee</span>
+              <input type="number" min="1" placeholder="Enter price" formControlName="price" />
+            </div>
+            <small *ngIf="isInvalid('price')"><span class="mi mi-xs">error</span> Valid price is required.</small>
           </div>
-
           <div class="form-group">
-            <label>Stock Quantity</label>
-            <input
-              type="number"
-              min="0"
-              placeholder="Enter stock quantity"
-              formControlName="stockQuantity"
-            />
-            <small *ngIf="isInvalid('stockQuantity')">
-              Valid stock quantity is required.
-            </small>
+            <label><span class="mi mi-xs">warehouse</span> Stock Quantity</label>
+            <div class="input-wrap">
+              <span class="mi input-icon">inventory</span>
+              <input type="number" min="0" placeholder="Enter stock" formControlName="stockQuantity" />
+            </div>
+            <small *ngIf="isInvalid('stockQuantity')"><span class="mi mi-xs">error</span> Valid quantity is
+              required.</small>
           </div>
-
         </div>
 
-        <button
-          class="submit-btn"
-          type="submit"
-          [disabled]="submitting">
+        <button class="submit-btn" type="submit" [disabled]="submitting">
+          <span class="mi mi-sm">{{ editingProductId ? 'save' : 'add' }}</span>
           {{ submitting ? 'Saving...' : editingProductId ? 'Update Product' : 'Create Product' }}
         </button>
 
-        <button
-          class="clear-btn"
-          type="button"
-          *ngIf="editingProductId"
-          (click)="cancelEdit()">
-          Cancel Edit
+        <button class="clear-btn" type="button" *ngIf="editingProductId" (click)="cancelEdit()">
+          <span class="mi mi-sm">close</span> Cancel Edit
         </button>
 
-        <button
-          class="clear-btn"
-          type="button"
-          *ngIf="!editingProductId"
-          (click)="resetForm()">
-          Clear Form
+        <button class="clear-btn" type="button" *ngIf="!editingProductId" (click)="resetForm()">
+          <span class="mi mi-sm">refresh</span> Clear Form
         </button>
-
       </form>
-
     </section>
 
     <!-- PRODUCTS PANEL -->
-    <section class="products-panel">
+    <section class="products-panel animate-in">
 
       <!-- STATS -->
       <div class="stats-grid">
-
         <article class="stat-card">
-          <p>My Products</p>
-          <h3>{{ productCount }}</h3>
+          <div class="stat-icon blue"><span class="mi">inventory_2</span></div>
+          <div>
+            <p>My Products</p>
+            <h3>{{ productCount }}</h3>
+          </div>
         </article>
-
         <article class="stat-card">
-          <p>Total Stock</p>
-          <h3>{{ totalStock }}</h3>
+          <div class="stat-icon cyan"><span class="mi">warehouse</span></div>
+          <div>
+            <p>Total Stock</p>
+            <h3>{{ totalStock | number }}</h3>
+          </div>
         </article>
-
         <article class="stat-card">
-          <p>Inventory Value</p>
-          <h3>{{ formatCurrency(inventoryValue) }}</h3>
+          <div class="stat-icon purple"><span class="mi">currency_rupee</span></div>
+          <div>
+            <p>Inventory Value</p>
+            <h3>{{ formatCurrency(inventoryValue) }}</h3>
+          </div>
         </article>
-
       </div>
 
       <!-- HEADER -->
       <div class="section-header">
         <div>
-          <span class="section-label">Product List</span>
+          <span class="section-label"><span class="mi mi-xs">list</span> Product List</span>
           <h3>Manufacturer Products</h3>
-          <p>View and update products created by logged-in manufacturer.</p>
+          <p>View and update products created by you.</p>
         </div>
-
-        <div class="search-box">
-          <span>🔍</span>
-
-          <input
-            type="text"
-            placeholder="Search products..."
-            [value]="productSearch"
-            (input)="onProductSearch($any($event.target).value)"
-          />
-
-          <button
-            type="button"
-            *ngIf="productSearch"
-            (click)="clearSearch()">
-            ×
-          </button>
+        <div class="search-panel">
+          <div class="search-box">
+            <span class="mi search-icon">search</span>
+            <input type="text" placeholder="Search products..." autocomplete="off" [value]="productSearch"
+              (input)="onProductSearch($any($event.target).value)" />
+            <button class="search-clear-btn" type="button" *ngIf="productSearch" (click)="clearSearch()"><span
+                class="mi">close</span></button>
+          </div>
+          <div class="search-meta" *ngIf="productSearch">{{ filteredProducts.length }} of {{ products.length }} products
+          </div>
         </div>
       </div>
 
       <!-- TABLE -->
       <div class="table-card">
         <div class="responsive-table">
-
           <table>
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Price</th>
                 <th>Stock</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
-
             <tbody>
-
-              <tr *ngFor="let product of filteredProducts">
-                <td>#{{ product.id }}</td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.description }}</td>
-                <td>{{ formatCurrency(product.price) }}</td>
-                <td>{{ product.stockQuantity }}</td>
+              <tr *ngFor="let product of filteredProducts"
+                [class.row-low-stock]="(product.stockQuantity||0) > 0 && (product.stockQuantity||0) < 10"
+                [class.row-out-stock]="(product.stockQuantity||0) === 0">
+                <td><span class="id-badge">#{{ product.id }}</span></td>
                 <td>
-                  <button
-                    class="small-btn"
-                    type="button"
-                    (click)="editProduct(product)">
-                    Edit
-                  </button>
-                </td>
-              </tr>
+                  <div class="table-img-wrap">
+                    <img *ngIf="product.imageUrl" [src]="getImageUrl(product.imageUrl)" alt="product"
+                      class="table-product-img" />
 
+                    <div *ngIf="!product.imageUrl" class="table-img-placeholder">
+                      <span class="mi">image</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="product-name-cell">
+                    <div class="product-mini-icon"><span class="mi">category</span></div><span>{{ product.name ||
+                      'Unnamed' }}</span>
+                  </div>
+                </td>
+                <td><span class="desc-cell">{{ product.description || '-' }}</span></td>
+                <td><strong class="price-text">{{ formatCurrency(product.price) }}</strong></td>
+                <td>
+                  <div class="stock-cell">
+                    <span>{{ product.stockQuantity || 0 }}</span>
+                    <div class="mini-stock-bar">
+                      <div class="mini-stock-fill" [class.critical]="(product.stockQuantity||0)===0"
+                        [class.warning]="(product.stockQuantity||0)>0 && (product.stockQuantity||0)<10"
+                        [class.healthy]="(product.stockQuantity||0)>=10" [style.width.%]="getStockPercent(product)">
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-pill" [class.status-critical]="(product.stockQuantity||0)===0"
+                    [class.status-pending]="(product.stockQuantity||0)>0 && (product.stockQuantity||0)<10"
+                    [class.status-delivered]="(product.stockQuantity||0)>=10">
+                    <span class="mi mi-xs">{{ (product.stockQuantity||0)===0?'error':(product.stockQuantity||0)
+                      <10?'warning':'check_circle' }}</span>
+                        {{ getStockStatusLabel(product.stockQuantity || 0) }}
+                    </span>
+                </td>
+                <td><button class="small-btn edit-action-btn" type="button" (click)="editProduct(product)"><span
+                      class="mi mi-xs">edit</span> Edit</button></td>
+              </tr>
               <tr *ngIf="loading">
-                <td colspan="6">
-                  <div class="empty-state">
-                    Loading products...
-                  </div>
+                <td colspan="8">
+                  <div class="empty-state"><span class="mi spin">refresh</span> Loading products...</div>
                 </td>
               </tr>
-
               <tr *ngIf="!loading && filteredProducts.length === 0">
-                <td colspan="6">
-                  <div class="empty-state">
-                    No products found.
+                <td colspan="8">
+                  <div class="empty-state"><span class="mi empty-icon">inbox</span>
+                    <p>{{ productSearch ? 'No match.' : 'No products yet. Create your first product.' }}</p>
                   </div>
                 </td>
               </tr>
-
             </tbody>
           </table>
-
         </div>
       </div>
-
     </section>
 
   </section>
-
 </main>

@@ -15,6 +15,8 @@
 /home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/repository/ProductRepository.java
 /home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/entity/Order.java
 /home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/config/Configurations.java
+/home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/service/ProductImageStorageService.java
+/home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/config/StaticResourceConfig.java
 /home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/controller/RegisterAndLoginController.java
 /home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/controller/ManufacturerController.java
 /home/coder/app/server/src/main/java/com/edutech/supply_of_goods_management/service/UserService.java

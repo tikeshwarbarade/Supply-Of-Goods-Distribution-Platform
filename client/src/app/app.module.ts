@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 
+import { LandingComponent } from './landing/landing.component';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -17,8 +19,10 @@ import { GetOrdersComponent } from './get-orders/get-orders.component';
 import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { ConsumerPlaceOrderComponent } from './consumer-place-order/consumer-place-order.component';
 import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-orders.component';
-
 import { ManufacturerDashboardComponent } from './manufacturer-dashboard/manufacturer-dashboard.component';
+
+// ADD THIS LINE
+import { ConsumerDashboardComponent } from './consumer-dashboard/consumer-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +37,9 @@ import { ManufacturerDashboardComponent } from './manufacturer-dashboard/manufac
     ConsumerPlaceOrderComponent,
     ConsumerGetOrdersComponent,
     WholesalerDashboardComponent,
-    ManufacturerDashboardComponent
+    ManufacturerDashboardComponent,
+    ConsumerDashboardComponent  ,
+        LandingComponent
   ],
   imports: [
     BrowserModule,

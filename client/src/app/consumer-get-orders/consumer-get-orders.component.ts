@@ -1,4 +1,6 @@
+
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 
@@ -25,7 +27,8 @@ export class ConsumerGetOrdersComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private http: HttpService
+    private http: HttpService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -54,6 +57,18 @@ export class ConsumerGetOrdersComponent implements OnInit {
       }
     });
   }
+
+  getImageUrl(imageUrl: string | null | undefined): string {
+  if (!imageUrl) {
+    return '';
+  }
+
+  if (imageUrl.startsWith('http')) {
+    return imageUrl;
+  }
+
+  return `${window.location.origin}/project/3689/proxy/3000${imageUrl}`;
+}
 
   openFeedback(order: any): void {
     this.selectedFeedbackOrder = order;
@@ -126,32 +141,45 @@ export class ConsumerGetOrdersComponent implements OnInit {
 
   getStatusClass(status: string): string {
     const normalized = this.normalizeStatus(status);
-
-    if (normalized === 'SHIPPED') {
-      return 'status-shipped';
-    }
-
-    if (normalized === 'DELIVERED') {
-      return 'status-delivered';
-    }
-
-    if (normalized === 'CANCELLED') {
-      return 'status-cancelled';
-    }
-
+    if (normalized === 'SHIPPED') return 'status-shipped';
+    if (normalized === 'DELIVERED') return 'status-delivered';
+    if (normalized === 'CANCELLED') return 'status-cancelled';
     return 'status-pending';
   }
 
-  getProductName(product: any): string {
-    if (!product) {
-      return 'Product not available';
-    }
+  getStatusIcon(status: string): string {
+    const n = this.normalizeStatus(status);
+    return n === 'PENDING' ? 'schedule' : n === 'SHIPPED' ? 'local_shipping' : n === 'DELIVERED' ? 'check_circle' : 'cancel';
+  }
 
+  getProductName(product: any): string {
+    if (!product) return 'Product not available';
     return product.name || `Product #${product.id || 'N/A'}`;
+  }
+
+  getProductPrice(product: any): number {
+    return Number(product?.price || 0);
+  }
+
+  formatCurrency(value: any): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(Number(value || 0));
   }
 
   setMessage(message: string, isError: boolean): void {
     this.message = message;
     this.messageError = isError;
   }
+
+  goBack(): void {
+    this.router.navigate(['/consumer-dashboard']);
+  }
+
+  // ═══ STAT GETTERS ═══
+  get pendingCount(): number { return this.orders.filter(o => this.normalizeStatus(o.status) === 'PENDING').length; }
+  get shippedCount(): number { return this.orders.filter(o => this.normalizeStatus(o.status) === 'SHIPPED').length; }
+  get deliveredCount(): number { return this.orders.filter(o => this.normalizeStatus(o.status) === 'DELIVERED').length; }
 }

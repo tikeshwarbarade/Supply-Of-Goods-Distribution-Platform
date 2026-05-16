@@ -1,3 +1,4 @@
+
 $primary: #4f46e5;
 $primary-dark: #312e81;
 $primary-mid: #6366f1;
@@ -1487,4 +1488,255 @@ tbody {
   margin-top: 12px;
   color: #64748b;
   font-weight: 700;
+}
+/* ===== READ ONLY INVENTORY TABLE - FULL WIDTH ===== */
+
+.inventory-section {
+  width: block !important;  width: 100% !important;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(226, 232, 240, 0.86);
+  box-shadow: $shadow-md;
+  backdrop-filter: blur(20px);
+}
+
+.inventory-section.active-section {
+  display: block !important;
+}
+
+/* ===== CARD WRAPPER ===== */
+
+.inventory-wide-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+  overflow: hidden;
+  border-radius: $radius-lg;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+/* ===== TABLE SCROLL WRAPPER ===== */
+
+.inventory-table-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+}
+
+/* Optional scrollbar styling */
+.inventory-table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.inventory-table-scroll::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.45);
+  border-radius: 999px;
+}
+
+.inventory-table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.55);
+  border-radius: 999px;
+}
+
+.inventory-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.75);
+}
+
+/* ===== TABLE ===== */
+
+.inventory-wide-table {
+  width: 100% !important;
+  min-width: 900px !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+  background: transparent;
+}
+
+.inventory-wide-table thead {
+  background: linear-gradient(135deg, $primary-soft, $cyan-soft);
+}
+
+.inventory-wide-table th,
+.inventory-wide-table td {
+  padding: 16px !important;
+  text-align: left;
+  border-bottom: 1px solid $border;
+  font-size: 13.5px;
+  vertical-align: middle;
+  white-space: normal !important;
+  word-break: break-word;
+}
+
+.inventory-wide-table th {
+  color: $text;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+}
+
+.inventory-wide-table td {
+  color: $text;
+  font-weight: 700;
+}
+
+/* ===== COLUMN WIDTHS ===== */
+
+.inventory-wide-table th:nth-child(1),
+.inventory-wide-table td:nth-child(1) {
+  width: 18%;
+}
+
+.inventory-wide-table th:nth-child(2),
+.inventory-wide-table td:nth-child(2) {
+  width: 30%;
+}
+
+.inventory-wide-table th:nth-child(3),
+.inventory-wide-table td:nth-child(3) {
+  width: 20%;
+}
+
+.inventory-wide-table th:nth-child(4),
+.inventory-wide-table td:nth-child(4) {
+  width: 32%;
+}
+
+/* ===== ROW EFFECTS ===== */
+
+.inventory-wide-table tbody tr {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.inventory-wide-table tbody tr:hover {
+  background: rgba(248, 250, 252, 0.95);
+}
+
+/* Remove border from last row */
+.inventory-wide-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== READ ONLY INPUT / TEXT STYLES IF USED INSIDE TABLE ===== */
+
+.inventory-wide-table input,
+.inventory-wide-table textarea,
+.inventory-wide-table select {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: $text;
+  font-size: 13.5px;
+  font-weight: 700;
+  pointer-events: none;
+  resize: none;
+}
+
+/* ===== BADGES / STATUS OPTIONAL ===== */
+
+.inventory-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.inventory-badge.available {
+  color: #166534;
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.inventory-badge.low-stock {
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.inventory-badge.out-stock {
+  color: #991b1b;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ===== EMPTY STATE ===== */
+
+.inventory-empty-state {
+  width: 100%;
+  padding: 32px 20px;
+  text-align: center;
+  color: $muted;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 1024px) {
+  .inventory-wide-table {
+    min-width: 850px !important;
+  }
+
+  .inventory-wide-table th,
+  .inventory-wide-table td {
+    padding: 14px !important;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .inventory-section {
+    border-radius: $radius-md;
+  }
+
+  .inventory-wide-card {
+    border-radius: $radius-md;
+  }
+
+  .inventory-wide-table {
+    min-width: 760px !important;
+  }
+
+  .inventory-wide-table th,
+  .inventory-wide-table td {
+    padding: 12px !important;
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventory-wide-table {
+    min-width: 700px !important;
+  }
+
+  .inventory-wide-table th,
+  .inventory-wide-table td {
+    padding: 10px !important;
+    font-size: 12px;
+  }
+}
+.product-image-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(135deg, $primary-soft, $cyan-soft);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.product-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }

@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
@@ -183,6 +184,18 @@ export class WholesalerDashboardComponent implements OnInit {
   // STATS
   // =========================
 
+  getImageUrl(imageUrl: string | null | undefined): string {
+  if (!imageUrl) {
+    return '';
+  }
+
+  if (imageUrl.startsWith('http')) {
+    return imageUrl;
+  }
+
+  return `${window.location.origin}/project/3689/proxy/3000${imageUrl}`;
+}
+
   get purchaseDeliveredCount(): number {
     return this.purchaseOrders.filter(order => this.normalizeStatus(order.status) === 'DELIVERED').length;
   }
@@ -326,46 +339,29 @@ export class WholesalerDashboardComponent implements OnInit {
     this.editingInventoryId = null;
     this.showToast(`${product.name} selected for inventory.`);
   }
-
-  submitInventory(): void {
-    if (!this.inventoryProductId) {
-      this.showToast('Please select a product.', true);
-      return;
-    }
-
-    if (!this.inventoryStock || this.inventoryStock <= 0) {
-      this.showToast('Please enter valid stock quantity.', true);
-      return;
-    }
-
-    if (this.editingInventoryId) {
-      this.updateInventory();
-    } else {
-      this.addInventory();
-    }
+submitInventory(): void {
+  if (!this.editingInventoryId) {
+    this.showToast(
+      'Direct inventory add is disabled. Inventory is added automatically after manufacturer delivers a purchase order.',
+      true
+    );
+    return;
   }
 
-  addInventory(): void {
-    if (!this.userId || !this.inventoryProductId || !this.inventoryStock) return;
-
-    const payload = {
-      wholesalerId: this.userId,
-      stockQuantity: this.inventoryStock
-    };
-
-    this.http.addInventory(payload, this.inventoryProductId).subscribe({
-      next: () => {
-        this.showToast('Inventory added successfully.');
-        this.resetInventoryForm();
-        this.loadInventories();
-      },
-      error: (err) => {
-        console.error('Add inventory failed', err);
-        this.showToast('Failed to add inventory.', true);
-      }
-    });
+  if (!this.inventoryStock || this.inventoryStock <= 0) {
+    this.showToast('Please enter valid stock quantity.', true);
+    return;
   }
 
+  this.updateInventory();
+}
+
+addInventory(): void {
+  this.showToast(
+    'Direct inventory add is disabled. Inventory is created automatically when manufacturer delivers a purchase order.',
+    true
+  );
+}
   updateInventory(): void {
     if (!this.editingInventoryId || !this.inventoryStock) return;
 

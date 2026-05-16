@@ -1,18 +1,64 @@
+
 <main class="orders-page">
 
-  <section class="orders-shell">
+  <section class="orders-shell animate-in">
 
+    <!-- HEADER -->
     <header class="page-header">
-      <span class="role-pill">CONSUMER ORDERS</span>
-      <h2>My Orders</h2>
-      <p>Track your orders. Feedback is available only after order is DELIVERED.</p>
+      <div class="header-top">
+        <div class="header-icon-wrap"><span class="mi">receipt_long</span></div>
+        <div>
+          <span class="role-pill">CONSUMER ORDERS</span>
+          <h2>My Orders</h2>
+          <p class="muted-text">Track your orders and submit feedback after delivery.</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="back-btn" type="button" (click)="goBack()">
+          <span class="mi mi-sm">arrow_back</span> Dashboard
+        </button>
+        <button class="refresh-btn" type="button" (click)="loadOrders()">
+          <span class="mi mi-sm">refresh</span> Refresh
+        </button>
+      </div>
     </header>
 
-    <div class="message" *ngIf="message" [class.error]="messageError">
+    <!-- STATS ROW -->
+    <section class="order-stats-row">
+      <article class="order-stat">
+        <div class="os-icon blue"><span class="mi">receipt_long</span></div>
+        <div><span class="os-value">{{ orders.length }}</span><span class="os-label">Total</span></div>
+      </article>
+      <article class="order-stat">
+        <div class="os-icon amber"><span class="mi">schedule</span></div>
+        <div><span class="os-value">{{ pendingCount }}</span><span class="os-label">Pending</span></div>
+      </article>
+      <article class="order-stat">
+        <div class="os-icon cyan"><span class="mi">local_shipping</span></div>
+        <div><span class="os-value">{{ shippedCount }}</span><span class="os-label">Shipped</span></div>
+      </article>
+      <article class="order-stat">
+        <div class="os-icon green"><span class="mi">check_circle</span></div>
+        <div><span class="os-value">{{ deliveredCount }}</span><span class="os-label">Delivered</span></div>
+      </article>
+    </section>
+
+    <!-- MESSAGE -->
+    <div class="message" *ngIf="message" [class.error]="messageError" [class.success]="!messageError">
+      <span class="mi mi-sm">{{ messageError ? 'error' : 'check_circle' }}</span>
       {{ message }}
     </div>
 
+    <!-- TABLE -->
     <div class="table-card">
+      <div class="table-header">
+        <div>
+          <span class="section-label"><span class="mi mi-xs">receipt_long</span> Purchase History</span>
+          <h3>Order List</h3>
+        </div>
+        <span class="table-count" *ngIf="orders.length > 0">{{ orders.length }} orders</span>
+      </div>
+
       <div class="responsive-table">
         <table>
           <thead>
@@ -20,49 +66,76 @@
               <th>Order ID</th>
               <th>Product</th>
               <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
               <th>Status</th>
               <th>Feedback</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr *ngFor="let order of orders">
-              <td>#{{ order.id }}</td>
+            <tr *ngFor="let order of orders" class="table-row">
+              <td><span class="id-badge">#{{ order.id }}</span></td>
 
-              <td>{{ getProductName(order.product) }}</td>
+            <td>
+  <div class="product-cell">
+    <div class="order-product-img-wrap">
+      <img
+        *ngIf="order.product?.imageUrl"
+        [src]="getImageUrl(order.product.imageUrl)"
+        alt="product"
+        class="order-product-img"
+      />
 
-              <td>{{ order.quantity || 0 }}</td>
+      <div *ngIf="!order.product?.imageUrl" class="product-mini-icon">
+        <span class="mi">category</span>
+      </div>
+    </div>
+
+    <span>{{ getProductName(order.product) }}</span>
+  </div>
+</td>
+
+              <td><span class="qty-badge">{{ order.quantity || 0 }}</span></td>
+
+              <td><strong class="price-text">{{ formatCurrency(getProductPrice(order.product)) }}</strong></td>
+
+              <td><strong class="price-text">{{ formatCurrency(getProductPrice(order.product) * (order.quantity || 0)) }}</strong></td>
 
               <td>
                 <span class="status-pill" [ngClass]="getStatusClass(order.status)">
+                  <span class="mi mi-xs">{{ getStatusIcon(order.status) }}</span>
                   {{ normalizeStatus(order.status) }}
                 </span>
               </td>
 
               <td>
                 <button
-                  class="small-btn"
+                  class="feedback-btn"
                   type="button"
                   *ngIf="normalizeStatus(order.status) === 'DELIVERED'"
                   (click)="openFeedback(order)">
-                  Give Feedback
+                  <span class="mi mi-sm">rate_review</span> Feedback
                 </button>
 
-                <span class="muted" *ngIf="normalizeStatus(order.status) !== 'DELIVERED'">
-                  Available after delivery
+                <span class="muted-label" *ngIf="normalizeStatus(order.status) !== 'DELIVERED'">
+                  <span class="mi mi-xs">lock</span> After delivery
                 </span>
               </td>
             </tr>
 
             <tr *ngIf="loading">
-              <td colspan="5">
-                <div class="empty-state">Loading orders...</div>
+              <td colspan="7">
+                <div class="empty-state"><span class="mi spin">refresh</span> Loading orders...</div>
               </td>
             </tr>
 
             <tr *ngIf="!loading && orders.length === 0">
-              <td colspan="5">
-                <div class="empty-state">No orders found.</div>
+              <td colspan="7">
+                <div class="empty-state">
+                  <span class="mi empty-icon">receipt_long</span>
+                  <p>No orders found. Start shopping!</p>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -70,32 +143,46 @@
       </div>
     </div>
 
-    <section class="feedback-panel" *ngIf="feedbackOrderId">
-      <h3>Submit Feedback for Order #{{ feedbackOrderId }}</h3>
+    <!-- FEEDBACK PANEL -->
+    <section class="feedback-panel animate-in" *ngIf="feedbackOrderId">
+      <div class="feedback-header">
+        <div class="feedback-icon-wrap"><span class="mi">rate_review</span></div>
+        <div>
+          <span class="section-label">Feedback</span>
+          <h3>Order #{{ feedbackOrderId }}</h3>
+          <p class="muted-text" *ngIf="selectedFeedbackOrder">
+            {{ getProductName(selectedFeedbackOrder.product) }} · Qty: {{ selectedFeedbackOrder.quantity || 0 }}
+          </p>
+        </div>
+      </div>
 
-      <textarea
-        placeholder="Write your feedback..."
-        [value]="feedbackContent"
-        (input)="setFeedbackContent($any($event.target).value)">
-      </textarea>
+      <label class="textarea-label">Your Feedback</label>
+      <div class="textarea-wrap">
+        <textarea
+          placeholder="Share your experience with this product..."
+          [value]="feedbackContent"
+          (input)="setFeedbackContent($any($event.target).value)">
+        </textarea>
+      </div>
 
       <div class="feedback-actions">
         <button
+          class="submit-feedback-btn"
           type="button"
           [disabled]="submitting"
           (click)="submitFeedback()">
+          <span class="mi mi-sm">{{ submitting ? 'refresh' : 'send' }}</span>
           {{ submitting ? 'Submitting...' : 'Submit Feedback' }}
         </button>
 
         <button
+          class="cancel-feedback-btn"
           type="button"
-          class="cancel"
           (click)="cancelFeedback()">
-          Cancel
+          <span class="mi mi-sm">close</span> Cancel
         </button>
       </div>
     </section>
 
   </section>
-
 </main>

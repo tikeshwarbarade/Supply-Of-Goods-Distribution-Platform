@@ -1,112 +1,285 @@
-<!-- <div class="simple-role-dashboard">
-  <div class="role-card">
-    <h2>Consumer Dashboard</h2>
-    <p>Browse products, place orders, and track order history.</p>
 
-    <button type="button" (click)="goToPlaceOrder()">
-      Place Order
-    </button>
+<main class="consumer-page" [class.dark-mode]="isDarkMode">
 
-    <button type="button" (click)="goToOrders()">
-      View Orders
-    </button>
+  <div class="sidebar-overlay" *ngIf="sidebarOpen" (click)="sidebarOpen = false"></div>
 
-    <button type="button" class="logout" (click)="logout()">
-      Logout
-    </button>
+  <section class="dashboard-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" [class.sidebar-open]="sidebarOpen">
+      <button class="sidebar-close-btn" type="button" (click)="sidebarOpen = false"><span class="mi">close</span></button>
+      <div class="brand-area">
+        <div class="brand-logo"><span class="mi">storefront</span></div>
+        <div>
+          <span class="brand-pill">CONSUMER PORTAL</span>
+          <h1>Nexus</h1>
+          <p>Browse products, place orders, track deliveries and share feedback.</p>
+        </div>
+      </div>
+      <nav class="side-nav">
+        <button class="nav-link" [class.active]="activeSection === 'dashboard'" (click)="switchSection('dashboard')"><span class="nav-icon"><span class="mi">dashboard</span></span> Dashboard</button>
+        <button class="nav-link" [class.active]="activeSection === 'browse'" (click)="switchSection('browse')"><span class="nav-icon"><span class="mi">shopping_bag</span></span> Browse Products<span class="nav-badge" *ngIf="inventoryCount > 0">{{ inventoryCount }}</span></button>
+        <button class="nav-link" (click)="goToPlaceOrder()"><span class="nav-icon"><span class="mi">add_shopping_cart</span></span> Place Order</button>
+        <button class="nav-link" [class.active]="activeSection === 'orders'" (click)="switchSection('orders')"><span class="nav-icon"><span class="mi">receipt_long</span></span> My Orders<span class="nav-badge badge-highlight" *ngIf="pendingOrders > 0">{{ pendingOrders }}</span></button>
+        <button class="nav-link" [class.active]="activeSection === 'analytics'" (click)="switchSection('analytics')"><span class="nav-icon"><span class="mi">analytics</span></span> Analytics</button>
+        <button class="nav-link" (click)="goToOrders()"><span class="nav-icon"><span class="mi">rate_review</span></span> Orders / Feedback</button>
+        <button class="nav-link" (click)="refresh()"><span class="nav-icon"><span class="mi">refresh</span></span> Refresh</button>
+      </nav>
+      <div class="sidebar-dark-toggle" (click)="toggleDarkMode()">
+        <span class="mi">dark_mode</span><span>Dark Mode</span>
+        <label class="switch" (click)="$event.stopPropagation()"><input type="checkbox" [checked]="isDarkMode" (change)="toggleDarkMode()" /><span class="slider"></span></label>
+      </div>
+      <div class="secure-status"><span></span><span class="mi mi-xs">verified_user</span> JWT secured consumer access</div>
+    </aside>
+
+    <!-- MAIN -->
+    <section class="main-panel">
+
+      <header class="topbar">
+        <div class="topbar-left-group">
+          <button class="hamburger-btn" (click)="sidebarOpen = true"><span class="mi">menu</span></button>
+          <div><span class="page-kicker">SupplyFlow Nexus</span><h2>Consumer Dashboard</h2><p>Browse inventory, place orders, and track deliveries.</p></div>
+        </div>
+        <div class="topbar-actions">
+          <div class="user-chip"><div class="avatar"><span class="mi">person</span></div><div><span>Consumer</span><small>CONSUMER</small></div></div>
+          <button class="ghost-btn" (click)="refresh()"><span class="mi mi-sm">refresh</span> Refresh</button>
+          <button class="danger-btn" (click)="confirmLogout()"><span class="mi mi-sm">logout</span> Logout</button>
+        </div>
+      </header>
+
+      <div class="toast" [class.show]="toastVisible" [class.error]="toastError"><span class="mi mi-sm">{{ toastError ? 'error' : 'check_circle' }}</span> {{ toastMessage }}</div>
+
+      <div class="confirm-overlay" *ngIf="confirmVisible" (click)="onConfirmCancel()">
+        <div class="confirm-dialog" (click)="$event.stopPropagation()">
+          <div class="confirm-icon-wrap"><span class="mi">warning</span></div>
+          <h3>{{ confirmTitle }}</h3><p>{{ confirmMessage }}</p>
+          <div class="confirm-actions"><button class="confirm-cancel-btn" (click)="onConfirmCancel()">Cancel</button><button class="confirm-yes-btn" (click)="onConfirmYes()">Confirm</button></div>
+        </div>
+      </div>
+
+      <!-- ═══════ DASHBOARD ═══════ -->
+      <div *ngIf="activeSection === 'dashboard'" class="animate-in">
+        <section class="stats-grid">
+          <article class="stat-card"><div class="stat-icon cyan"><span class="mi">shopping_bag</span></div><div><p>Available Products</p><h3>{{ inventoryCount }}</h3></div></article>
+          <article class="stat-card"><div class="stat-icon blue"><span class="mi">receipt_long</span></div><div><p>My Orders</p><h3>{{ orderCount }}</h3></div></article>
+          <article class="stat-card"><div class="stat-icon amber"><span class="mi">schedule</span></div><div><p>Pending</p><h3>{{ pendingOrders }}</h3></div></article>
+          <article class="stat-card"><div class="stat-icon green"><span class="mi">check_circle</span></div><div><p>Delivered</p><h3>{{ deliveredOrders }}</h3></div></article>
+        </section>
+
+        <section class="overview-grid">
+          <article class="glass-card action-card">
+            <div class="card-heading"><div><span class="section-label">Shop Now</span><h3>Place a New Order</h3></div><div class="card-heading-icon blue-glow"><span class="mi">add_shopping_cart</span></div></div>
+            <p class="muted-text">Browse wholesaler inventory and place purchase orders for products you need.</p>
+            <button class="primary-btn" (click)="goToPlaceOrder()"><span class="mi mi-sm">shopping_cart</span> Place Order</button>
+          </article>
+          <article class="glass-card action-card">
+            <div class="card-heading"><div><span class="section-label">Track & Review</span><h3>Orders & Feedback</h3></div><div class="card-heading-icon cyan-glow"><span class="mi">rate_review</span></div></div>
+            <p class="muted-text">Track your order status, view delivery history, and submit product feedback.</p>
+            <button class="secondary-btn" (click)="goToOrders()"><span class="mi mi-sm">arrow_forward</span> View Orders</button>
+          </article>
+        </section>
+
+        <section class="dashboard-row">
+          <article class="glass-card">
+            <div class="card-heading"><div><span class="section-label">Order History</span><h3>Recent Orders</h3></div><button class="view-all-link" (click)="switchSection('orders')">View All <span class="mi mi-xs">arrow_forward</span></button></div>
+            <div class="recent-orders-list" *ngIf="orders.length > 0">
+              <div class="recent-order-item" *ngFor="let order of orders.slice(0, 5)">
+                <div class="ro-rank">#{{ order.id }}</div>
+                <div class="ro-info">
+                  <span class="ro-product">{{ getProductName(order) }}</span>
+                  <small class="ro-wholesaler"><span class="mi mi-xs">store</span> {{ getWholesalerName(order) }} · Qty: {{ order.quantity || 0 }}</small>
+                </div>
+                <span class="status-pill" [ngClass]="getStatusClass(order.status)"><span class="mi mi-xs">{{ getStatusIcon(order.status) }}</span> {{ normalizeStatus(order.status) }}</span>
+              </div>
+            </div>
+            <div class="empty-state" *ngIf="!loadingOrders && orders.length === 0"><span class="mi empty-icon">receipt_long</span><p>No orders placed yet. Start shopping!</p></div>
+            <div class="empty-state" *ngIf="loadingOrders"><span class="mi spin">refresh</span> Loading...</div>
+          </article>
+
+          <article class="glass-card">
+            <div class="card-heading"><div><span class="section-label"><span class="mi mi-xs">local_offer</span> Featured</span><h3>Available Products</h3></div><button class="view-all-link" (click)="switchSection('browse')">Browse All <span class="mi mi-xs">arrow_forward</span></button></div>
+            <div class="featured-list" *ngIf="inventories.length > 0">
+              <div class="featured-item" *ngFor="let inv of inventories.slice(0, 5)">
+               <div class="fi-image-box">
+  <img
+    *ngIf="inv.product?.imageUrl"
+    [src]="getImageUrl(inv.product.imageUrl)"
+    alt="product"
+    class="fi-product-img"
+  />
+
+  <div *ngIf="!inv.product?.imageUrl" class="fi-icon">
+    <span class="mi">category</span>
   </div>
-</div> -->
-
-<!-- <main class="simple-role-dashboard">
-  <section class="role-card">
-
-    <span class="role-pill">CONSUMER PORTAL</span>
-
-    <h2>Consumer Dashboard</h2>
-    <p>Browse products, place orders, track purchases, and submit feedback.</p>
-
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span>Available Products</span>
-        <strong>{{ products.length }}</strong>
+</div>
+                <div class="fi-info">
+                  <span class="fi-name">{{ inv.product?.name || 'Product' }}</span>
+                  <small class="fi-meta"><span class="mi mi-xs">store</span> {{ inv.wholesalerId || 'Wholesaler' }} · {{ inv.stockQuantity || 0 }} in stock</small>
+                </div>
+                <span class="fi-price">{{ formatCurrency(inv.product?.price) }}</span>
+              </div>
+            </div>
+            <div class="empty-state" *ngIf="!loadingInventory && inventories.length === 0"><span class="mi empty-icon">shopping_bag</span><p>No products available right now.</p></div>
+            <div class="empty-state" *ngIf="loadingInventory"><span class="mi spin">refresh</span> Loading...</div>
+          </article>
+        </section>
       </div>
 
-      <div class="stat-card">
-        <span>My Orders</span>
-        <strong>{{ orders.length }}</strong>
+      <!-- ═══════ BROWSE PRODUCTS ═══════ -->
+      <div *ngIf="activeSection === 'browse'" class="animate-in">
+        <div class="section-header">
+          <div><span class="section-label"><span class="mi mi-xs">shopping_bag</span> Wholesaler Inventory</span><h3>Browse Products</h3><p>Products available from wholesalers for purchase.</p></div>
+          <div class="search-panel">
+            <div class="search-box"><span class="mi search-icon">search</span><input type="text" placeholder="Search products..." autocomplete="off" [value]="inventorySearch" (input)="onInventorySearch($any($event.target).value)" /><button class="search-clear-btn" *ngIf="inventorySearch" (click)="clearSearch()"><span class="mi">close</span></button></div>
+            <div class="search-meta" *ngIf="inventorySearch">{{ filteredInventories.length }} of {{ inventories.length }} products</div>
+          </div>
+        </div>
+
+        <div class="product-grid">
+          <article class="product-card" *ngFor="let inv of filteredInventories">
+<div class="pc-header">
+  <div class="pc-image-box">
+    <img
+      *ngIf="inv.product?.imageUrl"
+      [src]="getImageUrl(inv.product.imageUrl)"
+      alt="product"
+      class="pc-product-img"
+    />
+
+    <div *ngIf="!inv.product?.imageUrl" class="pc-icon">
+      <span class="mi">category</span>
+    </div>
+  </div>
+
+  <span
+    class="pc-stock-badge"
+    [class.in-stock]="(inv.stockQuantity || 0) >= 10"
+    [class.low-stock]="(inv.stockQuantity || 0) > 0 && (inv.stockQuantity || 0) < 10"
+    [class.out-stock]="(inv.stockQuantity || 0) === 0">
+    {{ (inv.stockQuantity || 0) === 0 ? 'Out of Stock' : (inv.stockQuantity || 0) < 10 ? 'Low Stock' : 'In Stock' }}
+  </span>
+</div>            <h4 class="pc-name">{{ inv.product?.name || 'Product' }}</h4>
+            <p class="pc-desc">{{ inv.product?.description || 'No description available' }}</p>
+            <div class="pc-meta">
+              <span class="pc-price">{{ formatCurrency(inv.product?.price) }}</span>
+              <span class="pc-qty"><span class="mi mi-xs">inventory</span> {{ inv.stockQuantity || 0 }} units</span>
+            </div>
+            <div class="pc-seller"><span class="mi mi-xs">store</span> {{ inv.wholesalerId || 'Wholesaler' }}</div>
+            <button class="pc-order-btn" (click)="goToPlaceOrder()" [disabled]="(inv.stockQuantity || 0) === 0">
+              <span class="mi mi-sm">{{ (inv.stockQuantity || 0) === 0 ? 'remove_shopping_cart' : 'add_shopping_cart' }}</span>
+              {{ (inv.stockQuantity || 0) === 0 ? 'Unavailable' : 'Order Now' }}
+            </button>
+          </article>
+        </div>
+
+        <div class="empty-state" *ngIf="!loadingInventory && filteredInventories.length === 0" style="margin-top:20px"><span class="mi empty-icon">shopping_bag</span><p>{{ inventorySearch ? 'No products match your search.' : 'No products available right now.' }}</p></div>
+        <div class="empty-state" *ngIf="loadingInventory" style="margin-top:20px"><span class="mi spin">refresh</span> Loading products...</div>
       </div>
 
-      <div class="stat-card">
-        <span>Delivered Orders</span>
-        <strong>{{ deliveredOrders }}</strong>
+      <!-- ═══════ MY ORDERS ═══════ -->
+      <div *ngIf="activeSection === 'orders'" class="animate-in">
+        <section class="order-summary-stats">
+          <div class="order-mini-stat"><div class="oms-icon blue"><span class="mi">receipt_long</span></div><div><span class="oms-value">{{ orderCount }}</span><span class="oms-label">Total</span></div></div>
+          <div class="order-mini-stat"><div class="oms-icon amber"><span class="mi">schedule</span></div><div><span class="oms-value">{{ pendingOrders }}</span><span class="oms-label">Pending</span></div></div>
+          <div class="order-mini-stat"><div class="oms-icon cyan"><span class="mi">local_shipping</span></div><div><span class="oms-value">{{ shippedOrders }}</span><span class="oms-label">Shipped</span></div></div>
+          <div class="order-mini-stat"><div class="oms-icon green"><span class="mi">check_circle</span></div><div><span class="oms-value">{{ deliveredOrders }}</span><span class="oms-label">Delivered</span></div></div>
+        </section>
+
+        <div class="section-header"><div><span class="section-label"><span class="mi mi-xs">receipt_long</span> Purchase History</span><h3>My Orders</h3><p>Track your orders and delivery status.</p></div></div>
+
+        <div class="table-card"><div class="responsive-table"><table>
+          <thead><tr><th>Order ID</th><th>Product</th><th>Wholesaler</th><th>Qty</th><th>Price</th><th>Total</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td><span class="id-badge">#{{ order.id }}</span></td>
+              <td><div class="product-name-cell"><div class="product-mini-icon"><span class="mi">category</span></div><span>{{ getProductName(order) }}</span></div></td>
+              <td><div class="wholesaler-cell"><div class="ws-avatar"><span class="mi">store</span></div><span>{{ getWholesalerName(order) }}</span></div></td>
+              <td><span class="qty-badge">{{ order.quantity || 0 }}</span></td>
+              <td><strong class="price-text">{{ formatCurrency(getProductPrice(order)) }}</strong></td>
+              <td><strong class="price-text">{{ formatCurrency(getProductPrice(order) * (order.quantity || 0)) }}</strong></td>
+              <td><span class="date-text">{{ order.orderDate | date:'dd MMM yyyy' }}</span></td>
+              <td><span class="status-pill" [ngClass]="getStatusClass(order.status)"><span class="mi mi-xs">{{ getStatusIcon(order.status) }}</span> {{ normalizeStatus(order.status) }}</span></td>
+            </tr>
+            <tr *ngIf="loadingOrders"><td colspan="8"><div class="empty-state"><span class="mi spin">refresh</span> Loading...</div></td></tr>
+            <tr *ngIf="!loadingOrders && orders.length === 0"><td colspan="8"><div class="empty-state"><span class="mi empty-icon">receipt_long</span><p>No orders placed yet.</p></div></td></tr>
+          </tbody>
+        </table></div></div>
       </div>
 
-      <div class="stat-card">
-        <span>Feedback Pending</span>
-        <strong>{{ pendingFeedback }}</strong>
+      <!-- ═══════ ANALYTICS ═══════ -->
+      <div *ngIf="activeSection === 'analytics'" class="animate-in">
+        <div class="section-header"><div><span class="section-label"><span class="mi mi-xs">analytics</span> Insights</span><h3>Consumer Analytics</h3><p>Your spending and order patterns at a glance.</p></div></div>
+
+        <section class="analytics-stats-row">
+          <article class="analytics-stat-card"><div class="as-icon as-revenue"><span class="mi">currency_rupee</span></div><div><span class="as-label">Total Spent</span><span class="as-value">{{ formatCurrency(totalSpent) }}</span><span class="as-sub"><span class="mi mi-xs">trending_up</span> {{ deliveredOrders }} delivered</span></div></article>
+          <article class="analytics-stat-card"><div class="as-icon as-aov"><span class="mi">receipt_long</span></div><div><span class="as-label">Avg Order Value</span><span class="as-value">{{ formatCurrency(avgOrderValue) }}</span><span class="as-sub"><span class="mi mi-xs">bar_chart</span> {{ orderCount }} orders</span></div></article>
+          <article class="analytics-stat-card"><div class="as-icon as-fulfilment"><span class="mi">pie_chart</span></div><div><span class="as-label">Fulfilment Rate</span><span class="as-value">{{ fulfilmentRate | number:'1.1-1' }}%</span><span class="as-sub"><span class="mi mi-xs">check</span> {{ deliveredOrders }}/{{ orderCount }}</span></div></article>
+          <article class="analytics-stat-card"><div class="as-icon as-turnover"><span class="mi">shopping_cart</span></div><div><span class="as-label">Units Ordered</span><span class="as-value">{{ totalUnitsOrdered }}</span><span class="as-sub"><span class="mi mi-xs">category</span> {{ uniqueProducts }} products</span></div></article>
+        </section>
+
+        <section class="analytics-stats-row secondary-kpi-row">
+          <article class="mini-kpi-card green-card"><div class="mkpi-icon"><span class="mi">check_circle</span></div><div class="mkpi-data"><span class="mkpi-value">{{ deliveredOrders }}</span><span class="mkpi-label">Delivered</span></div></article>
+          <article class="mini-kpi-card blue-card"><div class="mkpi-icon"><span class="mi">local_shipping</span></div><div class="mkpi-data"><span class="mkpi-value">{{ shippedOrders }}</span><span class="mkpi-label">Shipped</span></div></article>
+          <article class="mini-kpi-card amber-card"><div class="mkpi-icon"><span class="mi">schedule</span></div><div class="mkpi-data"><span class="mkpi-value">{{ pendingOrders }}</span><span class="mkpi-label">Pending</span></div></article>
+          <article class="mini-kpi-card red-card"><div class="mkpi-icon"><span class="mi">cancel</span></div><div class="mkpi-data"><span class="mkpi-value">{{ cancelledOrders }}</span><span class="mkpi-label">Cancelled</span></div></article>
+        </section>
+
+        <!-- Highlight Cards -->
+        <section class="analytics-grid">
+          <article class="glass-card highlight-card">
+            <div class="card-heading"><div><span class="section-label"><span class="mi mi-xs">emoji_events</span> Favourite</span><h3>Most Ordered Product</h3></div><div class="card-heading-icon blue-glow"><span class="mi">emoji_events</span></div></div>
+            <div class="highlight-body"><span class="highlight-value">{{ mostOrderedProduct.name }}</span><span class="highlight-sub"><span class="mi mi-xs">shopping_cart</span> {{ mostOrderedProduct.qty }} total units ordered</span><div class="highlight-bar-track"><div class="highlight-bar-fill blue-fill" [style.width.%]="mostOrderedProduct.qty > 0 ? 100 : 0"></div></div></div>
+          </article>
+          <article class="glass-card highlight-card">
+            <div class="card-heading"><div><span class="section-label"><span class="mi mi-xs">currency_rupee</span> Spending</span><h3>Total Amount Spent</h3></div><div class="card-heading-icon cyan-glow"><span class="mi">account_balance_wallet</span></div></div>
+            <div class="highlight-body"><span class="highlight-value">{{ formatCurrency(totalSpent) }}</span><span class="highlight-sub"><span class="mi mi-xs">trending_up</span> Across {{ orderCount }} orders on {{ uniqueProducts }} products</span><div class="highlight-bar-track"><div class="highlight-bar-fill cyan-fill" [style.width.%]="totalSpent > 0 ? 100 : 0"></div></div></div>
+          </article>
+        </section>
+
+        <!-- Charts -->
+        <section class="analytics-grid">
+          <article class="glass-card chart-card">
+            <div class="card-heading"><div><span class="section-label"><span class="mi mi-xs">pie_chart</span> Snapshot</span><h3>Order Status</h3></div><div class="card-heading-icon blue-glow"><span class="mi">pie_chart</span></div></div>
+            <div class="css-donut-wrap">
+              <div class="css-donut" [style.background]="statusGradient"><div class="css-donut-hole"><span class="donut-center-val">{{ orderCount }}</span><span class="donut-center-lbl">Total</span></div></div>
+              <div class="css-legend">
+                <div class="legend-row" *ngFor="let d of statusChartData"><span class="legend-dot" [style.background]="d.color"></span><span class="legend-name">{{ d.label }}</span><span class="legend-val">{{ d.value }}</span><span class="legend-pct">{{ d.percent | number:'1.0-0' }}%</span></div>
+                <div class="legend-row" *ngIf="statusChartData.length === 0"><span class="legend-name muted-text">No orders yet</span></div>
+              </div>
+            </div>
+          </article>
+          <article class="glass-card chart-card">
+            <div class="card-heading"><div><span class="section-label"><span class="mi mi-xs">bar_chart</span> Spending</span><h3>Spending by Product</h3></div><div class="card-heading-icon cyan-glow"><span class="mi">bar_chart</span></div></div>
+            <div class="css-bar-chart">
+              <div class="css-bar-row" *ngFor="let d of spendingByProductData"><span class="bar-label">{{ d.name.length > 16 ? d.name.substring(0,16)+'...' : d.name }}</span><div class="bar-track"><div class="bar-fill" [style.width.%]="d.percent" [style.background]="d.color"></div></div><span class="bar-value">{{ formatCurrency(d.value) }}</span></div>
+              <div class="empty-state" *ngIf="spendingByProductData.length === 0"><span class="mi empty-icon">bar_chart</span><p>No order data yet.</p></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="analytics-grid">
+          <article class="glass-card chart-card">
+            <div class="card-heading"><div><span class="section-label"><span class="mi mi-xs">pie_chart</span> Share</span><h3>Spending Distribution</h3></div><div class="card-heading-icon blue-glow"><span class="mi">pie_chart</span></div></div>
+            <div class="css-donut-wrap">
+              <div class="css-pie" [style.background]="spendingShareGradient"></div>
+              <div class="css-legend">
+                <div class="legend-row" *ngFor="let d of spendingShareData"><span class="legend-dot" [style.background]="d.color"></span><span class="legend-name">{{ d.name.length > 14 ? d.name.substring(0,14)+'...' : d.name }}</span><span class="legend-val">{{ formatCurrency(d.value) }}</span><span class="legend-pct">{{ d.percent | number:'1.0-0' }}%</span></div>
+                <div class="legend-row" *ngIf="spendingShareData.length === 0"><span class="legend-name muted-text">No data</span></div>
+              </div>
+            </div>
+          </article>
+          <article class="glass-card chart-card">
+            <div class="card-heading"><div><span class="section-label"><span class="mi mi-xs">shopping_cart</span> Volume</span><h3>Quantity by Product</h3></div><div class="card-heading-icon cyan-glow"><span class="mi">bar_chart</span></div></div>
+            <div class="css-bar-chart">
+              <div class="css-bar-row" *ngFor="let d of qtyByProductData"><span class="bar-label">{{ d.name.length > 16 ? d.name.substring(0,16)+'...' : d.name }}</span><div class="bar-track"><div class="bar-fill" [style.width.%]="d.percent" [style.background]="d.color"></div></div><span class="bar-value">{{ d.qty }} units</span></div>
+              <div class="empty-state" *ngIf="qtyByProductData.length === 0"><span class="mi empty-icon">shopping_cart</span><p>No data yet.</p></div>
+            </div>
+          </article>
+        </section>
       </div>
-    </div>
 
-    <div class="actions">
-      <button type="button" (click)="goToPlaceOrder()">
-        Place Order
-      </button>
-
-      <button type="button" (click)="goToOrders()">
-        View Orders
-      </button>
-
-      <button type="button" class="logout" (click)="logout()">
-        Logout
-      </button>
-    </div>
-
-  </section>
-</main> -->
-
-<main class="consumer-page">
-  <section class="role-card">
-
-    <span class="role-pill">CONSUMER PORTAL</span>
-
-    <h2>Consumer Dashboard</h2>
-    <p>Browse wholesaler inventory, place orders, track delivery, and submit feedback.</p>
-
-    <div class="stats-grid">
-      <article class="stat-card">
-        <span>Available Inventory</span>
-        <strong>{{ inventories.length }}</strong>
-      </article>
-
-      <article class="stat-card">
-        <span>My Orders</span>
-        <strong>{{ orders.length }}</strong>
-      </article>
-
-      <article class="stat-card">
-        <span>Pending Orders</span>
-        <strong>{{ pendingOrders }}</strong>
-      </article>
-
-      <article class="stat-card">
-        <span>Delivered Orders</span>
-        <strong>{{ deliveredOrders }}</strong>
-      </article>
-    </div>
-
-    <div class="actions">
-      <button type="button" (click)="goToPlaceOrder()">
-        Place Order
-      </button>
-
-      <button type="button" (click)="goToOrders()">
-        View Orders / Feedback
-      </button>
-
-      <button type="button" class="logout" (click)="logout()">
-        Logout
-      </button>
-    </div>
-
+    </section>
   </section>
 </main>
+
+

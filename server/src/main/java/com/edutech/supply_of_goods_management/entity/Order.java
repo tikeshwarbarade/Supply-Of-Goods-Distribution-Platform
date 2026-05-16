@@ -1,18 +1,15 @@
 package com.edutech.supply_of_goods_management.entity;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
-
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
-@Getter @Setter
+@Getter
+@Setter
 public class Order {
 
     @Id
@@ -20,14 +17,17 @@ public class Order {
     private Long id;
 
     private int quantity;
+
     private String status;
 
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
 
-@Column(name = "order_type")
-private String orderType;
+    @Column(name = "order_type")
+    private String orderType;
 
-@Column(name = "seller_wholesaler_id")
-private Long sellerWholesalerId;
+    @Column(name = "seller_wholesaler_id")
+    private Long sellerWholesalerId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -36,10 +36,15 @@ private Long sellerWholesalerId;
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.orderDate == null) {
+            this.orderDate = LocalDateTime.now();
+        }
+
+        if (this.status == null || this.status.trim().isEmpty()) {
+            this.status = "PENDING";
+        }
+    }
 }
-
-
-// @Table(name = "orders") // do not change the table name ( do not change this line)
-// public class Order {
-//     // implement the entity here
-// }

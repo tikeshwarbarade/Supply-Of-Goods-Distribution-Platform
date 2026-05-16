@@ -61,6 +61,34 @@ export class HttpService {
   // MANUFACTURER
   // =========================
 
+  uploadProductImage(productId: number, image: File) {
+  const formData = new FormData();
+  formData.append('image', image, image.name);
+
+  return this.http.post(
+    `${this.baseUrl}/api/manufacturers/product/${productId}/image`,
+    formData,
+    this.getMultipartHeaders()
+  );
+}
+
+deleteProductImage(productId: number) {
+  return this.http.delete(
+    `${this.baseUrl}/api/manufacturers/product/${productId}/image`,
+    this.getHeaders()
+  );
+}
+
+  private getMultipartHeaders() {
+  const token = this.isTest ? 'mockToken' : localStorage.getItem('token');
+
+  return {
+    headers: new HttpHeaders({
+      Authorization: 'Bearer ' + token
+    })
+  };
+}
+
   createProduct(data: any) {
     return this.http.post(
       `${this.baseUrl}/api/manufacturers/product`,

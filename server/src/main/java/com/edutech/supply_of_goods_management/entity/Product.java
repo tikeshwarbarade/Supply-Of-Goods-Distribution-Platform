@@ -24,7 +24,12 @@ private String description;
 private double price;
 
 @Column(name = "stock_quantity")
-private int stockQuantity;    @OneToMany(mappedBy = "product")
+private int stockQuantity;  
+
+@Column(name = "image_url")
+private String imageUrl;
+
+@OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<Order> orders;
 

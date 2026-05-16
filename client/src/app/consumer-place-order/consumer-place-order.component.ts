@@ -1,4 +1,6 @@
+
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 
@@ -27,7 +29,8 @@ export class ConsumerPlaceOrderComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private http: HttpService
+    private http: HttpService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +56,19 @@ export class ConsumerPlaceOrderComponent implements OnInit {
       }
     });
   }
+  getImageUrl(imageUrl: string | null | undefined): string {
+  if (!imageUrl) {
+    return '';
+  }
+
+  if (imageUrl.startsWith('http')) {
+    return imageUrl;
+  }
+
+  const cleanPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+
+  return `${window.location.origin}/project/3689/proxy/3000${cleanPath}`;
+}
 
   onSearch(value: string): void {
     this.searchText = value;
@@ -170,5 +186,9 @@ export class ConsumerPlaceOrderComponent implements OnInit {
   setMessage(message: string, isError: boolean): void {
     this.message = message;
     this.messageError = isError;
+  }
+
+  goBack(): void {
+    this.router.navigate(['/consumer-dashboard']);
   }
 }

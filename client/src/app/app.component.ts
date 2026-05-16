@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../services/auth.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+
+import { AuthService } from '../services/auth.service';
 import { SessionService } from '../services/session.service';
 
 @Component({
@@ -11,14 +12,23 @@ import { SessionService } from '../services/session.service';
 })
 export class AppComponent implements OnInit {
 
-  IsLoggin: boolean = false;
+  IsLoggin = false;
   roleName: string | null = null;
-  showGlobalNavbar: boolean = false;
+  showGlobalNavbar = false;
 
-  private fullScreenDashboardRoutes: string[] = [
+  private fullScreenRoutes: string[] = [
     '/manufacturer-dashboard',
     '/wholesaler-dashboard',
-    '/consumer-dashboard'
+    '/consumer-dashboard',
+    '/consumer-get-orders',
+    '/consumer-place-order',
+    '/create-product'
+  ];
+
+  private publicRoutes: string[] = [
+    '/',
+    '/login',
+    '/registration'
   ];
 
   constructor(
@@ -27,7 +37,7 @@ export class AppComponent implements OnInit {
     private sessionService: SessionService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadUserData();
 
     this.router.events
@@ -37,15 +47,19 @@ export class AppComponent implements OnInit {
       });
   }
 
-  loadUserData() {
+  loadUserData(): void {
     this.IsLoggin = this.authService.getLoginStatus;
     this.roleName = this.authService.getRole;
 
     const currentUrl = this.router.url.split('?')[0];
 
-    const publicRoutes = ['/login', '/registration'];
+    const isPublicRoute = this.publicRoutes.includes(currentUrl);
 
-    if (!this.IsLoggin && !publicRoutes.includes(currentUrl)) {
+    const isFullScreenRoute = this.fullScreenRoutes.some(route =>
+      currentUrl.startsWith(route)
+    );
+
+    if (!this.IsLoggin && !isPublicRoute) {
       this.showGlobalNavbar = false;
       this.router.navigateByUrl('/login');
       return;
@@ -55,14 +69,13 @@ export class AppComponent implements OnInit {
       this.sessionService.startSessionWatcher();
     }
 
-    // ✅ Hide global navbar on full-screen dashboards
     this.showGlobalNavbar =
       this.IsLoggin &&
-      !publicRoutes.includes(currentUrl) &&
-      !this.fullScreenDashboardRoutes.includes(currentUrl);
+      !isPublicRoute &&
+      !isFullScreenRoute;
   }
 
-  logout() {
+  logout(): void {
     this.sessionService.logoutManually();
     this.IsLoggin = false;
     this.roleName = null;
