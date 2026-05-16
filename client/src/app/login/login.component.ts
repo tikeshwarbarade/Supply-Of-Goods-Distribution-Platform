@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+
+import { Component, OnInit, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
 
   showPassword = false;
 
+  // ===== Captcha =====
   captchaText = '';
   captchaInput = '';
   captchaVerified = false;
@@ -26,13 +28,18 @@ export class LoginComponent implements OnInit {
   captchaMessageType = '';
   captchaCharsDisplay: any[] = [];
 
+  // ===== OTP =====
+  otpDigits: string[] = ['', '', '', '', '', ''];
+  loginLoading = false;
+
+  // ===== messages =====
   formMessage = '';
   formMessageError = false;
 
   private isTest = window.location.port === '9876';
+  private otpRequestedForUsername = '';
 
-  private captchaChars =
-    'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  private captchaChars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
 
   private captchaColors = [
     '#312e81',
@@ -41,39 +48,65 @@ export class LoginComponent implements OnInit {
     '#0f172a',
     '#1d4ed8'
   ];
-constructor(
-  private fb: FormBuilder,
-  private http: HttpService,
-  private auth: AuthService,
-  private router: Router,
-  private sessionService: SessionService
-) {}
+
+  @ViewChildren('otpBox') otpBoxes!: QueryList<ElementRef<HTMLInputElement>>;
+
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpService,
+    private auth: AuthService,
+    private router: Router,
+    private sessionService: SessionService
+  ) {}
 
   ngOnInit() {
     this.generateCaptcha();
+
+    this.itemForm.valueChanges.subscribe(() => {
+      if (this.captchaVerified) {
+        this.captchaVerified = false;
+        this.otpRequestedForUsername = '';
+        this.resetOtp();
+        this.captchaMessage = 'Details changed. Please verify captcha again.';
+        this.captchaMessageType = 'warning';
+      }
+    });
   }
+
+  trackByIndex = (index: number) => index;
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
-  randomNumber(min: number, max: number): number {
+  private getErrorMessage(err: any): string {
+    if (!err) return 'Something went wrong';
+
+    if (typeof err === 'string') return err;
+
+    if (err.error) {
+      if (typeof err.error === 'string') return err.error;
+      if (err.error.message) return err.error.message;
+    }
+
+    if (err.message) return err.message;
+
+    return 'Something went wrong';
+  }
+
+  private randomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  randomFromArray(arr: string[]): string {
+  private randomFromArray(arr: string[]): string {
     return arr[this.randomNumber(0, arr.length - 1)];
   }
 
-  createCaptchaText(length: number): string {
+  private createCaptchaText(length: number): string {
     let text = '';
-
     for (let i = 0; i < length; i++) {
-      text += this.captchaChars[
-        this.randomNumber(0, this.captchaChars.length - 1)
-      ];
+      text += this.captchaChars[this.randomNumber(0, this.captchaChars.length - 1)];
     }
-
     return text;
   }
 
@@ -81,6 +114,9 @@ constructor(
     this.captchaText = this.createCaptchaText(6);
     this.captchaVerified = false;
     this.captchaInput = '';
+    this.otpRequestedForUsername = '';
+    this.resetOtp();
+
     this.captchaMessage = 'Captcha verification is required.';
     this.captchaMessageType = '';
 
@@ -99,98 +135,131 @@ constructor(
     });
   }
 
-  verifyCaptcha(): boolean {
-    const enteredCaptcha = this.captchaInput.trim();
-
-    if (!enteredCaptcha) {
-      this.captchaVerified = false;
-      this.captchaMessage = 'Please enter the captcha code.';
-      this.captchaMessageType = 'warning';
-      return false;
-    }
-
-    if (enteredCaptcha.toLowerCase() === this.captchaText.toLowerCase()) {
-      this.captchaVerified = true;
-      this.captchaMessage = 'Captcha verified successfully.';
-      this.captchaMessageType = 'success';
-      return true;
-    }
-
-    this.captchaVerified = false;
-    this.captchaMessage = 'Incorrect captcha. A new code has been generated.';
-    this.captchaMessageType = 'error';
-    this.generateCaptcha();
-    return false;
-  }
-
   onCaptchaInputChange() {
     this.captchaVerified = false;
+    this.otpRequestedForUsername = '';
+    this.resetOtp();
 
-    if (this.captchaInput.trim()) {
-      this.captchaMessage = 'Captcha entered. Click Check or Login to verify.';
-      this.captchaMessageType = 'warning';
-    } else {
-      this.captchaMessage = 'Captcha verification is required.';
-      this.captchaMessageType = '';
-    }
+    this.captchaMessage = this.captchaInput
+      ? 'Captcha entered. Click Check to verify.'
+      : 'Captcha verification is required.';
   }
 
- submit() {
-  this.formMessage = '';
-  this.formMessageError = false;
+  // ✅ VERIFY CAPTCHA + SEND OTP
+  verifyCaptcha() {
+    this.formMessage = '';
+    this.formMessageError = false;
 
-  if (this.itemForm.invalid) {
-    this.itemForm.markAllAsTouched();
-    this.formMessage = 'Please enter username and password.';
-    this.formMessageError = true;
-    return;
-  }
-
-  // ✅ Skip captcha only for tests
-  if (!this.isTest && !this.captchaVerified) {
-    if (!this.verifyCaptcha()) {
-      this.formMessage = 'Please verify captcha before login.';
+    if (this.itemForm.invalid) {
+      this.formMessage = 'Enter username and password';
       this.formMessageError = true;
       return;
     }
-  }
 
-  this.http.Login(this.itemForm.value).subscribe({
-  next: (res: any) => {
-  this.auth.saveToken(res.token);
-  this.auth.SetRole(res.role);
-  this.auth.saveUserId(res.userId);
-
-  this.formMessage = 'Login successful.';
-  this.formMessageError = false;
-
-  if (res.role === 'WHOLESALER') {
-    this.router.navigate(['/wholesaler-dashboard']);
-    return;
-  }
-
-  this.router.navigate(['/dashboard']);
-},
-    error: (err) => {
-      console.error(err);
-
-      if (err.status === 409) {
-        this.formMessage = 'User is already logged in from another session.';
-        this.formMessageError = true;
-        alert('User already logged in from another browser/session ❌');
-        return;
-      }
-
-      this.formMessage = 'Invalid Username or Password.';
-      this.formMessageError = true;
-      alert('Invalid Username or Password ❌');
-
-      if (!this.isTest) {
-        this.generateCaptcha();
-      }
+    if (this.captchaInput.toLowerCase() !== this.captchaText.toLowerCase()) {
+      this.generateCaptcha();
+      this.captchaMessage = 'Incorrect captcha';
+      this.captchaMessageType = 'error';
+      return;
     }
-  });
-}
+
+    if (this.isTest) {
+      this.captchaVerified = true;
+      return;
+    }
+
+    this.loginLoading = true;
+
+    this.http.requestLoginOtp(this.itemForm.value).subscribe({
+      next: () => {
+        this.captchaVerified = true;
+        this.otpRequestedForUsername = this.itemForm.value.username!;
+
+        this.captchaMessage = 'OTP sent ✅';
+        this.captchaMessageType = 'success';
+
+        this.resetOtp();
+        setTimeout(() => this.focusOtp(0), 0);
+
+        this.loginLoading = false;
+      },
+      error: (err) => {
+        this.formMessage = this.getErrorMessage(err);
+        this.formMessageError = true;
+
+        this.generateCaptcha();
+        this.loginLoading = false;
+      }
+    });
+  }
+
+  private resetOtp() {
+    this.otpDigits = ['', '', '', '', '', ''];
+  }
+
+  private getOtpValue() {
+    return this.otpDigits.join('');
+  }
+
+  private focusOtp(i: number) {
+    this.otpBoxes.get(i)?.nativeElement.focus();
+  }
+
+  onOtpInput(e: any, i: number) {
+    const val = e.target.value.replace(/\D/g, '');
+    this.otpDigits[i] = val ? val[val.length - 1] : '';
+    if (this.otpDigits[i] && i < 5) this.focusOtp(i + 1);
+  }
+
+  onOtpKeyDown(e: KeyboardEvent, i: number) {
+    if (e.key === 'Backspace' && !this.otpDigits[i] && i > 0) {
+      this.focusOtp(i - 1);
+    }
+  }
+
+  onOtpPaste(e: ClipboardEvent) {
+    const data = e.clipboardData?.getData('text') || '';
+    const digits = data.replace(/\D/g, '').slice(0, 6);
+    this.otpDigits = digits.split('').concat(Array(6).fill('')).slice(0, 6);
+  }
+
+  // ✅ FINAL LOGIN
+  submit() {
+    if (!this.captchaVerified) {
+      this.formMessage = 'Verify captcha first';
+      this.formMessageError = true;
+      return;
+    }
+
+    const otp = this.getOtpValue();
+    if (otp.length !== 6) {
+      this.formMessage = 'Enter OTP';
+      this.formMessageError = true;
+      return;
+    }
+
+    this.loginLoading = true;
+
+    this.http.verifyLoginOtp({
+      username: this.itemForm.value.username,
+      otp: otp
+    }).subscribe({
+      next: (res: any) => {
+        this.auth.saveToken(res.token);
+        this.auth.SetRole(res.role);
+        this.auth.saveUserId(res.userId);
+
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.formMessage = this.getErrorMessage(err);
+        this.formMessageError = true;
+        this.resetOtp();
+        this.loginLoading = false;
+      }
+    });
+  }
+
   onSubmit() {
     this.submit();
   }

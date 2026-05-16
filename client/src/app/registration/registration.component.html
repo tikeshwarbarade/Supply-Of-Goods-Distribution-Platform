@@ -135,23 +135,37 @@
             </small>
           </div>
 
-          <!-- EMAIL -->
+          <!-- EMAIL + VERIFY BUTTON -->
           <div class="form-group">
             <label>Email Address</label>
 
-            <div class="input-control">
-              <span class="input-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M4 6H20V18H4V6Z"></path>
-                  <path d="M4 7L12 13L20 7"></path>
-                </svg>
-              </span>
+            <div class="email-verify-row">
+              <div class="input-control email-input-control">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 6H20V18H4V6Z"></path>
+                    <path d="M4 7L12 13L20 7"></path>
+                  </svg>
+                </span>
 
-              <input
-                type="email"
-                formControlName="email"
-                placeholder="Enter email address"
-                autocomplete="email">
+                <input
+                  type="email"
+                  formControlName="email"
+                  placeholder="Enter email address"
+                  autocomplete="email">
+              </div>
+
+              <button
+                type="button"
+                class="verify-email-btn"
+                [class.verified]="otpVerified"
+                [disabled]="verifyLoading || otpVerified"
+                (click)="sendOtp()">
+
+                <span *ngIf="verifyLoading">...</span>
+                <span *ngIf="!verifyLoading && !otpVerified">Verify</span>
+                <span *ngIf="otpVerified">Verified</span>
+              </button>
             </div>
 
             <small
@@ -161,9 +175,76 @@
             </small>
           </div>
 
+          <!-- OTP VERIFICATION -->
+          <div class="otp-card">
+            <div class="otp-card-header">
+              <div class="otp-card-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2L20 6V12C20 17 16.5 20.5 12 22C7.5 20.5 4 17 4 12V6L12 2Z"></path>
+                  <path d="M9 12L11 14L15 10"></path>
+                </svg>
+              </div>
+
+              <div>
+                <label>OTP Verification</label>
+                <p>Enter the 6-digit code sent to your email.</p>
+              </div>
+            </div>
+
+            <div class="otp-boxes" (paste)="onOtpPaste($event)">
+              <input
+                #otpBox
+                *ngFor="let d of otpDigits; let i = index; trackBy: trackByIndex"
+                class="otp-digit"
+                [class.filled]="otpDigits[i] !== ''"
+                [class.verified-digit]="otpVerified"
+                [value]="otpDigits[i]"
+                [disabled]="otpVerified"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="1"
+                autocomplete="one-time-code"
+                (keydown)="onOtpKeyDown($event, i)"
+                (input)="onOtpInput($event, i)"
+                [attr.aria-label]="'Digit ' + (i + 1)">
+            </div>
+
+            <button
+              type="button"
+              class="otp-confirm-btn"
+              *ngIf="!otpVerified"
+              (click)="verifyOtp()"
+              [disabled]="otpLoading">
+
+              <span>{{ otpLoading ? 'Verifying...' : 'Confirm OTP' }}</span>
+            </button>
+
+            <div class="otp-verified-row" *ngIf="otpVerified">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 12L11 14L15 10"></path>
+                <circle cx="12" cy="12" r="10"></circle>
+              </svg>
+              <span>Email verified successfully</span>
+            </div>
+
+            <div class="otp-actions-row" *ngIf="!otpVerified">
+              <button
+                type="button"
+                class="otp-resend-link"
+                (click)="sendOtp()"
+                [disabled]="verifyLoading">
+                Resend Code
+              </button>
+            </div>
+
+            <p class="otp-msg" [ngClass]="otpMessageType" *ngIf="otpMessage">
+              {{ otpMessage }}
+            </p>
+          </div>
+
           <div class="form-grid">
 
-            <!-- PHONE MOCK FIELD -->
+            <!-- PHONE -->
             <div class="form-group">
               <label>Phone Number</label>
 
@@ -248,7 +329,7 @@
             </small>
           </div>
 
-          <!-- CONFIRM PASSWORD MOCK FIELD -->
+          <!-- CONFIRM PASSWORD -->
           <div class="form-group">
             <label>Confirm Password</label>
 

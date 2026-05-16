@@ -1,0 +1,15 @@
+# Maven build folder
+target/
+
+# Compiled files
+*.class
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Environment files
+application.properties
+.env

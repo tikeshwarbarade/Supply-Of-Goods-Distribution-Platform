@@ -49,6 +49,18 @@ export class HttpService {
     );
   }
 
+  sendOtp(data: any) {
+    return this.isTest
+      ? this.http.post(this.baseUrl + '/api/user/send-otp', data, this.getHeaders())
+      : this.http.post(this.baseUrl + '/api/user/send-otp', data);
+  }
+
+  verifyOtp(data: any) {
+    return this.isTest
+      ? this.http.post(this.baseUrl + '/api/user/verify-otp', data, this.getHeaders())
+      : this.http.post(this.baseUrl + '/api/user/verify-otp', data);
+  }
+
   updateUserActivity(userId: number) {
     return this.http.post(
       `${this.baseUrl}/api/user/activity?userId=${userId}`,
@@ -253,5 +265,31 @@ deleteProductImage(productId: number) {
       data,
       this.getHeaders()
     );
+  }
+
+  requestLoginOtp(data: any) {
+    return this.isTest
+      ? this.http.post(
+        this.baseUrl + '/api/user/login/request-otp',
+        data,
+        this.getHeaders()
+      )
+      : this.http.post(
+        this.baseUrl + '/api/user/login/request-otp',
+        data
+      );
+  }
+
+  verifyLoginOtp(data: any) {
+    return this.isTest
+      ? this.http.post(
+        this.baseUrl + '/api/user/login/verify-otp',
+        data,
+        this.getHeaders()
+      )
+      : this.http.post(
+        this.baseUrl + '/api/user/login/verify-otp',
+        data
+      );
   }
 }

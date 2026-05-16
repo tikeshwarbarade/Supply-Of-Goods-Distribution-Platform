@@ -1,3 +1,4 @@
+
 <div class="page">
   <section class="login-shell">
 
@@ -45,7 +46,7 @@
         <div class="form-header">
           <span class="form-chip">Secure Login</span>
           <h2>Welcome back</h2>
-          <p>Enter your username, password, and captcha verification code to continue.</p>
+          <p>Enter your credentials, captcha, and OTP to continue.</p>
         </div>
 
         <form [formGroup]="itemForm" (ngSubmit)="submit()" novalidate>
@@ -53,7 +54,6 @@
           <!-- Username -->
           <div class="field-group">
             <label>Username</label>
-
             <div class="input-wrap">
               <span class="input-icon">
                 <svg viewBox="0 0 24 24">
@@ -61,15 +61,9 @@
                   <path d="M12 11C14.2 11 16 9.2 16 7C16 4.8 14.2 3 12 3C9.8 3 8 4.8 8 7C8 9.2 9.8 11 12 11Z"></path>
                 </svg>
               </span>
-
-              <input
-                type="text"
-                formControlName="username"
-                placeholder="Enter username">
+              <input type="text" formControlName="username" placeholder="Enter username">
             </div>
-
-            <small
-              class="error-text"
+            <small class="error-text"
               *ngIf="itemForm.controls['username'].invalid && itemForm.controls['username'].touched">
               Username is required.
             </small>
@@ -78,7 +72,6 @@
           <!-- Password -->
           <div class="field-group">
             <label>Password</label>
-
             <div class="input-wrap password-wrap">
               <span class="input-icon">
                 <svg viewBox="0 0 24 24">
@@ -87,25 +80,15 @@
                   <path d="M12 16V18"></path>
                 </svg>
               </span>
-
-              <input
-                [type]="showPassword ? 'text' : 'password'"
-                formControlName="password"
-                placeholder="Enter password">
-
-              <button
-                type="button"
-                class="password-toggle"
-                (click)="togglePassword()">
+              <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Enter password">
+              <button type="button" class="password-toggle" (click)="togglePassword()">
                 <svg viewBox="0 0 24 24">
                   <path d="M1.5 12S5.5 5 12 5S22.5 12 22.5 12S18.5 19 12 19S1.5 12 1.5 12Z"></path>
                   <path d="M12 15C13.7 15 15 13.7 15 12C15 10.3 13.7 9 12 9C10.3 9 9 10.3 9 12C9 13.7 10.3 15 12 15Z"></path>
                 </svg>
               </button>
             </div>
-
-            <small
-              class="error-text"
+            <small class="error-text"
               *ngIf="itemForm.controls['password'].invalid && itemForm.controls['password'].touched">
               Password is required.
             </small>
@@ -118,11 +101,7 @@
                 <label>Captcha Verification</label>
                 <p>Type the code shown below.</p>
               </div>
-
-              <button
-                type="button"
-                class="refresh-btn"
-                (click)="generateCaptcha()">
+              <button type="button" class="refresh-btn" (click)="generateCaptcha()">
                 <svg viewBox="0 0 24 24">
                   <path d="M21 12A9 9 0 0 1 6.6 19.2"></path>
                   <path d="M3 12A9 9 0 0 1 17.4 4.8"></path>
@@ -133,9 +112,8 @@
             </div>
 
             <div class="captcha-display">
-              <span
-                class="captcha-char"
-                *ngFor="let item of captchaCharsDisplay"
+              <span class="captcha-char"
+                *ngFor="let item of captchaCharsDisplay; trackBy: trackByIndex"
                 [ngStyle]="item.style">
                 {{ item.char }}
               </span>
@@ -149,26 +127,48 @@
                     <path d="M9 12L11 14L15 10"></path>
                   </svg>
                 </span>
-
-                <input
-                  type="text"
-                  [value]="captchaInput"
+                <input type="text" [value]="captchaInput"
                   (input)="captchaInput = $any($event.target).value; onCaptchaInputChange()"
-                  maxlength="6"
-                  placeholder="Enter captcha">
+                  maxlength="6" placeholder="Enter captcha">
               </div>
-
-              <button
-                type="button"
-                class="check-btn"
-                (click)="verifyCaptcha()">
-                Check
-              </button>
+              <button type="button" class="check-btn" (click)="verifyCaptcha()">Check</button>
             </div>
 
             <small class="captcha-message" [ngClass]="captchaMessageType">
               {{ captchaMessage }}
             </small>
+          </div>
+
+          <!-- OTP (visible only after captchaVerified) -->
+          <div class="otp-card" *ngIf="captchaVerified">
+            <div class="otp-card-header">
+              <div class="otp-card-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 6H20V18H4V6Z"></path>
+                  <path d="M4 7L12 13L20 7"></path>
+                </svg>
+              </div>
+              <div>
+                <label>OTP Verification</label>
+                <p>Enter the 6-digit code sent to your email.</p>
+              </div>
+            </div>
+
+            <div class="otp-boxes" (paste)="onOtpPaste($event)">
+              <input
+                #otpBox
+                *ngFor="let d of otpDigits; let i = index; trackBy: trackByIndex"
+                class="otp-digit"
+                [class.filled]="otpDigits[i] !== ''"
+                [value]="otpDigits[i]"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="1"
+                autocomplete="one-time-code"
+                (keydown)="onOtpKeyDown($event, i)"
+                (input)="onOtpInput($event, i)"
+                [attr.aria-label]="'Digit ' + (i + 1)">
+            </div>
           </div>
 
           <!-- Options -->
@@ -177,17 +177,13 @@
               <input type="checkbox">
               <span>Remember me</span>
             </label>
-
-            <a class="forgot-link" (click)="$event.preventDefault()">
-              Forgot password?
-            </a>
+            <a class="forgot-link" (click)="$event.preventDefault()">Forgot password?</a>
           </div>
 
           <!-- Submit -->
-          <button type="submit" class="login-btn">
-            <span>Login</span>
-
-            <svg viewBox="0 0 24 24">
+          <button type="submit" class="login-btn" [disabled]="loginLoading">
+            <span>{{ loginLoading ? 'Signing in...' : 'Login' }}</span>
+            <svg viewBox="0 0 24 24" *ngIf="!loginLoading">
               <path d="M5 12H19"></path>
               <path d="M13 6L19 12L13 18"></path>
             </svg>

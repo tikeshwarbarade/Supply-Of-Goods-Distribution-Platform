@@ -26,14 +26,18 @@ public class User {
     @JsonProperty
     private String password;
 
+    @Column(unique = true)
     private String email;
+
+    // ✅ Added phone number field
+    private String phone;
 
     private String role;
 
     // ✅ 0 = logged out, 1 = logged in
     private Integer loginStatus = 0;
 
-    // ✅ Used to expire stale sessions after 3 minutes
+    // ✅ Used to expire stale sessions
     private LocalDateTime lastActivityTime;
 
     @OneToMany(mappedBy = "user")
