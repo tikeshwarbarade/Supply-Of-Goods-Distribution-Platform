@@ -1,137 +1,212 @@
-
 <main class="wholesaler-page">
 
   <section class="dashboard-shell">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="brand-area">
-        <div class="brand-logo">W</div>
 
-        <div>
-          <span class="brand-pill">WHOLESALER PORTAL</span>
-          <h1>Nexus</h1>
-          <p>
-            Place manufacturer purchase orders, manage inventory, fulfil customer orders,
-            and review feedback.
-          </p>
+      <!-- BRAND -->
+      <div class="brand-area">
+        <div class="brand-lockup">
+
+          <div class="brand-logo" aria-label="Nexus logo">
+            <svg class="nexus-svg-logo" viewBox="0 0 96 96" role="img" aria-hidden="true">
+              <defs>
+                <linearGradient id="wholesalerLogoBg" x1="18" y1="14" x2="78" y2="84">
+                  <stop offset="0%" stop-color="#b8bac3" />
+                  <stop offset="100%" stop-color="#8f929d" />
+                </linearGradient>
+              </defs>
+
+              <rect x="6" y="6" width="84" height="84" rx="24" fill="url(#wholesalerLogoBg)"
+                stroke="rgba(255,255,255,.42)" stroke-width="2" />
+
+              <path d="M48 27 L72 40.5 L72 65.5 L48 79 L24 65.5 L24 40.5 Z" fill="none" stroke="#050505"
+                stroke-width="5" stroke-linejoin="round" />
+
+              <path d="M24 40.5 L48 54 L72 40.5" fill="none" stroke="#050505" stroke-width="5" stroke-linecap="round"
+                stroke-linejoin="round" />
+
+              <path d="M48 54 L48 79" fill="none" stroke="#050505" stroke-width="5" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <div class="brand-copy">
+            <h1>Nexus</h1>
+            <!-- <span class="brand-pill">Wholesaler Portal</span> -->
+          </div>
+
         </div>
+
+        <p class="brand-description">
+          Place purchase orders, manage inventory, fulfil customer orders, and review feedback.
+        </p>
       </div>
 
+      <!-- NAVIGATION -->
       <nav class="side-nav">
-        <button
-          class="nav-link"
-          [class.active]="activeSection === 'overview'"
-          type="button"
+
+        <button class="nav-link" [class.active]="activeSection === 'overview'" type="button"
           (click)="showSection('overview')">
-          <span class="nav-icon">▦</span>
-          Overview
+          <span class="nav-icon">
+            <span class="mi">dashboard</span>
+          </span>
+          <span class="nav-text">Overview</span>
         </button>
 
-        <button
-          class="nav-link"
-          [class.active]="activeSection === 'products'"
-          type="button"
+        <button class="nav-link" [class.active]="activeSection === 'products'" type="button"
           (click)="showSection('products')">
-          <span class="nav-icon">▣</span>
-          Products
+          <span class="nav-icon">
+            <span class="mi">inventory_2</span>
+          </span>
+          <span class="nav-text">Products</span>
+          <span class="nav-badge" *ngIf="products.length > 0">
+            {{ products.length }}
+          </span>
         </button>
 
-        <button
-          class="nav-link"
-          [class.active]="activeSection === 'purchaseOrders'"
-          type="button"
+        <button class="nav-link" [class.active]="activeSection === 'purchaseOrders'" type="button"
           (click)="showSection('purchaseOrders')">
-          <span class="nav-icon">🛒</span>
-          Purchase Orders
+          <span class="nav-icon">
+            <span class="mi">shopping_cart</span>
+          </span>
+          <span class="nav-text">Purchase Orders</span>
+          <span class="nav-badge" *ngIf="purchaseOrders.length > 0">
+            {{ purchaseOrders.length }}
+          </span>
         </button>
 
-        <button
-          class="nav-link"
-          [class.active]="activeSection === 'inventory'"
-          type="button"
+        <button class="nav-link" [class.active]="activeSection === 'inventory'" type="button"
           (click)="showSection('inventory')">
-          <span class="nav-icon">▤</span>
-          Inventory
+          <span class="nav-icon">
+            <span class="mi">warehouse</span>
+          </span>
+          <span class="nav-text">Inventory</span>
+          <span class="nav-badge" *ngIf="inventories.length > 0">
+            {{ inventories.length }}
+          </span>
         </button>
 
-        <button
-          class="nav-link"
-          [class.active]="activeSection === 'customerOrders'"
-          type="button"
+        <button class="nav-link" [class.active]="activeSection === 'customerOrders'" type="button"
           (click)="showSection('customerOrders')">
-          <span class="nav-icon">👥</span>
-          Customer Orders
+          <span class="nav-icon">
+            <span class="mi">groups</span>
+          </span>
+          <span class="nav-text">Customer Orders</span>
+          <span class="nav-badge badge-highlight" *ngIf="customerOrders.length > 0">
+            {{ customerOrders.length }}
+          </span>
         </button>
 
-        <button
-          class="nav-link"
-          [class.active]="activeSection === 'feedbacks'"
-          type="button"
+        <button class="nav-link" [class.active]="activeSection === 'feedbacks'" type="button"
           (click)="showSection('feedbacks')">
-          <span class="nav-icon">★</span>
-          Feedbacks
+          <span class="nav-icon">
+            <span class="mi">star</span>
+          </span>
+          <span class="nav-text">Feedbacks</span>
+          <span class="nav-badge" *ngIf="feedbacks.length > 0">
+            {{ feedbacks.length }}
+          </span>
         </button>
+
       </nav>
 
       <div class="secure-status">
-        <span></span>
-        JWT secured wholesaler access
+        <span class="secure-dot"></span>
+        <span class="mi mi-xs">verified_user</span>
+        <span>JWT secured access</span>
       </div>
+
     </aside>
 
     <!-- MAIN PANEL -->
     <section class="main-panel">
 
       <!-- TOPBAR -->
-      <header class="topbar">
-        <div>
+      <header class="topbar compact-topbar">
+
+        <div class="compact-title-block">
           <span class="page-kicker">SupplyFlow Nexus</span>
           <h2>Wholesaler Dashboard</h2>
-          <p>Manage manufacturer purchase orders, inventory, and consumer fulfilment.</p>
+          <p>Manage manufacturer orders, inventory, and consumer fulfilment.</p>
         </div>
 
-        <div class="topbar-actions">
-          <div class="user-chip">
-            <div class="avatar">W</div>
-            <div>
-              <span>Wholesaler</span>
-              <small>WHOLESALER</small>
+        <div class="topbar-actions compact-topbar-actions">
+
+          <div class="user-chip compact-user-chip">
+            <div class="avatar compact-avatar">
+              <span class="mi">storefront</span>
+            </div>
+
+            <div class="compact-user-text">
+              <p>Wholesaler</p>
+              <!-- <small>WHOLESALER</small> -->
             </div>
           </div>
 
-          <button class="ghost-btn" type="button" (click)="refreshDashboard()">
+          <!-- <button class="ghost-btn compact-refresh-btn" type="button" (click)="refreshDashboard()">
+            <span class="mi mi-sm">refresh</span>
             Refresh
-          </button>
+          </button> -->
 
-          <button class="danger-btn" type="button" (click)="logout()">
+          <button class="danger-btn compact-logout-btn" type="button" (click)="logout()">
+            <span class="mi mi-sm">logout</span>
             Logout
           </button>
+
         </div>
+
       </header>
 
       <!-- TOAST -->
-      <div
-        class="toast"
-        [class.show]="toastVisible"
-        [class.error]="toastError">
+      <div class="toast" [class.show]="toastVisible" [class.error]="toastError">
+        <span class="mi mi-sm">
+          {{ toastError ? 'error' : 'check_circle' }}
+        </span>
         {{ toastMessage }}
       </div>
 
       <!-- LOADING -->
       <div class="loading-state" *ngIf="loading">
+        <span class="mi spin">refresh</span>
         Loading dashboard...
       </div>
 
       <!-- OVERVIEW -->
-      <section
-        class="content-section"
-        [class.active-section]="activeSection === 'overview'">
+      <section class="content-section" [class.active-section]="activeSection === 'overview'">
+
+        <section class="dashboard-hero">
+          <div class="hero-content">
+            <span class="section-label">
+              <span class="mi mi-xs">dashboard</span>
+              Overview
+            </span>
+
+            <h3>Welcome back, Wholesaler</h3>
+            <p>
+              Browse manufacturer products, manage purchase orders, track inventory,
+              and fulfil customer demand from one clean workspace.
+            </p>
+          </div>
+
+          <div class="hero-summary-card">
+            <div class="hero-summary-icon">
+              <span class="mi">verified</span>
+            </div>
+
+            <div>
+              <span class="hero-summary-label">Workspace Status</span>
+              <strong>Active</strong>
+            </div>
+          </div>
+        </section>
 
         <div class="stats-grid">
 
           <article class="stat-card">
-            <div class="stat-icon blue">▣</div>
+            <div class="stat-icon blue">
+              <span class="mi">inventory_2</span>
+            </div>
             <div>
               <p>Available Products</p>
               <h3>{{ products.length }}</h3>
@@ -139,7 +214,9 @@
           </article>
 
           <article class="stat-card">
-            <div class="stat-icon cyan">🛒</div>
+            <div class="stat-icon cyan">
+              <span class="mi">shopping_cart</span>
+            </div>
             <div>
               <p>Purchase Orders</p>
               <h3>{{ purchaseOrders.length }}</h3>
@@ -147,7 +224,9 @@
           </article>
 
           <article class="stat-card">
-            <div class="stat-icon purple">▤</div>
+            <div class="stat-icon purple">
+              <span class="mi">warehouse</span>
+            </div>
             <div>
               <p>Inventory Stock</p>
               <h3>{{ totalInventoryStock }}</h3>
@@ -155,7 +234,9 @@
           </article>
 
           <article class="stat-card">
-            <div class="stat-icon green">👥</div>
+            <div class="stat-icon green">
+              <span class="mi">groups</span>
+            </div>
             <div>
               <p>Customer Orders</p>
               <h3>{{ customerOrders.length }}</h3>
@@ -166,33 +247,47 @@
 
         <div class="overview-grid">
 
-          <article class="glass-card">
-            <span class="section-label">Purchase Flow</span>
-            <h3>Buy From Manufacturer</h3>
+          <article class="glass-card action-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Purchase Flow</span>
+                <h3>Buy From Manufacturer</h3>
+              </div>
+
+              <div class="card-heading-icon blue-glow">
+                <span class="mi">shopping_cart</span>
+              </div>
+            </div>
+
             <p class="muted-text">
               Browse manufacturer products and place purchase orders.
               Manufacturer will update order status.
             </p>
 
-            <button
-              class="primary-btn"
-              type="button"
-              (click)="showSection('products')">
+            <button class="primary-btn" type="button" (click)="showSection('products')">
+              <span class="mi mi-sm">arrow_forward</span>
               Browse Products
             </button>
           </article>
 
-          <article class="glass-card">
-            <span class="section-label">Consumer Flow</span>
-            <h3>Fulfil Customer Orders</h3>
+          <article class="glass-card action-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Consumer Flow</span>
+                <h3>Fulfil Customer Orders</h3>
+              </div>
+
+              <div class="card-heading-icon cyan-glow">
+                <span class="mi">local_shipping</span>
+              </div>
+            </div>
+
             <p class="muted-text">
               View consumer orders placed against your inventory and update delivery status.
             </p>
 
-            <button
-              class="secondary-btn"
-              type="button"
-              (click)="showSection('customerOrders')">
+            <button class="secondary-btn" type="button" (click)="showSection('customerOrders')">
+              <span class="mi mi-sm">arrow_forward</span>
               View Customer Orders
             </button>
           </article>
@@ -201,35 +296,28 @@
       </section>
 
       <!-- PRODUCTS -->
-      <section
-        class="content-section"
-        [class.active-section]="activeSection === 'products'">
+      <section class="content-section" [class.active-section]="activeSection === 'products'">
 
-        <div class="section-header">
+        <div class="section-header products-section-header">
           <div>
-            <span class="section-label">Manufacturer Catalogue</span>
+            <span class="section-label">
+              <span class="mi mi-xs">inventory_2</span>
+              Manufacturer Catalogue
+            </span>
+
             <h3>Available Products</h3>
             <p>Place purchase orders to manufacturers. Status will default to PENDING.</p>
           </div>
 
           <div class="search-panel">
             <div class="search-box">
-              <span>🔍</span>
+              <span class="mi search-icon">search</span>
 
-              <input
-                type="text"
-                placeholder="Search products..."
-                autocomplete="off"
-                [value]="productSearch"
-                (input)="onProductSearch($any($event.target).value)"
-              />
+              <input type="text" placeholder="Search products..." autocomplete="off" [value]="productSearch"
+                (input)="onProductSearch($any($event.target).value)" />
 
-              <button
-                class="search-clear-btn"
-                type="button"
-                *ngIf="productSearch"
-                (click)="clearProductSearch()">
-                ×
+              <button class="search-clear-btn" type="button" *ngIf="productSearch" (click)="clearProductSearch()">
+                <span class="mi">close</span>
               </button>
             </div>
 
@@ -245,82 +333,71 @@
           </div>
         </div>
 
-        <div class="products-grid">
+        <div class="catalogue-grid">
 
-          <article
-            class="product-card"
-            *ngFor="let product of filteredProducts">
+          <article class="catalogue-card" *ngFor="let product of filteredProducts">
 
-            <div class="product-top">
-             <div class="product-image-box">
-  <img
-    *ngIf="product.imageUrl"
-    [src]="getImageUrl(product.imageUrl)"
-    alt="product"
-    class="product-card-img"
-  />
+            <div class="catalogue-media">
 
-  <div *ngIf="!product.imageUrl" class="product-icon">
-    📦
-  </div>
-</div>
-              <span class="stock-badge">
-                {{ product.stockQuantity || 0 }} manufacturer stock
-              </span>
+              <img *ngIf="product.imageUrl" [src]="getImageUrl(product.imageUrl)" alt="product" class="catalogue-img"
+                (error)="onProductImageError(product)" />
+
+              <div *ngIf="!product.imageUrl" class="catalogue-placeholder">
+                <span class="mi">inventory_2</span>
+              </div>
             </div>
 
-            <h4>{{ product.name || 'Unnamed Product' }}</h4>
+            <div class="catalogue-body">
 
-            <p>
-              {{ product.description || 'No product description available.' }}
-            </p>
+              <div class="catalogue-meta-row">
+                <span class="catalogue-badge-inline">
+                  {{ getProductStockLabel(product.stockQuantity || 0) }}
+                </span>
 
-            <div class="product-meta">
-              <div class="meta-box">
+                <span class="catalogue-stock">
+                  {{ product.stockQuantity || 0 }} stock
+                </span>
+              </div>
+
+              <h4>{{ product.name || 'Unnamed Product' }}</h4>
+
+              <p class="catalogue-desc">
+                {{ product.description || 'No product description available.' }}
+              </p>
+
+              <div class="catalogue-price-block">
                 <span>Price</span>
                 <strong>{{ formatCurrency(product.price) }}</strong>
               </div>
 
-              <div class="meta-box">
-                <span>Product ID</span>
-                <strong>#{{ product.id }}</strong>
-              </div>
-            </div>
-
-            <div class="product-actions">
-              <button
-                class="action-btn order-now-btn"
-                type="button"
-                (click)="openOrderDrawer(product)">
-                Place Purchase Order
+              <button class="catalogue-buy-btn catalogue-buy-btn-full" type="button" (click)="openOrderDrawer(product)">
+                Buy Now
               </button>
 
-           <button
-  class="action-btn inventory-now-btn"
-  type="button"
-  (click)="showSection('inventory')">
-  View Inventory
-</button>
+
             </div>
+
           </article>
 
-          <div
-            class="empty-state"
-            *ngIf="filteredProducts.length === 0">
+          <div class="empty-state catalogue-empty" *ngIf="filteredProducts.length === 0">
+            <span class="mi empty-icon">inbox</span>
             No products found.
           </div>
 
         </div>
       </section>
 
+
       <!-- PURCHASE ORDERS -->
-      <section
-        class="content-section"
-        [class.active-section]="activeSection === 'purchaseOrders'">
+      <section class="content-section" [class.active-section]="activeSection === 'purchaseOrders'">
 
         <div class="section-header">
           <div>
-            <span class="section-label">Orders To Manufacturer</span>
+            <span class="section-label">
+              <span class="mi mi-xs">shopping_cart</span>
+              Orders To Manufacturer
+            </span>
+
             <h3>My Purchase Orders</h3>
             <p>Manufacturer updates these statuses. You can only view them here.</p>
           </div>
@@ -341,42 +418,30 @@
 
               <tbody>
                 <tr *ngFor="let order of purchaseOrders">
-                  <td>#{{ order.id }}</td>
-
+                  <td><span class="id-badge">#{{ order.id }}</span></td>
                   <td>{{ getProductName(order.product) }}</td>
-
-                  <td>{{ order.quantity || 0 }}</td>
+                  <td><span class="qty-badge">{{ order.quantity || 0 }}</span></td>
 
                   <td>
-                    <span
-                      class="status-pill"
-                      [ngClass]="getStatusClass(order.status)">
+                    <span class="status-pill" [ngClass]="getStatusClass(order.status)">
                       {{ normalizeStatus(order.status) }}
                     </span>
                   </td>
 
                   <td>
-                    <span
-                      class="status-help"
-                      *ngIf="normalizeStatus(order.status) === 'PENDING'">
+                    <span class="status-help" *ngIf="normalizeStatus(order.status) === 'PENDING'">
                       Waiting for manufacturer.
                     </span>
 
-                    <span
-                      class="status-help"
-                      *ngIf="normalizeStatus(order.status) === 'SHIPPED'">
-                      Manufacturer has dispatched/processed it.
+                    <span class="status-help" *ngIf="normalizeStatus(order.status) === 'SHIPPED'">
+                      Manufacturer has dispatched it.
                     </span>
 
-                    <span
-                      class="status-help"
-                      *ngIf="normalizeStatus(order.status) === 'DELIVERED'">
+                    <span class="status-help" *ngIf="normalizeStatus(order.status) === 'DELIVERED'">
                       Delivered. Inventory should be updated.
                     </span>
 
-                    <span
-                      class="status-help"
-                      *ngIf="normalizeStatus(order.status) === 'CANCELLED'">
+                    <span class="status-help" *ngIf="normalizeStatus(order.status) === 'CANCELLED'">
                       Cancelled by manufacturer.
                     </span>
                   </td>
@@ -395,74 +460,76 @@
         </div>
       </section>
 
-  <!-- INVENTORY -->
-<section
-  class="content-section inventory-section"
-  [class.active-section]="activeSection === 'inventory'">
-
-  <div class="section-header">
-    <div>
-      <span class="section-label">Wholesaler Stock</span>
-      <h3>Inventory Records</h3>
-      <p>
-        This inventory is visible to consumers for ordering. Inventory is created or increased automatically when a manufacturer marks your purchase order as DELIVERED.
-      </p>
-    </div>
-  </div>
-
-  <div class="inventory-full-width-shell">
-    <div class="table-card inventory-table-card">
-      <div class="responsive-table inventory-responsive-table">
-
-        <table class="inventory-table">
-          <thead>
-            <tr>
-              <th>Inventory ID</th>
-              <th>Product</th>
-              <th>Stock Quantity</th>
-              <th>Source</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr *ngFor="let inventory of inventories">
-              <td>#{{ inventory.id }}</td>
-
-              <td>{{ getProductName(inventory.product) }}</td>
-
-              <td>{{ inventory.stockQuantity || 0 }}</td>
-
-              <td>
-                <span class="status-help">
-                  Added from delivered manufacturer order
-                </span>
-              </td>
-            </tr>
-
-            <tr *ngIf="inventories.length === 0">
-              <td colspan="4">
-                <div class="empty-state">
-                  No inventory records available. Inventory will appear after manufacturer delivers your purchase order.
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-      </div>
-    </div>
-  </div>
-
-
-</section>
-      <!-- CUSTOMER ORDERS -->
-      <section
-        class="content-section"
-        [class.active-section]="activeSection === 'customerOrders'">
+      <!-- INVENTORY -->
+      <section class="content-section inventory-section" [class.active-section]="activeSection === 'inventory'">
 
         <div class="section-header">
           <div>
-            <span class="section-label">Consumer Orders</span>
+            <span class="section-label">
+              <span class="mi mi-xs">warehouse</span>
+              Wholesaler Stock
+            </span>
+
+            <h3>Inventory Records</h3>
+            <p>
+              Inventory is created or increased automatically when a manufacturer marks your purchase order as
+              DELIVERED.
+            </p>
+          </div>
+        </div>
+
+        <div class="table-card inventory-table-card">
+          <div class="responsive-table inventory-responsive-table">
+
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th>Inventory ID</th>
+                  <th>Product</th>
+                  <th>Stock Quantity</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let inventory of inventories">
+                  <td><span class="id-badge">#{{ inventory.id }}</span></td>
+                  <td>{{ getProductName(inventory.product) }}</td>
+                  <td><span class="qty-badge">{{ inventory.stockQuantity || 0 }}</span></td>
+
+                  <td>
+                    <span class="status-help">
+                      Added from delivered manufacturer order
+                    </span>
+                  </td>
+                </tr>
+
+                <tr *ngIf="inventories.length === 0">
+                  <td colspan="4">
+                    <div class="empty-state">
+                      No inventory records available. Inventory will appear after manufacturer delivers your purchase
+                      order.
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- CUSTOMER ORDERS -->
+      <section class="content-section" [class.active-section]="activeSection === 'customerOrders'">
+
+        <div class="section-header">
+          <div>
+            <span class="section-label">
+              <span class="mi mi-xs">groups</span>
+              Consumer Orders
+            </span>
+
             <h3>Customer Orders Received</h3>
             <p>These orders are placed by consumers from your inventory. You update their status.</p>
           </div>
@@ -485,41 +552,30 @@
 
               <tbody>
                 <tr *ngFor="let order of customerOrders">
-                  <td>#{{ order.id }}</td>
-
+                  <td><span class="id-badge">#{{ order.id }}</span></td>
                   <td>{{ getUserName(order.user) }}</td>
-
                   <td>{{ getProductName(order.product) }}</td>
-
-                  <td>{{ order.quantity || 0 }}</td>
+                  <td><span class="qty-badge">{{ order.quantity || 0 }}</span></td>
 
                   <td>
-                    <span
-                      class="status-pill"
-                      [ngClass]="getStatusClass(order.status)">
+                    <span class="status-pill" [ngClass]="getStatusClass(order.status)">
                       {{ normalizeStatus(order.status) }}
                     </span>
                   </td>
 
                   <td>
-                    <select
-                      class="status-select"
-                      [value]="order.selectedStatus"
+                    <select class="status-select" [value]="order.selectedStatus"
                       (change)="order.selectedStatus = $any($event.target).value">
 
-                      <option
-                        *ngFor="let status of statuses"
-                        [value]="status">
+                      <option *ngFor="let status of statuses" [value]="status">
                         {{ status }}
                       </option>
                     </select>
                   </td>
 
                   <td>
-                    <button
-                      class="small-btn"
-                      type="button"
-                      (click)="updateCustomerOrderStatus(order)">
+                    <button class="small-btn" type="button" (click)="updateCustomerOrderStatus(order)">
+                      <span class="mi mi-xs">check</span>
                       Update
                     </button>
                   </td>
@@ -539,13 +595,15 @@
       </section>
 
       <!-- FEEDBACKS -->
-      <section
-        class="content-section"
-        [class.active-section]="activeSection === 'feedbacks'">
+      <section class="content-section" [class.active-section]="activeSection === 'feedbacks'">
 
         <div class="section-header">
           <div>
-            <span class="section-label">Consumer Feedback</span>
+            <span class="section-label">
+              <span class="mi mi-xs">star</span>
+              Consumer Feedback
+            </span>
+
             <h3>Product Feedbacks</h3>
             <p>Feedback submitted by consumers for delivered orders from your inventory.</p>
           </div>
@@ -553,9 +611,7 @@
 
         <div class="feedback-grid">
 
-          <article
-            class="feedback-card"
-            *ngFor="let feedback of feedbacks">
+          <article class="feedback-card" *ngFor="let feedback of feedbacks">
 
             <div class="feedback-top">
               <strong>Feedback #{{ feedback.id }}</strong>
@@ -571,9 +627,7 @@
             </small>
           </article>
 
-          <div
-            class="empty-state"
-            *ngIf="feedbacks.length === 0">
+          <div class="empty-state" *ngIf="feedbacks.length === 0">
             No feedbacks available yet.
           </div>
 
@@ -581,19 +635,15 @@
       </section>
 
     </section>
+
   </section>
 
   <!-- ORDER DRAWER -->
-  <aside
-    class="order-drawer"
-    [class.open]="orderDrawerOpen">
+  <aside class="order-drawer" [class.open]="orderDrawerOpen">
 
     <div class="drawer-card">
-      <button
-        class="drawer-close"
-        type="button"
-        (click)="closeOrderDrawer()">
-        ×
+      <button class="drawer-close" type="button" (click)="closeOrderDrawer()">
+        <span class="mi">close</span>
       </button>
 
       <div class="form-header">
@@ -602,9 +652,9 @@
 
         <p>
           {{
-            selectedProduct
-              ? selectedProduct.name + ' selected. Status will be PENDING by default.'
-              : 'Select a product to continue.'
+          selectedProduct
+          ? selectedProduct.name + ' selected. Status will be PENDING by default.'
+          : 'Select a product to continue.'
           }}
         </p>
       </div>
@@ -614,20 +664,15 @@
           <label>Quantity</label>
 
           <div class="input-control">
-            <input
-              type="number"
-              min="1"
-              step="1"
-              placeholder="Enter order quantity"
-              [value]="orderQuantity || ''"
-              (input)="setOrderQuantity($any($event.target).value)"
-            />
+            <span class="mi input-icon">production_quantity_limits</span>
+
+            <input type="number" min="1" step="1" placeholder="Enter order quantity" [value]="orderQuantity || ''"
+              (input)="setOrderQuantity($any($event.target).value)" />
           </div>
         </div>
 
-        <button
-          class="submit-btn"
-          type="submit">
+        <button class="submit-btn" type="submit">
+          <span class="mi mi-sm">shopping_cart</span>
           Place Purchase Order
         </button>
       </form>

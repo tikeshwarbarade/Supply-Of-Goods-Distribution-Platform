@@ -184,16 +184,60 @@ export class WholesalerDashboardComponent implements OnInit {
   // STATS
   // =========================
 
-  getImageUrl(imageUrl: string | null | undefined): string {
+  // =========================
+// IMAGE / PRODUCT CARD HELPERS
+// =========================
+
+getBackendBaseUrl(): string {
+  const origin = window.location.origin;
+  const pathname = window.location.pathname;
+
+  const match = pathname.match(/(\/project\/\d+)\/proxy\/\d+/);
+
+  if (match && match[1]) {
+    return `${origin}${match[1]}/proxy/3000`;
+  }
+
+  return `${origin}/project/1910/proxy/3000`;
+}
+
+getImageUrl(imageUrl: string | null | undefined): string {
   if (!imageUrl) {
     return '';
   }
 
-  if (imageUrl.startsWith('http')) {
+  if (
+    imageUrl.startsWith('http') ||
+    imageUrl.startsWith('data:') ||
+    imageUrl.startsWith('blob:')
+  ) {
     return imageUrl;
   }
 
-  return `${window.location.origin}/project/3689/proxy/3000${imageUrl}`;
+  if (imageUrl.startsWith('/project/')) {
+    return `${window.location.origin}${imageUrl}`;
+  }
+
+  const baseUrl = this.getBackendBaseUrl();
+  const cleanPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+
+  return `${baseUrl}${cleanPath}`;
+}
+
+onProductImageError(product: any): void {
+  product.imageUrl = null;
+}
+
+getProductStockLabel(stock: number): string {
+  if (!stock || stock === 0) {
+    return 'Out of Stock';
+  }
+
+  if (stock < 10) {
+    return 'Low Stock';
+  }
+
+  return 'Best Seller';
 }
 
   get purchaseDeliveredCount(): number {

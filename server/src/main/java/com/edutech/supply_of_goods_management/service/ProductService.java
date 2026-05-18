@@ -36,4 +36,11 @@ public Product update(Long id, Product p) {
     public List<Product> getAll() {
         return repo.findAll();
     }
+    public void delete(Long id) {
+    Product product = repo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+    repo.delete(product);
+}
+
 }

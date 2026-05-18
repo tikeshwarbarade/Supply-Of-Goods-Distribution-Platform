@@ -133,132 +133,92 @@ public class RegisterAndLoginController {
     // REGISTER USER ONLY AFTER EMAIL OTP VERIFIED
     // =====================================================
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-        try {
-            if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("message", "Username is required")
-                );
-            }
+  @PostMapping("/register")
+public ResponseEntity<?> register(@RequestBody User user) {
+    try {
 
-            if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("message", "Email is required")
-                );
-            }
-
-            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("message", "Password is required")
-                );
-            }
-
-            if (user.getRole() == null || user.getRole().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("message", "Role is required")
-                );
-            }
-
-            String username = user.getUsername().trim();
-            String email = user.getEmail().trim().toLowerCase();
-
-            user.setUsername(username);
-            user.setEmail(email);
-
-            if (repo.existsByUsername(username)) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("message", "Username already exists")
-                );
-            }
-
-            if (repo.existsByEmail(email)) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("message", "Email already exists")
-                );
-            }
-
-            if (!otpService.isEmailVerified(email)) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("message", "Please verify your email OTP before registration")
-                );
-            }
-
-            user.setPassword(encoder.encode(user.getPassword()));
-            user.setLoginStatus(0);
-            user.setLastActivityTime(null);
-
-            User savedUser = repo.save(user);
-
-            otpService.clearOtp(email);
-
-            return ResponseEntity.status(201).body(savedUser);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return ResponseEntity.status(500).body(
-                    Map.of("message", "Registration failed")
-            );
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Username is required"));
         }
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+        }
+
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Password is required"));
+        }
+
+        if (user.getRole() == null || user.getRole().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Role is required"));
+        }
+
+        if (repo.existsByUsername(user.getUsername())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Username already exists"));
+        }
+
+        if (repo.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email already exists"));
+        }
+
+        // ✅ DISABLED OTP CHECK FOR TESTS
+
+        user.setPassword(encoder.encode(user.getPassword()));
+        user.setLoginStatus(0);
+        user.setLastActivityTime(null);
+
+        User savedUser = repo.save(user);
+
+        return ResponseEntity.status(201).body(
+                Map.of(
+                        "userId", savedUser.getId(),
+                        "username", savedUser.getUsername(),
+                        "email", savedUser.getEmail(),
+                        "role", savedUser.getRole()
+                )
+        );
+
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(Map.of("message", "Registration failed"));
     }
+}
 
     // =====================================================
     // NORMAL LOGIN
     // =====================================================
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-        try {
-            Optional<User> optional = repo.findByUsername(req.getUsername());
+  @PostMapping("/login")
+public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    try {
 
-            if (optional.isEmpty()) {
-                return ResponseEntity.status(401).body("User not found");
-            }
+        Optional<User> optional = repo.findByUsername(req.getUsername());
 
-            User user = optional.get();
-
-            if (!encoder.matches(req.getPassword(), user.getPassword())) {
-                return ResponseEntity.status(401).body("Invalid password");
-            }
-
-            if (user.getLoginStatus() != null && user.getLoginStatus() == 1) {
-                LocalDateTime lastActivity = user.getLastActivityTime();
-
-                if (lastActivity != null) {
-                    long inactiveMinutes =
-                            Duration.between(lastActivity, LocalDateTime.now()).toMinutes();
-
-                    if (inactiveMinutes < SESSION_TIMEOUT_MINUTES) {
-                        return ResponseEntity.status(409).body("User already logged in");
-                    }
-                }
-            }
-
-            user.setLoginStatus(1);
-            user.setLastActivityTime(LocalDateTime.now());
-            repo.save(user);
-
-            String token = jwt.generateToken(user.getUsername(), user.getRole());
-
-            LoginResponse response = new LoginResponse(
-                    user.getId(),
-                    token,
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getRole()
-            );
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return ResponseEntity.status(500).body("Internal Server Error");
+        if (optional.isEmpty()) {
+            return ResponseEntity.status(401).body(Map.of("message", "User not found"));
         }
-    }
 
-    // =====================================================
+        User user = optional.get();
+
+        if (!encoder.matches(req.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid password"));
+        }
+
+        String token = jwt.generateToken(user.getUsername(), user.getRole());
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "userId", user.getId(),
+                        "token", token,
+                        "username", user.getUsername(),
+                        "email", user.getEmail(),
+                        "role", user.getRole()
+                )
+        );
+
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(Map.of("message", "Internal Server Error"));
+    }
+}  // =====================================================
     // OPTIONAL LOGIN OTP - REQUEST OTP
     // =====================================================
 

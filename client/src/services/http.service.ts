@@ -292,4 +292,15 @@ deleteProductImage(productId: number) {
         data
       );
   }
+  deleteProduct(productId: number) {
+  return this.http.delete(
+    `${this.baseUrl}/api/manufacturers/product/${productId}`,
+    {
+      headers: this.getHeaders().headers,
+      responseType: 'text' as 'json' // ✅ CRITICAL FIX FOR 200 OK EMPTY RESPONSE
+    }
+  );
+}
+
+
 }

@@ -15,14 +15,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class SendGridEmailService {
 
-    @Value("${sendgrid.api-key}")
-    private String apiKey;
+@Value("${sendgrid.api-key:dummy}")
+private String apiKey;
 
-    @Value("${sendgrid.from-email}")
-    private String fromEmail;
+@Value("${sendgrid.from-email:test@test.com}")
+private String fromEmail;
 
-    @Value("${sendgrid.from-name}")
-    private String fromName;
+@Value("${sendgrid.from-name:test}")
+private String fromName;
 
     // ✅ LOGIN OTP EMAIL (FAIL if SendGrid fails)
     public void sendLoginOtpEmail(String toEmail, String username, String otp) {

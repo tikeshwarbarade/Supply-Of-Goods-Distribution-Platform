@@ -10,7 +10,7 @@ import { HttpService } from './http.service';
 export class SessionService {
 
   // ✅ 1 minute inactivity timeout
-  private readonly SESSION_TIMEOUT = 1 * 60 * 1000;
+  private readonly SESSION_TIMEOUT = 10 * 60 * 1000;
 
   private timeoutRef: any = null;
   private activitySubscription: Subscription | null = null;

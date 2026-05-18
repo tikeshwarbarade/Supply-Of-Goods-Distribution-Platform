@@ -31,7 +31,7 @@ export class ConsumerPlaceOrderComponent implements OnInit {
     private auth: AuthService,
     private http: HttpService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.userId = this.auth.getUserId();
@@ -45,6 +45,7 @@ export class ConsumerPlaceOrderComponent implements OnInit {
       next: (res: any) => {
         this.inventories = Array.isArray(res) ? res : [];
         this.filteredInventories = [...this.inventories];
+        this.applySearch();
         this.loading = false;
       },
       error: (err) => {
@@ -56,19 +57,56 @@ export class ConsumerPlaceOrderComponent implements OnInit {
       }
     });
   }
+
+  // =========================
+  // IMAGE HELPERS
+  // =========================
+
+  getBackendBaseUrl(): string {
+    const origin = window.location.origin;
+    const pathname = window.location.pathname;
+
+    const match = pathname.match(/(\/project\/\d+)\/proxy\/\d+/);
+
+    if (match && match[1]) {
+      return `${origin}${match[1]}/proxy/3000`;
+    }
+
+    return `${origin}/project/1910/proxy/3000`;
+  }
+
   getImageUrl(imageUrl: string | null | undefined): string {
-  if (!imageUrl) {
-    return '';
+    if (!imageUrl) {
+      return '';
+    }
+
+    if (
+      imageUrl.startsWith('http') ||
+      imageUrl.startsWith('data:') ||
+      imageUrl.startsWith('blob:')
+    ) {
+      return imageUrl;
+    }
+
+    if (imageUrl.startsWith('/project/')) {
+      return `${window.location.origin}${imageUrl}`;
+    }
+
+    const baseUrl = this.getBackendBaseUrl();
+    const cleanPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+
+    return `${baseUrl}${cleanPath}`;
   }
 
-  if (imageUrl.startsWith('http')) {
-    return imageUrl;
+  onInventoryImageError(inventory: any): void {
+    if (inventory?.product) {
+      inventory.product.imageUrl = null;
+    }
   }
 
-  const cleanPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-
-  return `${window.location.origin}/project/3689/proxy/3000${cleanPath}`;
-}
+  // =========================
+  // SEARCH
+  // =========================
 
   onSearch(value: string): void {
     this.searchText = value;
@@ -104,10 +142,28 @@ export class ConsumerPlaceOrderComponent implements OnInit {
     });
   }
 
+  // =========================
+  // ORDER FLOW
+  // =========================
+
   selectInventory(inventory: any): void {
+    if (!inventory || !inventory.id) {
+      this.setMessage('Invalid inventory selected.', true);
+      return;
+    }
+
+    if ((inventory.stockQuantity || 0) === 0) {
+      this.setMessage('This product is out of stock.', true);
+      return;
+    }
+
     this.selectedInventoryId = inventory.id;
     this.orderQuantity = null;
-    this.setMessage(`${inventory.product?.name || 'Product'} selected. Enter quantity and place order.`, false);
+
+    this.setMessage(
+      `${inventory.product?.name || 'Product'} selected. Enter quantity and place order.`,
+      false
+    );
   }
 
   setOrderQuantity(value: string): void {
@@ -153,8 +209,10 @@ export class ConsumerPlaceOrderComponent implements OnInit {
       next: () => {
         this.submitting = false;
         this.setMessage('Order placed successfully. Status is PENDING.', false);
+
         this.selectedInventoryId = null;
         this.orderQuantity = null;
+
         this.loadInventories();
       },
       error: (err) => {
@@ -175,6 +233,10 @@ export class ConsumerPlaceOrderComponent implements OnInit {
     return this.inventories.find(item => Number(item.id) === Number(this.selectedInventoryId));
   }
 
+  // =========================
+  // HELPERS
+  // =========================
+
   formatCurrency(value: any): string {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -186,9 +248,14 @@ export class ConsumerPlaceOrderComponent implements OnInit {
   setMessage(message: string, isError: boolean): void {
     this.message = message;
     this.messageError = isError;
+
+    setTimeout(() => {
+      this.message = '';
+    }, 2800);
   }
 
   goBack(): void {
     this.router.navigate(['/consumer-dashboard']);
   }
 }
+

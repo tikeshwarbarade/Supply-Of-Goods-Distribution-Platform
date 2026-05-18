@@ -1,33 +1,177 @@
-<main class="consumer-order-page">
 
-  <section class="page-shell">
+<main class="consumer-page">
 
-    <!-- LEFT PANEL -->
-    <section class="hero-card animate-in">
+  <section class="dashboard-shell">
 
-      <div class="hero-top">
-        <div class="hero-icon-wrap">
-          <span class="mi">add_shopping_cart</span>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- BRAND -->
+      <div class="brand-area">
+        <div class="brand-lockup">
+
+          <div class="brand-logo" aria-label="Nexus logo">
+            <svg class="nexus-svg-logo" viewBox="0 0 96 96" role="img" aria-hidden="true">
+              <defs>
+                <linearGradient id="consumerPlaceOrderLogoBg" x1="18" y1="14" x2="78" y2="84">
+                  <stop offset="0%" stop-color="#b8bac3" />
+                  <stop offset="100%" stop-color="#8f929d" />
+                </linearGradient>
+              </defs>
+
+              <rect
+                x="6"
+                y="6"
+                width="84"
+                height="84"
+                rx="24"
+                fill="url(#consumerPlaceOrderLogoBg)"
+                stroke="rgba(255,255,255,.42)"
+                stroke-width="2"
+              />
+
+              <path
+                d="M48 27 L72 40.5 L72 65.5 L48 79 L24 65.5 L24 40.5 Z"
+                fill="none"
+                stroke="#050505"
+                stroke-width="5"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M24 40.5 L48 54 L72 40.5"
+                fill="none"
+                stroke="#050505"
+                stroke-width="5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M48 54 L48 79"
+                fill="none"
+                stroke="#050505"
+                stroke-width="5"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+
+          <div class="brand-copy">
+            <h1>Nexus</h1>
+            <span class="brand-pill">Consumer Portal</span>
+          </div>
+
         </div>
-        <span class="role-pill">CONSUMER ORDER</span>
+
+        <p class="brand-description">
+          Browse wholesaler inventory, place orders, track deliveries, and share feedback.
+        </p>
       </div>
 
-      <h2>Place Order</h2>
+      <!-- NAVIGATION -->
+      <nav class="side-nav">
 
-      <p class="muted-text">
-        Order from wholesaler inventory stock. Status will be set to <strong>PENDING</strong> by default.
-      </p>
+        <button class="nav-link" type="button" (click)="goBack()">
+          <span class="nav-icon">
+            <span class="mi">dashboard</span>
+          </span>
+          <span class="nav-text">Dashboard</span>
+        </button>
 
-      <button class="back-btn" type="button" (click)="goBack()">
-        <span class="mi mi-sm">arrow_back</span> Back to Dashboard
-      </button>
+        <button class="nav-link" type="button" (click)="goBack()">
+          <span class="nav-icon">
+            <span class="mi">shopping_bag</span>
+          </span>
+          <span class="nav-text">Browse Products</span>
 
-      <!-- Message -->
+          <span class="nav-badge" *ngIf="inventories.length > 0">
+            {{ inventories.length }}
+          </span>
+        </button>
+
+        <button class="nav-link active" type="button">
+          <span class="nav-icon">
+            <span class="mi">add_shopping_cart</span>
+          </span>
+          <span class="nav-text">Place Order</span>
+        </button>
+
+        <button class="nav-link" type="button" (click)="goBack()">
+          <span class="nav-icon">
+            <span class="mi">receipt_long</span>
+          </span>
+          <span class="nav-text">My Orders</span>
+        </button>
+
+        <button class="nav-link" type="button" (click)="goBack()">
+          <span class="nav-icon">
+            <span class="mi">analytics</span>
+          </span>
+          <span class="nav-text">Analytics</span>
+        </button>
+
+        <button class="nav-link" type="button" (click)="loadInventories()">
+          <span class="nav-icon">
+            <span class="mi">refresh</span>
+          </span>
+          <span class="nav-text">Refresh</span>
+        </button>
+
+      </nav>
+
+      <div class="secure-status">
+        <span class="secure-dot"></span>
+        <span class="mi mi-xs">verified_user</span>
+        <span>JWT secured consumer access</span>
+      </div>
+
+    </aside>
+
+    <!-- MAIN PANEL -->
+    <section class="main-panel">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+
+        <div class="topbar-title-block">
+          <span class="page-kicker">SupplyFlow Nexus</span>
+          <h2>Place Order</h2>
+          <p>Select wholesaler inventory, enter quantity, and submit your order.</p>
+        </div>
+
+        <div class="topbar-actions">
+
+          <div class="user-chip">
+            <div class="avatar">
+              <span class="mi">person</span>
+            </div>
+
+            <div>
+              <span>Consumer</span>
+              <small>CONSUMER</small>
+            </div>
+          </div>
+
+          <button class="ghost-btn" type="button" (click)="loadInventories()">
+            <span class="mi mi-sm">refresh</span>
+            Refresh
+          </button>
+
+          <button class="secondary-top-btn" type="button" (click)="goBack()">
+            <span class="mi mi-sm">arrow_back</span>
+            Dashboard
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- MESSAGE TOAST -->
       <div
-        class="message"
-        *ngIf="message"
-        [class.error]="messageError"
-        [class.success]="!messageError">
+        class="toast"
+        [class.show]="message"
+        [class.error]="messageError">
 
         <span class="mi mi-sm">
           {{ messageError ? 'error' : 'check_circle' }}
@@ -36,255 +180,312 @@
         {{ message }}
       </div>
 
-      <!-- Selected Product -->
-      <div class="selected-box" *ngIf="getSelectedInventory() as selected">
+      <!-- HERO -->
+      <section class="dashboard-hero">
 
-        <div class="selected-header">
-
-          <div class="selected-img-wrap">
-            <img
-              *ngIf="selected.product?.imageUrl"
-              [src]="getImageUrl(selected.product.imageUrl)"
-              alt="selected product"
-              class="selected-img"
-            />
-
-            <div *ngIf="!selected.product?.imageUrl" class="selected-icon">
-              <span class="mi">category</span>
-            </div>
-          </div>
-
-          <div>
-            <span class="selected-label">Selected Product</span>
-            <h3>{{ selected.product?.name || 'Product' }}</h3>
-          </div>
-
-        </div>
-
-        <div class="selected-meta">
-
-          <div class="sm-item">
-            <span class="mi mi-xs">inventory</span>
-            <span>Stock: <strong>{{ selected.stockQuantity }}</strong></span>
-          </div>
-
-          <div class="sm-item">
-            <span class="mi mi-xs">currency_rupee</span>
-            <span>Price: <strong>{{ formatCurrency(selected.product?.price) }}</strong></span>
-          </div>
-
-          <div class="sm-item">
-            <span class="mi mi-xs">store</span>
-            <span>Wholesaler: <strong>#{{ selected.wholesalerId }}</strong></span>
-          </div>
-
-        </div>
-
-        <label class="qty-label">Order Quantity</label>
-
-        <div class="qty-input-wrap">
-          <span class="mi mi-sm qty-icon">shopping_cart</span>
-
-          <input
-            type="number"
-            min="1"
-            placeholder="Enter quantity"
-            [value]="orderQuantity || ''"
-            (input)="setOrderQuantity($any($event.target).value)"
-          />
-        </div>
-
-        <button
-          class="place-order-btn"
-          type="button"
-          [disabled]="submitting"
-          (click)="placeOrder()">
-
-          <span class="mi mi-sm">
-            {{ submitting ? 'refresh' : 'send' }}
-          </span>
-
-          {{ submitting ? 'Placing Order...' : 'Place Order' }}
-        </button>
-
-      </div>
-
-      <!-- No selection hint -->
-      <div class="no-selection" *ngIf="!getSelectedInventory()">
-        <span class="mi hint-icon">touch_app</span>
-        <p>Select a product from the inventory to place an order.</p>
-      </div>
-
-    </section>
-
-    <!-- RIGHT PANEL -->
-    <section class="inventory-panel animate-in">
-
-      <div class="section-header">
-
-        <div>
+        <div class="hero-content">
           <span class="section-label">
-            <span class="mi mi-xs">shopping_bag</span> Available Stock
+            <span class="mi mi-xs">shopping_cart</span>
+            Consumer Order
           </span>
 
-          <h3>Wholesaler Inventory</h3>
+          <h3>Order From Wholesaler Inventory</h3>
 
-          <p class="muted-text">
-            Products available from wholesalers for consumer purchase.
+          <p>
+            Choose a product from available wholesaler stock. Your order will be created
+            with <strong>PENDING</strong> status by default.
           </p>
         </div>
 
-        <div class="search-panel">
-
-          <div class="search-box">
-            <span class="mi search-icon">search</span>
-
-            <input
-              type="text"
-              placeholder="Search inventory..."
-              autocomplete="off"
-              [value]="searchText"
-              (input)="onSearch($any($event.target).value)"
-            />
-
-            <button
-              class="search-clear-btn"
-              type="button"
-              *ngIf="searchText"
-              (click)="clearSearch()">
-
-              <span class="mi">close</span>
-            </button>
+        <div class="hero-summary-card">
+          <div class="hero-summary-icon">
+            <span class="mi">inventory_2</span>
           </div>
 
-          <div class="search-meta" *ngIf="searchText">
-            {{ filteredInventories.length }} of {{ inventories.length }} products
+          <div>
+            <span class="hero-summary-label">Available Items</span>
+            <strong>{{ inventories.length }}</strong>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ORDER WORKSPACE -->
+      <section class="order-workspace">
+
+        <!-- SELECTED PRODUCT -->
+        <article class="order-form-card">
+
+          <div class="card-heading">
+            <div>
+              <span class="section-label">Order Details</span>
+              <h3>Selected Product</h3>
+            </div>
+
+            <div class="card-heading-icon blue-glow">
+              <span class="mi">add_shopping_cart</span>
+            </div>
+          </div>
+
+          <div class="selected-product-card" *ngIf="getSelectedInventory() as selected">
+
+            <div class="selected-media">
+              <img
+                *ngIf="selected.product?.imageUrl"
+                [src]="getImageUrl(selected.product.imageUrl)"
+                alt="selected product"
+                class="selected-img"
+                (error)="onInventoryImageError(selected)"
+              />
+
+              <div *ngIf="!selected.product?.imageUrl" class="selected-placeholder">
+                <span class="mi">inventory_2</span>
+              </div>
+            </div>
+
+            <div class="selected-info">
+              <span class="selected-label">Product Selected</span>
+
+              <h4>{{ selected.product?.name || 'Product' }}</h4>
+
+              <p>
+                {{ selected.product?.description || 'No description available.' }}
+              </p>
+
+              <div class="selected-meta">
+                <span class="selected-price">
+                  {{ formatCurrency(selected.product?.price) }}
+                </span>
+
+                <span class="selected-stock">
+                  {{ selected.stockQuantity || 0 }} stock
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="no-selection" *ngIf="!getSelectedInventory()">
+            <span class="mi hint-icon">touch_app</span>
+            <h4>No product selected</h4>
+            <p>Select a product from the inventory catalogue to place an order.</p>
+          </div>
+
+          <div class="order-form-block">
+
+            <label class="qty-label">Order Quantity</label>
+
+            <div class="qty-input-wrap">
+              <span class="mi mi-sm qty-icon">production_quantity_limits</span>
+
+              <input
+                type="number"
+                min="1"
+                placeholder="Enter quantity"
+                [value]="orderQuantity || ''"
+                (input)="setOrderQuantity($any($event.target).value)"
+              />
+            </div>
+
+            <button
+              class="place-order-btn"
+              type="button"
+              [disabled]="submitting || !selectedInventoryId"
+              (click)="placeOrder()">
+
+              <span class="mi mi-sm">
+                {{ submitting ? 'refresh' : 'send' }}
+              </span>
+
+              {{ submitting ? 'Placing Order...' : 'Place Order' }}
+            </button>
+
+          </div>
+
+        </article>
+
+        <!-- GUIDE -->
+        <article class="guide-card">
+
+          <span class="section-label">How it works</span>
+          <h3>Simple Order Flow</h3>
+
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <span class="mi">looks_one</span>
+              <p>Select a product from available inventory.</p>
+            </div>
+
+            <div class="guide-item">
+              <span class="mi">looks_two</span>
+              <p>Enter quantity less than or equal to available stock.</p>
+            </div>
+
+            <div class="guide-item">
+              <span class="mi">looks_3</span>
+              <p>Submit your order. Status will start as PENDING.</p>
+            </div>
+
+          </div>
+
+        </article>
+
+      </section>
+
+      <!-- INVENTORY PANEL -->
+      <section class="inventory-panel">
+
+        <div class="section-header">
+
+          <div>
+            <span class="section-label">
+              <span class="mi mi-xs">shopping_bag</span>
+              Available Stock
+            </span>
+
+            <h3>Wholesaler Inventory</h3>
+
+            <p>
+              Products available from wholesalers for consumer purchase.
+            </p>
+          </div>
+
+          <div class="search-panel">
+
+            <div class="search-box">
+              <span class="mi search-icon">search</span>
+
+              <input
+                type="text"
+                placeholder="Search inventory..."
+                autocomplete="off"
+                [value]="searchText"
+                (input)="onSearch($any($event.target).value)"
+              />
+
+              <button
+                class="search-clear-btn"
+                type="button"
+                *ngIf="searchText"
+                (click)="clearSearch()">
+                <span class="mi">close</span>
+              </button>
+            </div>
+
+            <div class="search-meta" *ngIf="searchText">
+              {{ filteredInventories.length }} of {{ inventories.length }} products
+            </div>
+
           </div>
 
         </div>
 
-      </div>
+        <div class="products-grid">
 
-      <div class="products-grid">
+          <article
+            class="inventory-card"
+            *ngFor="let inventory of filteredInventories"
+            [class.selected]="selectedInventoryId === inventory.id">
 
-        <article
-          class="inventory-card"
-          *ngFor="let inventory of filteredInventories"
-          [class.selected]="selectedInventoryId === inventory.id">
+            <div class="inventory-media">
 
-          <div class="ic-header">
-
-            <div class="product-img-wrap">
               <img
                 *ngIf="inventory.product?.imageUrl"
                 [src]="getImageUrl(inventory.product.imageUrl)"
                 alt="product"
-                class="product-img"
+                class="inventory-img"
+                (error)="onInventoryImageError(inventory)"
               />
 
-              <div *ngIf="!inventory.product?.imageUrl" class="product-icon">
-                <span class="mi">category</span>
+              <div *ngIf="!inventory.product?.imageUrl" class="inventory-placeholder">
+                <span class="mi">inventory_2</span>
               </div>
+
             </div>
 
-            <span
-              class="stock-badge"
-              [class.in-stock]="(inventory.stockQuantity || 0) >= 10"
-              [class.low-stock]="(inventory.stockQuantity || 0) > 0 && (inventory.stockQuantity || 0) < 10"
-              [class.out-stock]="(inventory.stockQuantity || 0) === 0">
+            <div class="inventory-body">
 
-              {{
-                (inventory.stockQuantity || 0) === 0
-                  ? 'Out of Stock'
-                  : (inventory.stockQuantity || 0) < 10
-                    ? 'Low Stock'
-                    : 'In Stock'
-              }}
-            </span>
+              <div class="inventory-meta-row">
+                <span
+                  class="stock-badge"
+                  [class.in-stock]="(inventory.stockQuantity || 0) >= 10"
+                  [class.low-stock]="(inventory.stockQuantity || 0) > 0 && (inventory.stockQuantity || 0) < 10"
+                  [class.out-stock]="(inventory.stockQuantity || 0) === 0">
 
+                  {{
+                    (inventory.stockQuantity || 0) === 0
+                      ? 'Out of Stock'
+                      : (inventory.stockQuantity || 0) < 10
+                        ? 'Low Stock'
+                        : 'In Stock'
+                  }}
+                </span>
+
+                <span class="stock-count">
+                  {{ inventory.stockQuantity || 0 }} stock
+                </span>
+              </div>
+
+              <h4>{{ inventory.product?.name || 'Unnamed Product' }}</h4>
+
+              <p class="inventory-desc">
+                {{ inventory.product?.description || 'No description available.' }}
+              </p>
+
+              <div class="price-row">
+                <div>
+                  <span>Price</span>
+                  <strong>{{ formatCurrency(inventory.product?.price) }}</strong>
+                </div>
+
+                <small>#{{ inventory.id }}</small>
+              </div>
+
+              <button
+                class="select-btn"
+                type="button"
+                [class.selected-btn]="selectedInventoryId === inventory.id"
+                [disabled]="(inventory.stockQuantity || 0) === 0"
+                (click)="selectInventory(inventory)">
+
+                <span class="mi mi-sm">
+                  {{
+                    selectedInventoryId === inventory.id
+                      ? 'check_circle'
+                      : (inventory.stockQuantity || 0) === 0
+                        ? 'remove_shopping_cart'
+                        : 'add_shopping_cart'
+                  }}
+                </span>
+
+                {{
+                  selectedInventoryId === inventory.id
+                    ? 'Selected'
+                    : (inventory.stockQuantity || 0) === 0
+                      ? 'Unavailable'
+                      : 'Select Product'
+                }}
+
+              </button>
+
+            </div>
+
+          </article>
+
+          <div class="empty-state" *ngIf="!loading && filteredInventories.length === 0">
+            <span class="mi empty-icon">shopping_bag</span>
+            <p>{{ searchText ? 'No products match your search.' : 'No wholesaler inventory available.' }}</p>
           </div>
 
-          <h4>{{ inventory.product?.name || 'Unnamed Product' }}</h4>
-
-          <p class="ic-desc">
-            {{ inventory.product?.description || 'No description available.' }}
-          </p>
-
-          <div class="meta-grid">
-
-            <div class="meta-item">
-              <span class="mi mi-xs">currency_rupee</span>
-              <div>
-                <span class="meta-label">Price</span>
-                <strong>{{ formatCurrency(inventory.product?.price) }}</strong>
-              </div>
-            </div>
-
-            <div class="meta-item">
-              <span class="mi mi-xs">inventory</span>
-              <div>
-                <span class="meta-label">Available</span>
-                <strong>{{ inventory.stockQuantity || 0 }}</strong>
-              </div>
-            </div>
-
-            <div class="meta-item">
-              <span class="mi mi-xs">store</span>
-              <div>
-                <span class="meta-label">Wholesaler</span>
-                <strong>#{{ inventory.wholesalerId }}</strong>
-              </div>
-            </div>
-
-            <div class="meta-item">
-              <span class="mi mi-xs">tag</span>
-              <div>
-                <span class="meta-label">Inv. ID</span>
-                <strong>#{{ inventory.id }}</strong>
-              </div>
-            </div>
-
+          <div class="empty-state" *ngIf="loading">
+            <span class="mi spin">refresh</span>
+            Loading inventory...
           </div>
 
-          <button
-            class="select-btn"
-            type="button"
-            [class.selected-btn]="selectedInventoryId === inventory.id"
-            [disabled]="(inventory.stockQuantity || 0) === 0"
-            (click)="selectInventory(inventory)">
-
-            <span class="mi mi-sm">
-              {{
-                selectedInventoryId === inventory.id
-                  ? 'check_circle'
-                  : (inventory.stockQuantity || 0) === 0
-                    ? 'remove_shopping_cart'
-                    : 'add_shopping_cart'
-              }}
-            </span>
-
-            {{
-              selectedInventoryId === inventory.id
-                ? 'Selected'
-                : (inventory.stockQuantity || 0) === 0
-                  ? 'Unavailable'
-                  : 'Select Product'
-            }}
-
-          </button>
-
-        </article>
-
-        <div class="empty-state" *ngIf="!loading && filteredInventories.length === 0">
-          <span class="mi empty-icon">shopping_bag</span>
-          <p>{{ searchText ? 'No products match your search.' : 'No wholesaler inventory available.' }}</p>
         </div>
 
-        <div class="empty-state" *ngIf="loading">
-          <span class="mi spin">refresh</span> Loading inventory...
-        </div>
-
-      </div>
+      </section>
 
     </section>
 

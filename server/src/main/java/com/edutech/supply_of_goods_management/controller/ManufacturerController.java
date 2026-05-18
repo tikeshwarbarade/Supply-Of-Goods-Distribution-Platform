@@ -65,4 +65,9 @@ public class ManufacturerController {
     public ResponseEntity<?> deleteProductImage(@PathVariable Long id) {
         return ResponseEntity.ok(productImageStorageService.deleteProductImage(id));
     }
+    @DeleteMapping("/product/{id}")
+public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+    service.delete(id);
+    return ResponseEntity.ok("Product deleted successfully");
+}
 }

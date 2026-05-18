@@ -5,94 +5,165 @@
     <section class="form-card animate-in">
 
       <button class="back-btn" type="button" (click)="goBack()">
-        <span class="mi">arrow_back</span> Back to Dashboard
+        <span class="mi">arrow_back</span>
+        Back to Dashboard
       </button>
 
       <div class="form-header">
         <div class="form-header-icon" [class.editing]="editingProductId">
           <span class="mi">{{ editingProductId ? 'edit' : 'add_circle' }}</span>
         </div>
-        <span class="form-badge">{{ editingProductId ? 'UPDATE PRODUCT' : 'CREATE PRODUCT' }}</span>
+
+        <span class="form-badge">
+          {{ editingProductId ? 'UPDATE PRODUCT' : 'CREATE PRODUCT' }}
+        </span>
+
         <h2>{{ editingProductId ? 'Update Product & Stock' : 'Create Manufacturer Product' }}</h2>
+
         <p>Product stock quantity represents manufacturer inventory.</p>
       </div>
 
       <div class="form-alert" *ngIf="formMessage" [class.error]="formMessageError">
-        <span class="mi mi-sm">{{ formMessageError ? 'error' : 'check_circle' }}</span>
+        <span class="mi mi-sm">
+          {{ formMessageError ? 'error' : 'check_circle' }}
+        </span>
         {{ formMessage }}
       </div>
 
       <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
-        <!-- Image Upload -->
+        <!-- IMAGE UPLOAD -->
         <div class="form-group">
-          <label><span class="mi mi-xs">image</span> Product Image</label>
+          <label>
+            <span class="mi mi-xs">image</span>
+            Product Image
+          </label>
+
           <input type="file" id="productImageInput" accept="image/*" (change)="onImageSelected($event)" hidden />
+
           <div class="image-upload-area" *ngIf="!imagePreview" (click)="triggerFileInput()">
-            <div class="upload-icon"><span class="mi">cloud_upload</span></div>
+            <div class="upload-icon">
+              <span class="mi">cloud_upload</span>
+            </div>
+
             <span class="upload-text">Click to upload product image</span>
             <span class="upload-hint">JPG, PNG, WEBP (Max 5MB)</span>
           </div>
+
           <div class="image-preview-area" *ngIf="imagePreview">
             <img [src]="imagePreview" alt="Product preview" />
+
             <div class="image-actions">
               <button class="img-action-btn change" type="button" (click)="triggerFileInput()">
-                <span class="mi mi-xs">edit</span> Change
+                <span class="mi mi-xs">edit</span>
+                Change
               </button>
+
               <button class="img-action-btn remove" type="button" (click)="removeImage()">
-                <span class="mi mi-xs">delete</span> Remove
+                <span class="mi mi-xs">delete</span>
+                Remove
               </button>
             </div>
           </div>
         </div>
 
+        <!-- PRODUCT NAME -->
         <div class="form-group">
-          <label><span class="mi mi-xs">inventory_2</span> Product Name</label>
+          <label>
+            <span class="mi mi-xs">inventory_2</span>
+            Product Name
+          </label>
+
           <div class="input-wrap">
             <span class="mi input-icon">label</span>
+
             <input type="text" placeholder="Enter product name" formControlName="name" />
           </div>
-          <small *ngIf="isInvalid('name')"><span class="mi mi-xs">error</span> Product name is required.</small>
+
+          <small *ngIf="isInvalid('name')">
+            <span class="mi mi-xs">error</span>
+            Product name is required.
+          </small>
         </div>
 
+        <!-- DESCRIPTION -->
         <div class="form-group">
-          <label><span class="mi mi-xs">description</span> Description</label>
-          <textarea placeholder="Enter product description" formControlName="description"></textarea>
-          <small *ngIf="isInvalid('description')"><span class="mi mi-xs">error</span> Description is required.</small>
+          <label>
+            <span class="mi mi-xs">description</span>
+            Description
+          </label>
+
+          <textarea placeholder="Enter product description" formControlName="description">
+          </textarea>
+
+          <small *ngIf="isInvalid('description')">
+            <span class="mi mi-xs">error</span>
+            Description is required.
+          </small>
         </div>
 
+        <!-- PRICE + STOCK -->
         <div class="form-row">
+
           <div class="form-group">
-            <label><span class="mi mi-xs">currency_rupee</span> Price</label>
+            <label>
+              <span class="mi mi-xs">currency_rupee</span>
+              Price
+            </label>
+
             <div class="input-wrap">
               <span class="mi input-icon">currency_rupee</span>
+
               <input type="number" min="1" placeholder="Enter price" formControlName="price" />
             </div>
-            <small *ngIf="isInvalid('price')"><span class="mi mi-xs">error</span> Valid price is required.</small>
+
+            <small *ngIf="isInvalid('price')">
+              <span class="mi mi-xs">error</span>
+              Valid price is required.
+            </small>
           </div>
+
           <div class="form-group">
-            <label><span class="mi mi-xs">warehouse</span> Stock Quantity</label>
+            <label>
+              <span class="mi mi-xs">warehouse</span>
+              Stock Quantity
+            </label>
+
             <div class="input-wrap">
               <span class="mi input-icon">inventory</span>
+
               <input type="number" min="0" placeholder="Enter stock" formControlName="stockQuantity" />
             </div>
-            <small *ngIf="isInvalid('stockQuantity')"><span class="mi mi-xs">error</span> Valid quantity is
-              required.</small>
+
+            <small *ngIf="isInvalid('stockQuantity')">
+              <span class="mi mi-xs">error</span>
+              Valid quantity is required.
+            </small>
           </div>
+
         </div>
 
+        <!-- SUBMIT -->
         <button class="submit-btn" type="submit" [disabled]="submitting">
-          <span class="mi mi-sm">{{ editingProductId ? 'save' : 'add' }}</span>
+          <span class="mi mi-sm">
+            {{ editingProductId ? 'save' : 'add' }}
+          </span>
+
           {{ submitting ? 'Saving...' : editingProductId ? 'Update Product' : 'Create Product' }}
         </button>
 
+        <!-- CANCEL EDIT -->
         <button class="clear-btn" type="button" *ngIf="editingProductId" (click)="cancelEdit()">
-          <span class="mi mi-sm">close</span> Cancel Edit
+          <span class="mi mi-sm">close</span>
+          Cancel Edit
         </button>
 
+        <!-- CLEAR FORM -->
         <button class="clear-btn" type="button" *ngIf="!editingProductId" (click)="resetForm()">
-          <span class="mi mi-sm">refresh</span> Clear Form
+          <span class="mi mi-sm">refresh</span>
+          Clear Form
         </button>
+
       </form>
     </section>
 
@@ -101,45 +172,68 @@
 
       <!-- STATS -->
       <div class="stats-grid">
+
         <article class="stat-card">
-          <div class="stat-icon blue"><span class="mi">inventory_2</span></div>
+          <div class="stat-icon blue">
+            <span class="mi">inventory_2</span>
+          </div>
+
           <div>
             <p>My Products</p>
             <h3>{{ productCount }}</h3>
           </div>
         </article>
+
         <article class="stat-card">
-          <div class="stat-icon cyan"><span class="mi">warehouse</span></div>
+          <div class="stat-icon cyan">
+            <span class="mi">warehouse</span>
+          </div>
+
           <div>
             <p>Total Stock</p>
             <h3>{{ totalStock | number }}</h3>
           </div>
         </article>
+
         <article class="stat-card">
-          <div class="stat-icon purple"><span class="mi">currency_rupee</span></div>
+          <div class="stat-icon purple">
+            <span class="mi">currency_rupee</span>
+          </div>
+
           <div>
             <p>Inventory Value</p>
             <h3>{{ formatCurrency(inventoryValue) }}</h3>
           </div>
         </article>
+
       </div>
 
       <!-- HEADER -->
       <div class="section-header">
         <div>
-          <span class="section-label"><span class="mi mi-xs">list</span> Product List</span>
+          <span class="section-label">
+            <span class="mi mi-xs">list</span>
+            Product List
+          </span>
+
           <h3>Manufacturer Products</h3>
-          <p>View and update products created by you.</p>
+          <p>View, update, and delete products created by you.</p>
         </div>
+
         <div class="search-panel">
           <div class="search-box">
             <span class="mi search-icon">search</span>
+
             <input type="text" placeholder="Search products..." autocomplete="off" [value]="productSearch"
               (input)="onProductSearch($any($event.target).value)" />
-            <button class="search-clear-btn" type="button" *ngIf="productSearch" (click)="clearSearch()"><span
-                class="mi">close</span></button>
+
+            <button class="search-clear-btn" type="button" *ngIf="productSearch" (click)="clearSearch()">
+              <span class="mi">close</span>
+            </button>
           </div>
-          <div class="search-meta" *ngIf="productSearch">{{ filteredProducts.length }} of {{ products.length }} products
+
+          <div class="search-meta" *ngIf="productSearch">
+            {{ filteredProducts.length }} of {{ products.length }} products
           </div>
         </div>
       </div>
@@ -147,6 +241,7 @@
       <!-- TABLE -->
       <div class="table-card">
         <div class="responsive-table">
+
           <table>
             <thead>
               <tr>
@@ -160,11 +255,17 @@
                 <th>Action</th>
               </tr>
             </thead>
+
             <tbody>
+
               <tr *ngFor="let product of filteredProducts"
-                [class.row-low-stock]="(product.stockQuantity||0) > 0 && (product.stockQuantity||0) < 10"
-                [class.row-out-stock]="(product.stockQuantity||0) === 0">
-                <td><span class="id-badge">#{{ product.id }}</span></td>
+                [class.row-low-stock]="(product.stockQuantity || 0) > 0 && (product.stockQuantity || 0) < 10"
+                [class.row-out-stock]="(product.stockQuantity || 0) === 0">
+
+                <td>
+                  <span class="id-badge">#{{ product.id }}</span>
+                </td>
+
                 <td>
                   <div class="table-img-wrap">
                     <img *ngIf="product.imageUrl" [src]="getImageUrl(product.imageUrl)" alt="product"
@@ -175,54 +276,143 @@
                     </div>
                   </div>
                 </td>
+
                 <td>
                   <div class="product-name-cell">
-                    <div class="product-mini-icon"><span class="mi">category</span></div><span>{{ product.name ||
-                      'Unnamed' }}</span>
+                    <div class="product-mini-icon">
+                      <span class="mi">category</span>
+                    </div>
+
+                    <span>{{ product.name || 'Unnamed' }}</span>
                   </div>
                 </td>
-                <td><span class="desc-cell">{{ product.description || '-' }}</span></td>
-                <td><strong class="price-text">{{ formatCurrency(product.price) }}</strong></td>
+
+                <td>
+                  <span class="desc-cell">
+                    {{ product.description || '-' }}
+                  </span>
+                </td>
+
+                <td>
+                  <strong class="price-text">
+                    {{ formatCurrency(product.price) }}
+                  </strong>
+                </td>
+
                 <td>
                   <div class="stock-cell">
                     <span>{{ product.stockQuantity || 0 }}</span>
+
                     <div class="mini-stock-bar">
-                      <div class="mini-stock-fill" [class.critical]="(product.stockQuantity||0)===0"
-                        [class.warning]="(product.stockQuantity||0)>0 && (product.stockQuantity||0)<10"
-                        [class.healthy]="(product.stockQuantity||0)>=10" [style.width.%]="getStockPercent(product)">
+                      <div class="mini-stock-fill" [class.critical]="(product.stockQuantity || 0) === 0"
+                        [class.warning]="(product.stockQuantity || 0) > 0 && (product.stockQuantity || 0) < 10"
+                        [class.healthy]="(product.stockQuantity || 0) >= 10" [style.width.%]="getStockPercent(product)">
                       </div>
                     </div>
                   </div>
                 </td>
+
                 <td>
-                  <span class="status-pill" [class.status-critical]="(product.stockQuantity||0)===0"
-                    [class.status-pending]="(product.stockQuantity||0)>0 && (product.stockQuantity||0)<10"
-                    [class.status-delivered]="(product.stockQuantity||0)>=10">
-                    <span class="mi mi-xs">{{ (product.stockQuantity||0)===0?'error':(product.stockQuantity||0)
-                      <10?'warning':'check_circle' }}</span>
+                  <span class="status-pill" [class.status-critical]="(product.stockQuantity || 0) === 0"
+                    [class.status-pending]="(product.stockQuantity || 0) > 0 && (product.stockQuantity || 0) < 10"
+                    [class.status-delivered]="(product.stockQuantity || 0) >= 10">
+                    <span class="mi mi-xs">
+                      {{
+                      (product.stockQuantity || 0) === 0
+                      ? 'error'
+                      : (product.stockQuantity || 0) < 10 ? 'warning' : 'check_circle' }} </span>
+
                         {{ getStockStatusLabel(product.stockQuantity || 0) }}
                     </span>
                 </td>
-                <td><button class="small-btn edit-action-btn" type="button" (click)="editProduct(product)"><span
-                      class="mi mi-xs">edit</span> Edit</button></td>
+
+                <td>
+                  <div class="table-action-group">
+
+                    <button class="small-btn edit-action-btn" type="button" (click)="editProduct(product)">
+                      <span class="mi mi-xs">edit</span>
+                      Edit
+                    </button>
+
+                    <button class="small-btn delete-action-btn" type="button" (click)="deleteProduct(product)"
+                      [disabled]="deletingProductId === product.id">
+
+                      <span class="mi mi-xs" [class.spin]="deletingProductId === product.id">
+                        {{ deletingProductId === product.id ? 'refresh' : 'delete' }}
+                      </span>
+
+                      {{ deletingProductId === product.id ? 'Deleting...' : 'Delete' }}
+
+                    </button>
+
+                  </div>
+                </td>
+
               </tr>
+
               <tr *ngIf="loading">
                 <td colspan="8">
-                  <div class="empty-state"><span class="mi spin">refresh</span> Loading products...</div>
-                </td>
-              </tr>
-              <tr *ngIf="!loading && filteredProducts.length === 0">
-                <td colspan="8">
-                  <div class="empty-state"><span class="mi empty-icon">inbox</span>
-                    <p>{{ productSearch ? 'No match.' : 'No products yet. Create your first product.' }}</p>
+                  <div class="empty-state">
+                    <span class="mi spin">refresh</span>
+                    Loading products...
                   </div>
                 </td>
               </tr>
+
+              <tr *ngIf="!loading && filteredProducts.length === 0">
+                <td colspan="8">
+                  <div class="empty-state">
+                    <span class="mi empty-icon">inbox</span>
+
+                    <p>
+                      {{ productSearch ? 'No match.' : 'No products yet. Create your first product.' }}
+                    </p>
+                  </div>
+                </td>
+              </tr>
+
             </tbody>
           </table>
+
         </div>
       </div>
+
     </section>
 
   </section>
+<div class="confirm-overlay"
+     *ngIf="confirmVisible"
+     style="position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.4);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:9999;">
+
+  <div class="confirm-dialog"
+       style="background:white;
+              padding:20px;
+              border-radius:10px;
+              min-width:300px;
+              text-align:center;">
+
+    <h3>{{ confirmTitle }}</h3>
+    <p>{{ confirmMessage }}</p>
+
+   <div class="confirm-actions">
+
+      <button (click)="onConfirmCancel()">Cancel</button>
+
+      <button (click)="onConfirmYes()"
+              style="background:red;color:white;">
+        Delete
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
 </main>

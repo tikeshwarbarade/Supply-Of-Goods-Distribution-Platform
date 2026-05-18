@@ -265,3 +265,4 @@ private applySearch(): void {
     setTimeout(() => this.toastVisible = false, 3200);
   }
 }
+
