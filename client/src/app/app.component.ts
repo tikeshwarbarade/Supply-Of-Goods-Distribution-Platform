@@ -28,7 +28,8 @@ export class AppComponent implements OnInit {
   private publicRoutes: string[] = [
     '/',
     '/login',
-    '/registration'
+    '/registration',
+    '/forgot-password'
   ];
 
   constructor(

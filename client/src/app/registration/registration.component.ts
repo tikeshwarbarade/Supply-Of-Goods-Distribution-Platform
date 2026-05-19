@@ -18,9 +18,32 @@ export class RegistrationComponent {
   @ViewChildren('otpBox') otpBoxes!: QueryList<ElementRef<HTMLInputElement>>;
 
   itemForm = this.fb.group({
-    username: ['', Validators.required],
+    username: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(4),
+        Validators.pattern(/^[a-zA-Z0-9_]+$/)
+      ]
+    ],
+    firstName: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.pattern(/^[a-zA-Z ]+$/)
+      ]
+    ],
+    lastName: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.pattern(/^[a-zA-Z ]+$/)
+      ]
+    ],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
+    password: ['', [Validators.required, Validators.minLength(8)]],
     role: [null as any, Validators.required]
   });
 
@@ -34,29 +57,50 @@ export class RegistrationComponent {
   formMessage = '';
   formMessageError = false;
 
-  // ================= OTP VARIABLES =================
-
   otpDigits: string[] = ['', '', '', '', '', ''];
   otpVerified = false;
   verifiedEmail = '';
+  otpSent = false;
+
   otpLoading = false;
   verifyLoading = false;
+  registrationLoading = false;
+
+  otpAttempts = 0;
+  maxOtpAttempts = 3;
+
   otpMessage = '';
   otpMessageType: 'success' | 'error' | 'warning' | '' = '';
+
+  usernameSuggestions: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private http: HttpService,
     private router: Router
-  ) {}
+  ) {
+    this.itemForm.get('email')?.valueChanges.subscribe(() => {
+      this.otpVerified = false;
+      this.verifiedEmail = '';
+      this.otpSent = false;
+      this.otpAttempts = 0;
+      this.resetOtpInputs(true);
+    });
 
-  // ================= PASSWORD TOGGLE =================
+    this.itemForm.get('username')?.valueChanges.subscribe(() => {
+      this.usernameSuggestions = [];
+    });
+  }
 
-  togglePassword() {
+  // =========================
+  // UI HELPERS
+  // =========================
+
+  togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  toggleConfirmPassword() {
+  toggleConfirmPassword(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
@@ -64,25 +108,99 @@ export class RegistrationComponent {
     return index;
   }
 
-  // ================= SEND OTP =================
+  private normalizeEmail(email: any): string {
+    return String(email || '').trim().toLowerCase();
+  }
 
-  sendOtp() {
-    const email = this.itemForm.get('email')?.value;
+  shouldShowVerifyButton(): boolean {
+    const emailControl = this.itemForm.get('email');
+    return !!emailControl?.value && !emailControl.invalid && !this.otpVerified;
+  }
 
-    if (!email || this.itemForm.get('email')?.invalid) {
-      this.formMessage = 'Please enter a valid email address first.';
+  canSendOtp(): boolean {
+    return (
+      !this.itemForm.get('username')?.invalid &&
+      !this.itemForm.get('firstName')?.invalid &&
+      !this.itemForm.get('lastName')?.invalid &&
+      !this.itemForm.get('email')?.invalid
+    );
+  }
+
+  getControlError(controlName: string): string {
+    const control = this.itemForm.get(controlName);
+
+    if (!control || !control.touched || !control.errors) {
+      return '';
+    }
+
+    if (control.errors['required']) {
+      return `${this.labelOf(controlName)} is required.`;
+    }
+
+    if (control.errors['minlength']) {
+      return `${this.labelOf(controlName)} is too short.`;
+    }
+
+    if (control.errors['email']) {
+      return 'Please enter a valid email address.';
+    }
+
+    if (control.errors['pattern']) {
+      if (controlName === 'username') {
+        return 'Username can contain only letters, numbers, and underscore.';
+      }
+
+      return `${this.labelOf(controlName)} can contain only letters and spaces.`;
+    }
+
+    return 'Invalid value.';
+  }
+
+  private labelOf(controlName: string): string {
+    const labels: any = {
+      username: 'Username',
+      firstName: 'First name',
+      lastName: 'Last name',
+      email: 'Email',
+      password: 'Password',
+      role: 'Role'
+    };
+
+    return labels[controlName] || controlName;
+  }
+
+  // =========================
+  // SEND OTP
+  // =========================
+
+  sendOtp(): void {
+    this.formMessage = '';
+    this.formMessageError = false;
+
+    if (!this.canSendOtp()) {
+      this.itemForm.get('username')?.markAsTouched();
+      this.itemForm.get('firstName')?.markAsTouched();
+      this.itemForm.get('lastName')?.markAsTouched();
+      this.itemForm.get('email')?.markAsTouched();
+
+      this.formMessage = 'Please enter username, first name, last name, and valid email before verification.';
       this.formMessageError = true;
       return;
     }
 
+    const email = this.normalizeEmail(this.itemForm.get('email')?.value);
+
     this.verifyLoading = true;
     this.otpVerified = false;
     this.verifiedEmail = '';
-    this.resetOtpInputs();
+    this.otpSent = false;
+    this.otpAttempts = 0;
+    this.resetOtpInputs(true);
 
     this.http.sendOtp({ email }).subscribe({
       next: (res: any) => {
         this.verifyLoading = false;
+        this.otpSent = true;
 
         this.otpMessage = res?.message || 'OTP sent successfully. Please check your email.';
         this.otpMessageType = 'success';
@@ -94,6 +212,7 @@ export class RegistrationComponent {
       },
       error: (err) => {
         this.verifyLoading = false;
+        this.otpSent = false;
 
         this.otpMessage = err?.error?.message || 'Failed to send OTP. Please try again.';
         this.otpMessageType = 'error';
@@ -104,9 +223,11 @@ export class RegistrationComponent {
     });
   }
 
-  // ================= OTP INPUT HELPERS =================
+  // =========================
+  // OTP INPUT HELPERS
+  // =========================
 
-  private focusOtpBox(index: number) {
+  private focusOtpBox(index: number): void {
     queueMicrotask(() => {
       const boxes = this.otpBoxes?.toArray();
 
@@ -116,10 +237,13 @@ export class RegistrationComponent {
     });
   }
 
-  private resetOtpInputs() {
+  private resetOtpInputs(clearMessage: boolean = true): void {
     this.otpDigits = ['', '', '', '', '', ''];
-    this.otpMessage = '';
-    this.otpMessageType = '';
+
+    if (clearMessage) {
+      this.otpMessage = '';
+      this.otpMessageType = '';
+    }
 
     queueMicrotask(() => {
       const boxes = this.otpBoxes?.toArray();
@@ -138,7 +262,7 @@ export class RegistrationComponent {
     return this.otpDigits.every(d => /^[0-9]$/.test(d));
   }
 
-  onOtpInput(event: Event, index: number) {
+  onOtpInput(event: Event, index: number): void {
     const input = event.target as HTMLInputElement;
     const raw = (input.value || '').replace(/\D/g, '');
     const digit = raw ? raw[raw.length - 1] : '';
@@ -150,11 +274,12 @@ export class RegistrationComponent {
       this.focusOtpBox(index + 1);
     }
 
+    // Clear success/error text while typing, but OTP card remains because otpSent = true.
     this.otpMessage = '';
     this.otpMessageType = '';
   }
 
-  onOtpKeyDown(event: KeyboardEvent, index: number) {
+  onOtpKeyDown(event: KeyboardEvent, index: number): void {
     const key = event.key;
 
     if (key === 'Backspace') {
@@ -197,7 +322,7 @@ export class RegistrationComponent {
     }
   }
 
-  onOtpPaste(event: ClipboardEvent) {
+  onOtpPaste(event: ClipboardEvent): void {
     const text = (event.clipboardData?.getData('text') || '')
       .replace(/\D/g, '')
       .slice(0, 6);
@@ -230,10 +355,12 @@ export class RegistrationComponent {
     this.otpMessageType = '';
   }
 
-  // ================= VERIFY OTP =================
+  // =========================
+  // VERIFY OTP
+  // =========================
 
-  verifyOtp() {
-    const email = this.itemForm.get('email')?.value;
+  verifyOtp(): void {
+    const email = this.normalizeEmail(this.itemForm.get('email')?.value);
 
     if (!email || this.itemForm.get('email')?.invalid) {
       this.otpMessage = 'Please enter a valid email first.';
@@ -241,9 +368,21 @@ export class RegistrationComponent {
       return;
     }
 
+    if (!this.otpSent) {
+      this.otpMessage = 'Please request OTP first.';
+      this.otpMessageType = 'warning';
+      return;
+    }
+
     if (!this.isOtpComplete()) {
       this.otpMessage = 'Please enter the complete 6-digit OTP.';
       this.otpMessageType = 'warning';
+      return;
+    }
+
+    if (this.otpAttempts >= this.maxOtpAttempts) {
+      this.otpMessage = 'Maximum attempts reached. Please resend OTP.';
+      this.otpMessageType = 'error';
       return;
     }
 
@@ -260,6 +399,8 @@ export class RegistrationComponent {
 
         this.otpVerified = true;
         this.verifiedEmail = email;
+        this.otpSent = true;
+        this.otpAttempts = 0;
 
         this.otpMessage = res?.message || 'Email verified successfully!';
         this.otpMessageType = 'success';
@@ -273,20 +414,29 @@ export class RegistrationComponent {
         this.otpVerified = false;
         this.verifiedEmail = '';
 
+        this.otpAttempts++;
+
         this.otpMessage = err?.error?.message || 'Invalid or expired OTP.';
         this.otpMessageType = 'error';
 
-        this.resetOtpInputs();
-        this.focusOtpBox(0);
+        // Important: clear OTP boxes but DO NOT clear error message.
+        this.resetOtpInputs(false);
+
+        if (this.otpAttempts < this.maxOtpAttempts) {
+          this.focusOtpBox(0);
+        }
       }
     });
   }
 
-  // ================= REGISTER =================
+  // =========================
+  // REGISTER
+  // =========================
 
-  submit() {
+  submit(): void {
     this.formMessage = '';
     this.formMessageError = false;
+    this.usernameSuggestions = [];
 
     if (this.itemForm.invalid) {
       this.itemForm.markAllAsTouched();
@@ -295,17 +445,23 @@ export class RegistrationComponent {
       return;
     }
 
-    const email = this.itemForm.value.email;
-    const password = this.itemForm.value.password;
+    const email = this.normalizeEmail(this.itemForm.value.email);
+    const password = this.itemForm.value.password || '';
 
-    if (this.confirmPassword && password !== this.confirmPassword) {
+    if (!this.confirmPassword) {
+      this.formMessage = 'Please confirm your password.';
+      this.formMessageError = true;
+      return;
+    }
+
+    if (password !== this.confirmPassword) {
       this.formMessage = 'Password and confirm password do not match.';
       this.formMessageError = true;
       return;
     }
 
-    if (!this.isOtpComplete()) {
-      this.formMessage = 'Please enter the 6-digit OTP.';
+    if (this.phone && !/^[0-9]{10}$/.test(this.phone.trim())) {
+      this.formMessage = 'Phone number must be exactly 10 digits.';
       this.formMessageError = true;
       return;
     }
@@ -317,30 +473,42 @@ export class RegistrationComponent {
     }
 
     const payload = {
-      ...this.itemForm.value,
-      phone: this.phone,
-      otp: this.getOtpCode()
+      username: String(this.itemForm.value.username || '').trim(),
+      firstName: String(this.itemForm.value.firstName || '').trim(),
+      lastName: String(this.itemForm.value.lastName || '').trim(),
+      email,
+      password,
+      role: this.itemForm.value.role,
+      phone: this.phone ? this.phone.trim() : ''
     };
+
+    this.registrationLoading = true;
 
     this.http.registerUser(payload).subscribe({
       next: () => {
+        this.registrationLoading = false;
         alert('Registration Successful ✅ Check your email');
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        console.error(err);
-        this.formMessage = err?.error?.message || 'Registration failed. Username or email may already exist.';
+        this.registrationLoading = false;
+
+        const message = err?.error?.message || 'Registration failed. Please try again.';
+        this.formMessage = message;
         this.formMessageError = true;
-        alert('Registration failed ❌');
+
+        if (err?.error?.suggestions) {
+          this.usernameSuggestions = err.error.suggestions;
+        }
       }
     });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submit();
   }
 
-  goToLogin() {
+  goToLogin(): void {
     this.router.navigate(['/login']);
   }
 }

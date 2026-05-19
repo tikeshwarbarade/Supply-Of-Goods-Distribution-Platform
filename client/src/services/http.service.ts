@@ -6,13 +6,17 @@ import { Injectable } from '@angular/core';
 })
 export class HttpService {
 
-  private isTest = window.location.port === '9876';
+  private readonly isTest: boolean = window.location.port === '9876';
 
-  private baseUrl = this.isTest
+  private readonly baseUrl: string = this.isTest
     ? 'http://localhost:9876/context.html'
     : window.location.origin + '/project/3689/proxy/3000';
 
   constructor(private http: HttpClient) {}
+
+  // =====================================================
+  // HEADERS
+  // =====================================================
 
   private getHeaders() {
     const token = this.isTest ? 'mockToken' : localStorage.getItem('token');
@@ -25,81 +29,134 @@ export class HttpService {
     };
   }
 
-  // =========================
+  private getMultipartHeaders() {
+    const token = this.isTest ? 'mockToken' : localStorage.getItem('token');
+
+    return {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + token
+      })
+    };
+  }
+
+  private getPublicOptions() {
+    return this.isTest ? this.getHeaders() : {};
+  }
+
+  // =====================================================
   // AUTH
-  // =========================
+  // =====================================================
 
   Login(data: any) {
-    return this.isTest
-      ? this.http.post(this.baseUrl + '/api/user/login', data, this.getHeaders())
-      : this.http.post(this.baseUrl + '/api/user/login', data);
+    return this.http.post(
+      `${this.baseUrl}/api/user/login`,
+      data,
+      this.getPublicOptions()
+    );
   }
 
   registerUser(data: any) {
-    return this.isTest
-      ? this.http.post(this.baseUrl + '/api/user/register', data, this.getHeaders())
-      : this.http.post(this.baseUrl + '/api/user/register', data);
+    return this.http.post(
+      `${this.baseUrl}/api/user/register`,
+      data,
+      this.getPublicOptions()
+    );
   }
 
   logoutUser(userId: number) {
     return this.http.post(
       `${this.baseUrl}/api/user/logout?userId=${userId}`,
       {},
-      this.isTest ? this.getHeaders() : {}
+      this.getPublicOptions()
     );
-  }
-
-  sendOtp(data: any) {
-    return this.isTest
-      ? this.http.post(this.baseUrl + '/api/user/send-otp', data, this.getHeaders())
-      : this.http.post(this.baseUrl + '/api/user/send-otp', data);
-  }
-
-  verifyOtp(data: any) {
-    return this.isTest
-      ? this.http.post(this.baseUrl + '/api/user/verify-otp', data, this.getHeaders())
-      : this.http.post(this.baseUrl + '/api/user/verify-otp', data);
   }
 
   updateUserActivity(userId: number) {
     return this.http.post(
       `${this.baseUrl}/api/user/activity?userId=${userId}`,
       {},
-      this.isTest ? this.getHeaders() : {}
+      this.getPublicOptions()
     );
   }
 
-  // =========================
+  // =====================================================
+  // REGISTRATION OTP
+  // =====================================================
+
+  sendOtp(data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/send-otp`,
+      data,
+      this.getPublicOptions()
+    );
+  }
+
+  verifyOtp(data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/verify-otp`,
+      data,
+      this.getPublicOptions()
+    );
+  }
+
+  suggestUsername(username: string) {
+    return this.http.get(
+      `${this.baseUrl}/api/user/suggest-username?username=${encodeURIComponent(username)}`,
+      this.getPublicOptions()
+    );
+  }
+
+  // =====================================================
+  // LOGIN OTP
+  // =====================================================
+
+  requestLoginOtp(data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/login/request-otp`,
+      data,
+      this.getPublicOptions()
+    );
+  }
+
+  verifyLoginOtp(data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/login/verify-otp`,
+      data,
+      this.getPublicOptions()
+    );
+  }
+
+  // =====================================================
+  // FORGOT PASSWORD
+  // =====================================================
+
+  forgotPasswordSendOtp(data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/forgot-password/send-otp`,
+      data,
+      this.getPublicOptions()
+    );
+  }
+
+  forgotPasswordVerifyOtp(data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/forgot-password/verify-otp`,
+      data,
+      this.getPublicOptions()
+    );
+  }
+
+  resetPassword(data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/user/reset-password`,
+      data,
+      this.getPublicOptions()
+    );
+  }
+
+  // =====================================================
   // MANUFACTURER
-  // =========================
-
-  uploadProductImage(productId: number, image: File) {
-  const formData = new FormData();
-  formData.append('image', image, image.name);
-
-  return this.http.post(
-    `${this.baseUrl}/api/manufacturers/product/${productId}/image`,
-    formData,
-    this.getMultipartHeaders()
-  );
-}
-
-deleteProductImage(productId: number) {
-  return this.http.delete(
-    `${this.baseUrl}/api/manufacturers/product/${productId}/image`,
-    this.getHeaders()
-  );
-}
-
-  private getMultipartHeaders() {
-  const token = this.isTest ? 'mockToken' : localStorage.getItem('token');
-
-  return {
-    headers: new HttpHeaders({
-      Authorization: 'Bearer ' + token
-    })
-  };
-}
+  // =====================================================
 
   createProduct(data: any) {
     return this.http.post(
@@ -117,9 +174,37 @@ deleteProductImage(productId: number) {
     );
   }
 
-  getProductsByManufacturer(id: number) {
+  deleteProduct(productId: number) {
+    return this.http.delete(
+      `${this.baseUrl}/api/manufacturers/product/${productId}`,
+      {
+        headers: this.getHeaders().headers,
+        responseType: 'text' as 'json'
+      }
+    );
+  }
+
+  uploadProductImage(productId: number, image: File) {
+    const formData = new FormData();
+    formData.append('image', image, image.name);
+
+    return this.http.post(
+      `${this.baseUrl}/api/manufacturers/product/${productId}/image`,
+      formData,
+      this.getMultipartHeaders()
+    );
+  }
+
+  deleteProductImage(productId: number) {
+    return this.http.delete(
+      `${this.baseUrl}/api/manufacturers/product/${productId}/image`,
+      this.getHeaders()
+    );
+  }
+
+  getProductsByManufacturer(manufacturerId: number) {
     return this.http.get(
-      `${this.baseUrl}/api/manufacturers/products?manufacturerId=${id}`,
+      `${this.baseUrl}/api/manufacturers/products?manufacturerId=${manufacturerId}`,
       this.getHeaders()
     );
   }
@@ -139,9 +224,9 @@ deleteProductImage(productId: number) {
     );
   }
 
-  // =========================
+  // =====================================================
   // WHOLESALER
-  // =========================
+  // =====================================================
 
   getProductsByWholesaler() {
     return this.http.get(
@@ -158,16 +243,16 @@ deleteProductImage(productId: number) {
     );
   }
 
-  getOrderByWholesalers(id: number) {
+  getOrderByWholesalers(userId: number) {
     return this.http.get(
-      `${this.baseUrl}/api/wholesalers/orders?userId=${id}`,
+      `${this.baseUrl}/api/wholesalers/orders?userId=${userId}`,
       this.getHeaders()
     );
   }
 
-  updateOrderStatus(id: number, status: string) {
+  updateOrderStatus(orderId: number, status: string) {
     return this.http.put(
-      `${this.baseUrl}/api/wholesalers/order/${id}?status=${status}`,
+      `${this.baseUrl}/api/wholesalers/order/${orderId}?status=${status}`,
       {},
       this.getHeaders()
     );
@@ -181,17 +266,17 @@ deleteProductImage(productId: number) {
     );
   }
 
-  updateInventory(stock: number, id: number) {
+  updateInventory(stockQuantity: number, inventoryId: number) {
     return this.http.put(
-      `${this.baseUrl}/api/wholesalers/inventories/${id}?stockQuantity=${stock}`,
+      `${this.baseUrl}/api/wholesalers/inventories/${inventoryId}?stockQuantity=${stockQuantity}`,
       {},
       this.getHeaders()
     );
   }
 
-  getInventoryByWholesalers(id: number) {
+  getInventoryByWholesalers(wholesalerId: number) {
     return this.http.get(
-      `${this.baseUrl}/api/wholesalers/inventories?wholesalerId=${id}`,
+      `${this.baseUrl}/api/wholesalers/inventories?wholesalerId=${wholesalerId}`,
       this.getHeaders()
     );
   }
@@ -218,28 +303,20 @@ deleteProductImage(productId: number) {
     );
   }
 
-  // =========================
+  // =====================================================
   // CONSUMER
-  // =========================
-
-  getInventoriesForConsumers() {
-    return this.http.get(
-      `${this.baseUrl}/api/consumers/inventories`,
-      this.getHeaders()
-    );
-  }
-
-  consumerPlaceInventoryOrder(data: any, inventoryId: number, userId: number) {
-    return this.http.post(
-      `${this.baseUrl}/api/consumers/inventory-order?inventoryId=${inventoryId}&userId=${userId}`,
-      data,
-      this.getHeaders()
-    );
-  }
+  // =====================================================
 
   getProductsByConsumers() {
     return this.http.get(
       `${this.baseUrl}/api/consumers/products`,
+      this.getHeaders()
+    );
+  }
+
+  getInventoriesForConsumers() {
+    return this.http.get(
+      `${this.baseUrl}/api/consumers/inventories`,
       this.getHeaders()
     );
   }
@@ -252,55 +329,26 @@ deleteProductImage(productId: number) {
     );
   }
 
-  getOrderConsumer(id: number) {
-    return this.http.get(
-      `${this.baseUrl}/api/consumers/orders?userId=${id}`,
-      this.getHeaders()
-    );
-  }
-
-  addConsumerFeedBack(id: number, userId: number, data: any) {
+  consumerPlaceInventoryOrder(data: any, inventoryId: number, userId: number) {
     return this.http.post(
-      `${this.baseUrl}/api/consumers/order/${id}/feedback?userId=${userId}`,
+      `${this.baseUrl}/api/consumers/inventory-order?inventoryId=${inventoryId}&userId=${userId}`,
       data,
       this.getHeaders()
     );
   }
 
-  requestLoginOtp(data: any) {
-    return this.isTest
-      ? this.http.post(
-        this.baseUrl + '/api/user/login/request-otp',
-        data,
-        this.getHeaders()
-      )
-      : this.http.post(
-        this.baseUrl + '/api/user/login/request-otp',
-        data
-      );
+  getOrderConsumer(userId: number) {
+    return this.http.get(
+      `${this.baseUrl}/api/consumers/orders?userId=${userId}`,
+      this.getHeaders()
+    );
   }
 
-  verifyLoginOtp(data: any) {
-    return this.isTest
-      ? this.http.post(
-        this.baseUrl + '/api/user/login/verify-otp',
-        data,
-        this.getHeaders()
-      )
-      : this.http.post(
-        this.baseUrl + '/api/user/login/verify-otp',
-        data
-      );
+  addConsumerFeedBack(orderId: number, userId: number, data: any) {
+    return this.http.post(
+      `${this.baseUrl}/api/consumers/order/${orderId}/feedback?userId=${userId}`,
+      data,
+      this.getHeaders()
+    );
   }
-  deleteProduct(productId: number) {
-  return this.http.delete(
-    `${this.baseUrl}/api/manufacturers/product/${productId}`,
-    {
-      headers: this.getHeaders().headers,
-      responseType: 'text' as 'json' // ✅ CRITICAL FIX FOR 200 OK EMPTY RESPONSE
-    }
-  );
-}
-
-
 }

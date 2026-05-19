@@ -1,6 +1,5 @@
 package com.edutech.supply_of_goods_management.service;
 
-
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -15,119 +14,150 @@ import org.springframework.stereotype.Service;
 @Service
 public class SendGridEmailService {
 
-@Value("${sendgrid.api-key:dummy}")
-private String apiKey;
+    private static final String SENDGRID_MAIL_ENDPOINT = "mail/send";
+    private static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
 
-@Value("${sendgrid.from-email:test@test.com}")
-private String fromEmail;
+    @Value("${sendgrid.api-key:dummy}")
+    private String apiKey;
 
-@Value("${sendgrid.from-name:test}")
-private String fromName;
+    @Value("${sendgrid.from-email:test@test.com}")
+    private String fromEmail;
 
-    // ✅ LOGIN OTP EMAIL (FAIL if SendGrid fails)
+    @Value("${sendgrid.from-name:test}")
+    private String fromName;
+
+    // =====================================================
+    // LOGIN OTP EMAIL
+    // This should fail if email sending fails
+    // =====================================================
+
     public void sendLoginOtpEmail(String toEmail, String username, String otp) {
-        try {
-            Email from = new Email(fromEmail, fromName);
-            Email to = new Email(toEmail);
+        String subject = "Login OTP";
 
-            String subject = "Login OTP ✅";
-            String body = "Hello " + username + ",\n\n" +
-                    "Your OTP for login is: " + otp + "\n\n" +
-                    "This OTP is valid for 5 minutes.\n\n" +
-                    "If you did not request this, ignore this email.";
+        String body = "Hello " + safeValue(username) + ",\n\n"
+                + "Your OTP for login is: " + otp + "\n\n"
+                + "This OTP is valid for 5 minutes.\n\n"
+                + "If you did not request this, please ignore this email.\n\n"
+                + "Thank you,\n"
+                + "SupplyFlow Nexus";
 
-            Content content = new Content("text/plain", body);
-            Mail mail = new Mail(from, subject, to, content);
-
-            SendGrid sg = new SendGrid(apiKey);
-            Request request = new Request();
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-
-            Response response = sg.api(request);
-
-            System.out.println("LOGIN OTP Email Status Code: " + response.getStatusCode());
-            System.out.println("LOGIN OTP Email Body: " + response.getBody());
-
-            // ✅ If SendGrid fails, login OTP request API should fail
-            if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
-                throw new RuntimeException("Failed to send LOGIN OTP email. SendGrid status: " + response.getStatusCode());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to send LOGIN OTP email");
-        }
+        sendEmailOrThrow(toEmail, subject, body, "LOGIN OTP");
     }
 
-    // ✅ REGISTRATION WELCOME EMAIL (DO NOT FAIL registration)
+    // =====================================================
+    // REGISTRATION WELCOME EMAIL
+    // This should NOT fail registration if email sending fails
+    // =====================================================
+
     public void sendRegistrationEmail(String toEmail, String username) {
+        String subject = "Registration Successful";
+
+        String body = "Hello " + safeValue(username) + ",\n\n"
+                + "Your account has been successfully registered.\n\n"
+                + "Welcome to SupplyFlow Nexus.\n\n"
+                + "Thank you!";
+
+        sendEmailSilently(toEmail, subject, body, "REGISTRATION");
+    }
+
+    // =====================================================
+    // OTP EMAIL
+    // Used for registration OTP and forgot-password OTP
+    // This should fail if email sending fails
+    // =====================================================
+
+    public void sendOtpEmail(String toEmail, String otp) {
+        String subject = "Your OTP Verification Code";
+
+        String body = "Hello,\n\n"
+                + "Your OTP verification code is: " + otp + "\n\n"
+                + "This OTP is valid for 5 minutes only.\n\n"
+                + "If you did not request this OTP, please ignore this email.\n\n"
+                + "Thank you,\n"
+                + "SupplyFlow Nexus";
+
+        sendEmailOrThrow(toEmail, subject, body, "OTP");
+    }
+
+    // =====================================================
+    // PASSWORD RESET CONFIRMATION EMAIL
+    // This should NOT fail password reset if email sending fails
+    // =====================================================
+
+    public void sendPasswordResetConfirmationEmail(String toEmail, String username) {
+        String subject = "Password Reset Successful";
+
+        String body = "Hello " + safeValue(username) + ",\n\n"
+                + "Your password has been successfully reset.\n\n"
+                + "If you did not make this change, please contact support immediately.\n\n"
+                + "Stay secure,\n"
+                + "SupplyFlow Nexus Team";
+
+        sendEmailSilently(toEmail, subject, body, "PASSWORD RESET CONFIRMATION");
+    }
+
+    // =====================================================
+    // PRIVATE HELPERS
+    // =====================================================
+
+    private void sendEmailOrThrow(String toEmail, String subject, String body, String emailType) {
         try {
-            Email from = new Email(fromEmail, fromName);
-            Email to = new Email(toEmail);
+            Response response = sendEmail(toEmail, subject, body);
 
-            String subject = "Registration Successful ✅";
+            logSendGridResponse(emailType, response);
 
-            String body = "Hello " + username + ",\n\n" +
-                    "Your account has been successfully registered.\n\n" +
-                    "Welcome to Supply Of Goods Management System 🚀\n\n" +
-                    "Thank you!";
-
-            Content content = new Content("text/plain", body);
-            Mail mail = new Mail(from, subject, to, content);
-
-            SendGrid sg = new SendGrid(apiKey);
-            Request request = new Request();
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-
-            Response response = sg.api(request);
-            System.out.println("Registration Email Status Code: " + response.getStatusCode());
+            if (!isSuccessStatus(response.getStatusCode())) {
+                throw new RuntimeException(
+                        emailType + " email failed. SendGrid status: " + response.getStatusCode()
+                );
+            }
 
         } catch (Exception e) {
-            // ✅ IMPORTANT — don't break registration
+            throw new RuntimeException("Failed to send " + emailType + " email", e);
+        }
+    }
+
+    private void sendEmailSilently(String toEmail, String subject, String body, String emailType) {
+        try {
+            Response response = sendEmail(toEmail, subject, body);
+            logSendGridResponse(emailType, response);
+
+        } catch (Exception e) {
+            // Do not break main business flow for non-critical emails.
             e.printStackTrace();
         }
     }
 
-    // ✅ EMAIL OTP (Registration verification) — FAIL if SendGrid fails
-    public void sendOtpEmail(String toEmail, String otp) {
-        try {
-            Email from = new Email(fromEmail, fromName);
-            Email to = new Email(toEmail);
+    private Response sendEmail(String toEmail, String subject, String body) throws Exception {
+        Email from = new Email(fromEmail, fromName);
+        Email to = new Email(toEmail);
 
-            String subject = "Your OTP Verification Code";
+        Content content = new Content(CONTENT_TYPE_TEXT_PLAIN, body);
+        Mail mail = new Mail(from, subject, to, content);
 
-            String body = "Hello,\n\n" +
-                    "Your OTP for email verification is: " + otp + "\n\n" +
-                    "This OTP is valid for 1 minute only.\n\n" +
-                    "If you did not request this OTP, please ignore this email.\n\n" +
-                    "Thank you,\n" +
-                    "Supply Of Goods Management System";
+        SendGrid sendGrid = new SendGrid(apiKey);
 
-            Content content = new Content("text/plain", body);
-            Mail mail = new Mail(from, subject, to, content);
+        Request request = new Request();
+        request.setMethod(Method.POST);
+        request.setEndpoint(SENDGRID_MAIL_ENDPOINT);
+        request.setBody(mail.build());
 
-            SendGrid sg = new SendGrid(apiKey);
-            Request request = new Request();
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
+        return sendGrid.api(request);
+    }
 
-            Response response = sg.api(request);
-            System.out.println("OTP Email Status Code: " + response.getStatusCode());
-            System.out.println("OTP Email Body: " + response.getBody());
+    private boolean isSuccessStatus(int statusCode) {
+        return statusCode >= 200 && statusCode < 300;
+    }
 
-            // ✅ If SendGrid fails, OTP API should fail
-            if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
-                throw new RuntimeException("Failed to send OTP email. SendGrid status: " + response.getStatusCode());
-            }
+    private void logSendGridResponse(String emailType, Response response) {
+        System.out.println(emailType + " Email Status Code: " + response.getStatusCode());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to send OTP email");
+        if (response.getBody() != null && !response.getBody().isBlank()) {
+            System.out.println(emailType + " Email Body: " + response.getBody());
         }
+    }
+
+    private String safeValue(String value) {
+        return value == null || value.trim().isEmpty() ? "User" : value.trim();
     }
 }

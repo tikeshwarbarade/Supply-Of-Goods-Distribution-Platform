@@ -20,6 +20,8 @@ import { ConsumerDashboardComponent } from './consumer-dashboard/consumer-dashbo
 import { AuthGuard } from '../services/auth.guard';
 import { RouterModule, Routes } from '@angular/router';
 import { LandingComponent } from './landing/landing.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+
 
 const routes: Routes = [
   // Landing page
@@ -49,8 +51,13 @@ const routes: Routes = [
   { path: 'consumer-place-order', component: ConsumerPlaceOrderComponent, canActivate: [AuthGuard] },
   { path: 'consumer-get-orders', component: ConsumerGetOrdersComponent, canActivate: [AuthGuard] },
 
+  //foget route
+{ path: 'forgot-password', component: ForgotPasswordComponent },
   // Wrong URL
   { path: '**', redirectTo: '', pathMatch: 'full' }
+
+ 
+
 ];
 
 @NgModule({

@@ -23,12 +23,14 @@ import { ManufacturerDashboardComponent } from './manufacturer-dashboard/manufac
 
 // ADD THIS LINE
 import { ConsumerDashboardComponent } from './consumer-dashboard/consumer-dashboard.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegistrationComponent,
+     ForgotPasswordComponent,
     DashbaordComponent,
     CreateProductsComponent,
     PlaceOrderComponent,

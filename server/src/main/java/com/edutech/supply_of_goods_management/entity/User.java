@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +27,11 @@ public class User {
 
     @JsonProperty
     private String password;
+@Column(name = "first_name")
+private String firstName;
+
+@Column(name = "last_name")
+private String lastName;
 
     @Column(unique = true)
     private String email;

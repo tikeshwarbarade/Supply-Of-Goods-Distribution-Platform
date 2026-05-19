@@ -128,11 +128,69 @@
                 autocomplete="username">
             </div>
 
-            <small
-              class="error-text"
-              *ngIf="itemForm.controls['username'].invalid && itemForm.controls['username'].touched">
-              Username is required.
+            <small class="error-text" *ngIf="getControlError('username')">
+              {{ getControlError('username') }}
             </small>
+
+            <div class="username-suggestions" *ngIf="usernameSuggestions.length > 0">
+              <p>Username already exists. Try one of these:</p>
+
+              <button
+                type="button"
+                *ngFor="let suggestion of usernameSuggestions"
+                (click)="itemForm.patchValue({ username: suggestion }); usernameSuggestions = []">
+                {{ suggestion }}
+              </button>
+            </div>
+          </div>
+
+          <!-- FIRST NAME + LAST NAME -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label>First Name</label>
+
+              <div class="input-control">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21"></path>
+                    <path d="M12 11C14.2 11 16 9.2 16 7C16 4.8 14.2 3 12 3C9.8 3 8 4.8 8 7C8 9.2 9.8 11 12 11Z"></path>
+                  </svg>
+                </span>
+
+                <input
+                  type="text"
+                  formControlName="firstName"
+                  placeholder="First name"
+                  autocomplete="given-name">
+              </div>
+
+              <small class="error-text" *ngIf="getControlError('firstName')">
+                {{ getControlError('firstName') }}
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label>Last Name</label>
+
+              <div class="input-control">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21"></path>
+                    <path d="M12 11C14.2 11 16 9.2 16 7C16 4.8 14.2 3 12 3C9.8 3 8 4.8 8 7C8 9.2 9.8 11 12 11Z"></path>
+                  </svg>
+                </span>
+
+                <input
+                  type="text"
+                  formControlName="lastName"
+                  placeholder="Last name"
+                  autocomplete="family-name">
+              </div>
+
+              <small class="error-text" *ngIf="getControlError('lastName')">
+                {{ getControlError('lastName') }}
+              </small>
+            </div>
           </div>
 
           <!-- EMAIL + VERIFY BUTTON -->
@@ -158,6 +216,7 @@
               <button
                 type="button"
                 class="verify-email-btn"
+                *ngIf="shouldShowVerifyButton() || otpVerified"
                 [class.verified]="otpVerified"
                 [disabled]="verifyLoading || otpVerified"
                 (click)="sendOtp()">
@@ -168,16 +227,13 @@
               </button>
             </div>
 
-            <small
-              class="error-text"
-              *ngIf="itemForm.controls['email'].invalid && itemForm.controls['email'].touched">
-              Valid email is required.
+            <small class="error-text" *ngIf="getControlError('email')">
+              {{ getControlError('email') }}
             </small>
           </div>
 
           <!-- OTP VERIFICATION -->
-          <div class="otp-card">
-            <div class="otp-card-header">
+         <div class="otp-card" *ngIf="otpSent || otpMessage || otpVerified || verifyLoading || otpAttempts > 0">   <div class="otp-card-header">
               <div class="otp-card-icon">
                 <svg viewBox="0 0 24 24">
                   <path d="M12 2L20 6V12C20 17 16.5 20.5 12 22C7.5 20.5 4 17 4 12V6L12 2Z"></path>
@@ -199,7 +255,7 @@
                 [class.filled]="otpDigits[i] !== ''"
                 [class.verified-digit]="otpVerified"
                 [value]="otpDigits[i]"
-                [disabled]="otpVerified"
+                [disabled]="otpVerified || otpAttempts >= maxOtpAttempts"
                 inputmode="numeric"
                 pattern="[0-9]*"
                 maxlength="1"
@@ -212,7 +268,7 @@
             <button
               type="button"
               class="otp-confirm-btn"
-              *ngIf="!otpVerified"
+              *ngIf="!otpVerified && otpAttempts < maxOtpAttempts"
               (click)="verifyOtp()"
               [disabled]="otpLoading">
 
@@ -224,6 +280,7 @@
                 <path d="M9 12L11 14L15 10"></path>
                 <circle cx="12" cy="12" r="10"></circle>
               </svg>
+
               <span>Email verified successfully</span>
             </div>
 
@@ -233,7 +290,8 @@
                 class="otp-resend-link"
                 (click)="sendOtp()"
                 [disabled]="verifyLoading">
-                Resend Code
+
+                {{ otpAttempts >= maxOtpAttempts ? 'Send New OTP' : 'Resend Code' }}
               </button>
             </div>
 
@@ -242,9 +300,8 @@
             </p>
           </div>
 
+          <!-- PHONE + ROLE -->
           <div class="form-grid">
-
-            <!-- PHONE -->
             <div class="form-group">
               <label>Phone Number</label>
 
@@ -264,7 +321,6 @@
               </div>
             </div>
 
-            <!-- ROLE -->
             <div class="form-group">
               <label>Select Role</label>
 
@@ -284,10 +340,8 @@
                 </select>
               </div>
 
-              <small
-                class="error-text"
-                *ngIf="itemForm.controls['role'].invalid && itemForm.controls['role'].touched">
-                Role is required.
+              <small class="error-text" *ngIf="getControlError('role')">
+                {{ getControlError('role') }}
               </small>
             </div>
           </div>
@@ -322,10 +376,8 @@
               </button>
             </div>
 
-            <small
-              class="error-text"
-              *ngIf="itemForm.controls['password'].invalid && itemForm.controls['password'].touched">
-              Password is required.
+            <small class="error-text" *ngIf="getControlError('password')">
+              {{ getControlError('password') }}
             </small>
           </div>
 
@@ -361,12 +413,14 @@
             </div>
           </div>
 
-          <p class="form-message" [ngClass]="{ error: formMessageError }">
+          <!-- FORM MESSAGE -->
+          <p class="form-message" [ngClass]="{ error: formMessageError }" *ngIf="formMessage">
             {{ formMessage }}
           </p>
 
-          <button type="submit" class="submit-btn">
-            <span>Create Account</span>
+          <!-- SUBMIT -->
+          <button type="submit" class="submit-btn" [disabled]="registrationLoading">
+            <span>{{ registrationLoading ? 'Creating Account...' : 'Create Account' }}</span>
 
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 12H19"></path>

@@ -3,118 +3,213 @@ package com.edutech.supply_of_goods_management.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class OtpService {
 
-    private static final int OTP_EXPIRY_MINUTES = 1;
+    private static final int OTP_EXPIRY_MINUTES = 5;
+    private static final int EMAIL_VERIFICATION_EXPIRY_MINUTES = 15;
+    private static final int MAX_ATTEMPTS = 3;
+
+    private final SecureRandom random = new SecureRandom();
+
+    private final Map<String, OtpData> otpStore = new ConcurrentHashMap<>();
+    private final Map<String, LocalDateTime> verifiedEmailStore = new ConcurrentHashMap<>();
 
     @Autowired
     private SendGridEmailService emailService;
 
-    private final Map<String, OtpData> otpStore = new ConcurrentHashMap<>();
+    // =====================================================
+    // SEND OTP
+    // =====================================================
 
     public void sendOtp(String email) {
-
         String normalizedEmail = normalizeEmail(email);
+
+        if (normalizedEmail.isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
 
         String otp = generateOtp();
-
         LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES);
 
-        OtpData otpData = new OtpData(otp, expiryTime, false);
+        OtpData otpData = new OtpData(otp, expiryTime);
 
+        /*
+         * Important:
+         * When a new OTP is requested, previous verified state must be removed.
+         * This prevents using an old verified state after requesting a new OTP.
+         */
+        verifiedEmailStore.remove(normalizedEmail);
         otpStore.put(normalizedEmail, otpData);
 
-        emailService.sendOtpEmail(normalizedEmail, otp);
+        try {
+            emailService.sendOtpEmail(normalizedEmail, otp);
+        } catch (RuntimeException e) {
+            /*
+             * If email sending fails, remove stored OTP.
+             * Otherwise user could verify an OTP that was never delivered.
+             */
+            otpStore.remove(normalizedEmail);
+            verifiedEmailStore.remove(normalizedEmail);
+            throw e;
+        }
     }
 
-    public boolean verifyOtp(String email, String otp) {
+    // =====================================================
+    // VERIFY OTP
+    // =====================================================
 
+    public boolean verifyOtp(String email, String otp) {
         String normalizedEmail = normalizeEmail(email);
+        String normalizedOtp = normalizeOtp(otp);
+
+        if (normalizedEmail.isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+
+        if (normalizedOtp.isEmpty()) {
+            throw new IllegalArgumentException("OTP is required");
+        }
 
         OtpData otpData = otpStore.get(normalizedEmail);
 
         if (otpData == null) {
-            return false;
+            throw new IllegalArgumentException("No OTP found. Please request a new OTP.");
         }
 
         if (LocalDateTime.now().isAfter(otpData.getExpiryTime())) {
             otpStore.remove(normalizedEmail);
-            return false;
+            verifiedEmailStore.remove(normalizedEmail);
+            throw new IllegalArgumentException("OTP expired. Please request a new OTP.");
         }
 
-        if (!otpData.getOtp().equals(otp)) {
-            return false;
+        if (otpData.getAttempts() >= MAX_ATTEMPTS) {
+            otpStore.remove(normalizedEmail);
+            verifiedEmailStore.remove(normalizedEmail);
+            throw new IllegalArgumentException("Maximum OTP attempts exceeded. Please request a new OTP.");
+        }
+
+        if (!otpData.getOtp().equals(normalizedOtp)) {
+            otpData.incrementAttempts();
+
+            int attemptsLeft = MAX_ATTEMPTS - otpData.getAttempts();
+
+            if (attemptsLeft <= 0) {
+                otpStore.remove(normalizedEmail);
+                verifiedEmailStore.remove(normalizedEmail);
+                throw new IllegalArgumentException("Maximum OTP attempts exceeded. Please request a new OTP.");
+            }
+
+            throw new IllegalArgumentException("Invalid OTP. Attempts left: " + attemptsLeft);
         }
 
         otpData.setVerified(true);
-        otpStore.put(normalizedEmail, otpData);
+
+        verifiedEmailStore.put(
+                normalizedEmail,
+                LocalDateTime.now().plusMinutes(EMAIL_VERIFICATION_EXPIRY_MINUTES)
+        );
 
         return true;
     }
 
-    public boolean isEmailVerified(String email) {
+    // =====================================================
+    // CHECK EMAIL VERIFIED
+    // =====================================================
 
+    public boolean isEmailVerified(String email) {
         String normalizedEmail = normalizeEmail(email);
 
-        OtpData otpData = otpStore.get(normalizedEmail);
-
-        if (otpData == null) {
+        if (normalizedEmail.isEmpty()) {
             return false;
         }
 
-        if (LocalDateTime.now().isAfter(otpData.getExpiryTime())) {
+        LocalDateTime verifiedUntil = verifiedEmailStore.get(normalizedEmail);
+
+        if (verifiedUntil == null) {
+            return false;
+        }
+
+        if (LocalDateTime.now().isAfter(verifiedUntil)) {
             otpStore.remove(normalizedEmail);
+            verifiedEmailStore.remove(normalizedEmail);
             return false;
         }
 
-        return otpData.isVerified();
+        return true;
     }
+
+    // =====================================================
+    // CLEAR OTP
+    // =====================================================
 
     public void clearOtp(String email) {
-        otpStore.remove(normalizeEmail(email));
+        String normalizedEmail = normalizeEmail(email);
+
+        otpStore.remove(normalizedEmail);
+        verifiedEmailStore.remove(normalizedEmail);
     }
 
+    // =====================================================
+    // PRIVATE HELPERS
+    // =====================================================
+
     private String generateOtp() {
-        Random random = new Random();
-        int number = 100000 + random.nextInt(900000);
-        return String.valueOf(number);
+        return String.format("%06d", random.nextInt(1_000_000));
     }
 
     private String normalizeEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
     }
 
-    private static class OtpData {
-
-        private String otp;
-        private LocalDateTime expiryTime;
-        private boolean verified;
-
-        public OtpData(String otp, LocalDateTime expiryTime, boolean verified) {
-            this.otp = otp;
-            this.expiryTime = expiryTime;
-            this.verified = verified;
+    private String normalizeOtp(String otp) {
+        if (otp == null) {
+            return "";
         }
 
-        public String getOtp() {
+        return otp.trim().replaceAll("\\s+", "");
+    }
+
+    // =====================================================
+    // OTP STORAGE MODEL
+    // =====================================================
+
+    private static class OtpData {
+
+        private final String otp;
+        private final LocalDateTime expiryTime;
+        private boolean verified;
+        private int attempts;
+
+        private OtpData(String otp, LocalDateTime expiryTime) {
+            this.otp = otp;
+            this.expiryTime = expiryTime;
+            this.verified = false;
+            this.attempts = 0;
+        }
+
+        private String getOtp() {
             return otp;
         }
 
-        public LocalDateTime getExpiryTime() {
+        private LocalDateTime getExpiryTime() {
             return expiryTime;
         }
 
-        public boolean isVerified() {
-            return verified;
+        private int getAttempts() {
+            return attempts;
         }
 
-        public void setVerified(boolean verified) {
+        private void incrementAttempts() {
+            this.attempts++;
+        }
+
+        private void setVerified(boolean verified) {
             this.verified = verified;
         }
     }
