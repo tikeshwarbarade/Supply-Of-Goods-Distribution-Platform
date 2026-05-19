@@ -29,6 +29,10 @@ private int stockQuantity;
 @Column(name = "image_url")
 private String imageUrl;
 
+@Column(name = "is_deleted")
+private boolean isDeleted = false;
+
+
 @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<Order> orders;

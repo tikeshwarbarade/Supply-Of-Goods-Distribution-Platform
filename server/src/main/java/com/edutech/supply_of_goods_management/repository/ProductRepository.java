@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByManufacturerId(Long manufacturerId);
+   List<Product> findByManufacturerIdAndIsDeletedFalse(Long manufacturerId);
 }

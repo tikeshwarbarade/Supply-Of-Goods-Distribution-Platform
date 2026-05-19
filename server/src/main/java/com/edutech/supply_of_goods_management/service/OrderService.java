@@ -97,9 +97,31 @@ public class OrderService {
          * If order is already DELIVERED and update is clicked again,
          * inventory should NOT increase again.
          */
-        if (shouldUpdateWholesalerInventory(order, oldStatus, newStatus)) {
-            addOrderQuantityToWholesalerInventory(order);
-        }
+       if (shouldUpdateWholesalerInventory(order, oldStatus, newStatus)) {
+
+    Product product = order.getProduct();
+
+    if (product == null) {
+        throw new RuntimeException("Product not found for order");
+    }
+
+    int availableStock = product.getStockQuantity();
+    int orderQty = order.getQuantity();
+
+    // ✅ CHECK STOCK FIRST
+    if (availableStock < orderQty) {
+        throw new RuntimeException(
+            "Not enough stock. Available: " + availableStock + ", Required: " + orderQty
+        );
+    }
+
+    // ✅ REDUCE MANUFACTURER STOCK
+    product.setStockQuantity(availableStock - orderQty);
+    productRepo.save(product);
+
+    // ✅ ADD TO WHOLESALER INVENTORY
+    addOrderQuantityToWholesalerInventory(order);
+}
 
         return orderRepo.save(order);
     }
@@ -206,18 +228,47 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
-    @Transactional
-    public Order updateCustomerOrderStatus(Long orderId, String status) {
-        Order order = orderRepo.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+   @Transactional
+public Order updateCustomerOrderStatus(Long orderId, String status) {
 
-        String newStatus = normalizeStatus(status);
-        validateStatus(newStatus);
+    Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        order.setStatus(newStatus);
+    String oldStatus = normalizeStatus(order.getStatus());
+    String newStatus = normalizeStatus(status);
 
-        return orderRepo.save(order);
+    validateStatus(newStatus);
+
+    if (!STATUS_DELIVERED.equals(oldStatus) && STATUS_DELIVERED.equals(newStatus)) {
+
+        Long wholesalerId = order.getSellerWholesalerId();
+        Long productId = order.getProduct().getId();
+
+        Inventory inventory = inventoryRepo
+                .findByWholesalerIdAndProductId(wholesalerId, productId)
+                .orElseThrow(() -> new RuntimeException("Inventory not found"));
+
+        int currentStock = inventory.getStockQuantity();
+        int orderQty = order.getQuantity();
+
+        // ✅ VALIDATION
+        if (orderQty > currentStock) {
+            throw new RuntimeException(
+                "Not enough inventory stock. Available: " + currentStock +
+                ", Requested: " + orderQty
+            );
+        }
+
+        // ✅ REDUCE STOCK
+        inventory.setStockQuantity(currentStock - orderQty);
+
+        inventoryRepo.save(inventory);
     }
+
+    order.setStatus(newStatus);
+
+    return orderRepo.save(order);
+}
 
     // =====================================================
     // VALIDATION / HELPERS

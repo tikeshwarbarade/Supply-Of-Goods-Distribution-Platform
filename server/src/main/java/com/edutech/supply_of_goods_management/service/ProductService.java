@@ -29,18 +29,24 @@ public Product update(Long id, Product p) {
 
     return repo.save(db);
 }
-    public List<Product> getManufacturer(Long id) {
-        return repo.findByManufacturerId(id);
-    }
+  public List<Product> getManufacturer(Long id) {
+    return repo.findByManufacturerIdAndIsDeletedFalse(id);
+}
 
     public List<Product> getAll() {
-        return repo.findAll();
-    }
-    public void delete(Long id) {
+    List<Product> all = repo.findAll();
+    all.removeIf(p -> p.isDeleted());
+    return all;
+}
+
+public void delete(Long id) {
     Product product = repo.findById(id)
             .orElseThrow(() -> new RuntimeException("Product not found"));
 
-    repo.delete(product);
+    // ✅ SOFT DELETE INSTEAD OF HARD DELETE
+    product.setDeleted(true);
+
+    repo.save(product);
 }
 
 }
