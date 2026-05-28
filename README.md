@@ -194,6 +194,47 @@ Entity relationships are managed using JPA annotations:
 
 ---
 
+## 📸 Application Screens
+
+---
+
+### 🔐 Authentication
+
+<img src="screenshot/login.png" width="300"/>
+<img src="screenshot/register-page.png" width="300"/>
+
+---
+
+### 🏠 Landing Pages
+
+<img src="screenshot/landing-page.png" width="300"/>
+<img src="screenshot/landing-page-analytics.png" width="300"/>
+
+---
+
+### 👤 Consumer Dashboard
+
+<img src="screenshot/consumer-dashboard-1.png" width="300"/>
+<img src="screenshot/consumer-dashboard-4.png" width="300"/>
+<img src="screenshot/consumer-dashboard-5.png" width="300"/>
+
+---
+
+### 🏭 Manufacturer Dashboard
+
+<img src="screenshot/manufacture-dashboard-3.png" width="300"/>
+<img src="screenshot/manufacture-dashboard-4.png" width="300"/>
+<img src="screenshot/manufacture-dashboard-5.png" width="300"/>
+<img src="screenshot/manufacture-dashboard-6.png" width="300"/>
+<img src="screenshot/manufacture-dashboard-8.png" width="300"/>
+
+---
+
+### 📦 Wholesaler Dashboard
+
+<img src="screenshot/wholesaler-dashboard-3.png" width="300"/>
+<img src="screenshot/wholesaler-dashboard-4.png" width="300"/>
+
 ## 📈 Future Enhancements
 
 - Payment gateway integration  
